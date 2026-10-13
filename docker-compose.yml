@@ -1,0 +1,56 @@
+name: zegabytez-mail-local
+
+services:
+  mail-postgres:
+    image: postgres:16-alpine
+    container_name: zegabytez-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zegabytez
+      POSTGRES_PASSWORD: zegabytez_password_local
+      POSTGRES_DB: zegabytez_mail
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zegabytez -d zegabytez_mail"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mail-redis:
+    image: redis:7-alpine
+    container_name: zegabytez-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: zegabytez-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@zegabytez.local
+      PGADMIN_DEFAULT_PASSWORD: admin_password_local
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      mail-postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:

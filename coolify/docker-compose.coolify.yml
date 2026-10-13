@@ -1,0 +1,163 @@
+# ==============================================================================
+# ZegaMail Cloud — Coolify v4 Production Stack Template
+# One-Click Deployable Docker Compose for Coolify & Self-Hosted PaaS
+# ==============================================================================
+# This template provisions the complete ZegaMail architecture:
+#   1. mail-db     : PostgreSQL 16 (Multi-tenant relational database)
+#   2. mail-redis  : Redis 7 In-Memory Broker (BullMQ async queues)
+#   3. mail-api    : Fastify Backend API + cPanel UAPI / WHM Provisioning Engine
+#   4. mail-worker : BullMQ Background Worker (Queue dispatcher & cPanel sync)
+#   5. mail-web    : Next.js 15 Modern Webmail Interface & Admin Client
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. DATABASE: PostgreSQL 16
+  # ----------------------------------------------------------------------------
+  mail-db:
+    image: postgres:16-alpine
+    container_name: zegamail-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zegamail}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zegamail_secure_pass_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-zegamail_prod}
+    volumes:
+      - zegamail_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zegamail} -d ${POSTGRES_DB:-zegamail_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zegamail-internal
+
+  # ----------------------------------------------------------------------------
+  # 2. QUEUE BROKER: Redis 7
+  # ----------------------------------------------------------------------------
+  mail-redis:
+    image: redis:7-alpine
+    container_name: zegamail-redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-redis_secure_pass}"]
+    volumes:
+      - zegamail_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_secure_pass}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zegamail-internal
+
+  # ----------------------------------------------------------------------------
+  # 3. BACKEND API: Fastify + cPanel UAPI & WHM Provisioning Engine
+  # ----------------------------------------------------------------------------
+  mail-api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: zegamail-api
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zegamail}:${POSTGRES_PASSWORD:-zegamail_secure_pass_change_me}@mail-db:5432/${POSTGRES_DB:-zegamail_prod}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure_pass}@mail-redis:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-generate_a_random_32_char_secret_here}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-32_byte_hex_encryption_master_key_64_chars}
+      
+      # cPanel UAPI & WHM API Credentials
+      CPANEL_HOST: ${CPANEL_HOST:-cpanel.yourhosting.com}
+      CPANEL_PORT: ${CPANEL_PORT:-2083}
+      CPANEL_USERNAME: ${CPANEL_USERNAME:-root_or_reseller}
+      CPANEL_API_TOKEN: ${CPANEL_API_TOKEN:-your_cpanel_api_token_here}
+      CPANEL_SECURE: ${CPANEL_SECURE:-true}
+      
+      WHM_HOST: ${WHM_HOST:-cpanel.yourhosting.com}
+      WHM_PORT: ${WHM_PORT:-2087}
+      WHM_USERNAME: ${WHM_USERNAME:-root}
+      WHM_API_TOKEN: ${WHM_API_TOKEN:-your_whm_api_token_here}
+      WHM_SECURE: ${WHM_SECURE:-true}
+      
+      # WHMCS Provisioning Webhook Secret
+      WHMCS_INTERNAL_WEBHOOK_SECRET: ${WHMCS_INTERNAL_WEBHOOK_SECRET:-whmcs_webhook_token_change_me}
+      CORS_ORIGIN: ${APP_WEB_URL:-https://mail.yourdomain.com}
+    depends_on:
+      mail-db:
+        condition: service_healthy
+      mail-redis:
+        condition: service_healthy
+    networks:
+      - zegamail-internal
+      - coolify
+    labels:
+      - "coolify.managed=true"
+
+  # ----------------------------------------------------------------------------
+  # 4. BACKGROUND WORKER: BullMQ Queue Dispatcher
+  # ----------------------------------------------------------------------------
+  mail-worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    container_name: zegamail-worker
+    restart: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zegamail}:${POSTGRES_PASSWORD:-zegamail_secure_pass_change_me}@mail-db:5432/${POSTGRES_DB:-zegamail_prod}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure_pass}@mail-redis:6379
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-32_byte_hex_encryption_master_key_64_chars}
+      CPANEL_HOST: ${CPANEL_HOST:-cpanel.yourhosting.com}
+      CPANEL_PORT: ${CPANEL_PORT:-2083}
+      CPANEL_USERNAME: ${CPANEL_USERNAME:-root_or_reseller}
+      CPANEL_API_TOKEN: ${CPANEL_API_TOKEN:-your_cpanel_api_token_here}
+    depends_on:
+      mail-db:
+        condition: service_healthy
+      mail-redis:
+        condition: service_healthy
+    networks:
+      - zegamail-internal
+
+  # ----------------------------------------------------------------------------
+  # 5. FRONTEND: Next.js 15 Modern Webmail Interface & Admin Client
+  # ----------------------------------------------------------------------------
+  mail-web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: zegamail-web
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${APP_API_URL:-https://api-mail.yourdomain.com}
+      NEXT_PUBLIC_APP_NAME: "ZegaMail Cloud"
+    depends_on:
+      - mail-api
+    networks:
+      - zegamail-internal
+      - coolify
+    labels:
+      - "coolify.managed=true"
+
+# ------------------------------------------------------------------------------
+# Persistent Storage Volumes
+# ------------------------------------------------------------------------------
+volumes:
+  zegamail_pgdata:
+    name: zegamail_pgdata
+  zegamail_redisdata:
+    name: zegamail_redisdata
+
+# ------------------------------------------------------------------------------
+# Networks
+# ------------------------------------------------------------------------------
+networks:
+  zegamail-internal:
+    internal: true
+  coolify:
+    external: true

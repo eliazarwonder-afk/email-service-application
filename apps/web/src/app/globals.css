@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --bg-canvas: #faf9f6;
+  --bg-surface: #ffffff;
+  --border-subtle: #eaeaea;
+  --text-primary: #121212;
+  --text-secondary: #706f6c;
+  --text-muted: #8d8c89;
+  
+  /* Minimalist Muted Spot Pastels */
+  --pastel-green-bg: #edf3ec;
+  --pastel-green-text: #2b5930;
+  --pastel-blue-bg: #e1f3fe;
+  --pastel-blue-text: #1a5c88;
+  --pastel-yellow-bg: #fbf3db;
+  --pastel-yellow-text: #7d5400;
+  --pastel-red-bg: #fdebec;
+  --pastel-red-text: #8c2625;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg-canvas: #090a0f;
+  --bg-surface: #12151e;
+  --border-subtle: #202636;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  --pastel-green-bg: #142a19;
+  --pastel-green-text: #6ee7b7;
+  --pastel-blue-bg: #12283e;
+  --pastel-blue-text: #93c5fd;
+  --pastel-yellow-bg: #302610;
+  --pastel-yellow-text: #fde047;
+  --pastel-red-bg: #321617;
+  --pastel-red-text: #fca5a5;
+}
+
+html, body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", "Geist Sans", "Helvetica Neue", sans-serif;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, kbd, pre, .font-mono {
+  font-family: "SF Mono", "Geist Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.35rem;
+  font-size: 0.7rem;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background-color: #f7f6f3;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+}
+
+.dark kbd {
+  background-color: #1a1e29;
+  color: #9ca3af;
+  border-color: #2a3245;
+}
+
+/* Tabular figures for numbers, timestamps, sizes */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}

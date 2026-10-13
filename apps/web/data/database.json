@@ -1,0 +1,689 @@
+{
+  "users": [
+    {
+      "id": "usr_owner_001",
+      "name": "Alex Carter",
+      "email": "owner@zegacloud.com",
+      "passwordHash": "f21c8bc2eb95f787ddccb1088d391a6b762666f3314557ce824c302efbed59d0",
+      "role": "owner",
+      "orgId": "org_acme_001",
+      "createdAt": "2026-10-11T15:39:21.099Z"
+    },
+    {
+      "id": "usr_sales_002",
+      "name": "Sarah Jenkins",
+      "email": "sales@acmedesign.co",
+      "passwordHash": "a67c604d686f72c6092a23980f7b7147ac44631d5d2ef355527d4a254beddb69",
+      "role": "admin",
+      "orgId": "org_acme_001",
+      "createdAt": "2026-10-11T15:39:21.102Z"
+    },
+    {
+      "id": "usr_support_003",
+      "name": "Support Desk",
+      "email": "support@zegacloud.com",
+      "passwordHash": "19ca54f515be90a0a573eda5595c75ca6847328f6698abbd9791569008396619",
+      "role": "member",
+      "orgId": "org_acme_001",
+      "createdAt": "2026-10-11T15:39:21.102Z"
+    },
+    {
+      "id": "usr_7b51aeee",
+      "name": "Marcus Thorne",
+      "email": "marcus@vanguardmedia.com",
+      "passwordHash": "f4b6d847f416b72471de2fbd9881718c5aa21803297db9fad0a6f26626f4a567",
+      "role": "owner",
+      "orgId": "org_dcf42ae2",
+      "createdAt": "2026-10-11T15:39:21.109Z"
+    }
+  ],
+  "orgs": [
+    {
+      "id": "org_acme_001",
+      "name": "Acme Creative Studio Ltd",
+      "ownerId": "usr_owner_001",
+      "plan": "growth",
+      "whmcsClientId": "WHMCS-CL-40192",
+      "createdAt": "2026-10-11T15:39:21.102Z"
+    },
+    {
+      "id": "org_dcf42ae2",
+      "name": "Vanguard Media Group",
+      "ownerId": "usr_7b51aeee",
+      "plan": "growth",
+      "whmcsClientId": "WHMCS-CL-62992",
+      "createdAt": "2026-10-11T15:39:21.110Z"
+    }
+  ],
+  "domains": [
+    {
+      "id": "dom_acme_001",
+      "orgId": "org_acme_001",
+      "domainName": "acmedesign.co",
+      "domainType": "existing",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-90214",
+      "createdAt": "2026-10-11T15:39:21.102Z"
+    },
+    {
+      "id": "dom_1688715d",
+      "orgId": "org_dcf42ae2",
+      "domainName": "vanguardmedia.com",
+      "domainType": "existing",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-80249",
+      "createdAt": "2026-10-11T15:39:21.110Z"
+    },
+    {
+      "id": "dom_2aa8718f",
+      "orgId": "org_acme_001",
+      "domainName": "vanguardbrands.com",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-51045",
+      "createdAt": "2026-10-11T15:39:21.477Z"
+    },
+    {
+      "id": "dom_mv41292z_9233",
+      "orgId": "org_acme_001",
+      "domainName": "globexcorp.org",
+      "domainType": "existing",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "ZCL-DOM-35483",
+      "createdAt": "2026-10-11T16:18:31.931Z"
+    }
+  ],
+  "mailboxes": [
+    {
+      "id": "mbx_1",
+      "orgId": "org_acme_001",
+      "emailAddress": "alex@acmedesign.co",
+      "role": "Organization Admin",
+      "quotaMb": 10000,
+      "usedMb": 620,
+      "status": "active",
+      "createdAt": "2026-10-11T15:39:21.102Z"
+    },
+    {
+      "id": "mbx_2",
+      "orgId": "org_acme_001",
+      "emailAddress": "sales@acmedesign.co",
+      "role": "Client Outreach Desk",
+      "quotaMb": 10000,
+      "usedMb": 240,
+      "status": "active",
+      "createdAt": "2026-10-11T15:39:21.102Z"
+    },
+    {
+      "id": "mbx_3",
+      "orgId": "org_acme_001",
+      "emailAddress": "support@acmedesign.co",
+      "role": "Shared Support Inbox",
+      "quotaMb": 10000,
+      "usedMb": 110,
+      "status": "active",
+      "createdAt": "2026-10-11T15:39:21.102Z"
+    },
+    {
+      "id": "mbx_aef4ae0c",
+      "orgId": "org_dcf42ae2",
+      "emailAddress": "marcus@vanguardmedia.com",
+      "role": "Organization Owner",
+      "quotaMb": 5000,
+      "usedMb": 12,
+      "status": "active",
+      "createdAt": "2026-10-11T15:39:21.110Z"
+    },
+    {
+      "id": "mbx_6e347d1c",
+      "orgId": "org_dcf42ae2",
+      "emailAddress": "info@vanguardmedia.com",
+      "role": "General Inquiries",
+      "quotaMb": 5000,
+      "usedMb": 0,
+      "status": "active",
+      "createdAt": "2026-10-11T15:39:21.110Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg_745ba8aa",
+      "orgId": "org_acme_001",
+      "from": "You (Alex Carter)",
+      "fromEmail": "sales@acmedesign.co",
+      "toEmail": "client@globalbrands.co",
+      "subject": "Proposal: 2026 Media Retainer",
+      "preview": "Hi team, Attached is our comprehensive Q4 media strategy. We look forward t…",
+      "body": "Hi team, Attached is our comprehensive Q4 media strategy. We look forward to your feedback.",
+      "date": "Just now",
+      "folder": "tracked",
+      "isRead": true,
+      "tracked": true,
+      "openCount": 0,
+      "lastOpened": "Awaiting recipient open…",
+      "device": "Tracking pixel active (2048-bit DKIM)",
+      "followUpDue": "In 2 days",
+      "createdAt": "2026-10-11T15:39:21.440Z"
+    },
+    {
+      "id": "msg_1",
+      "orgId": "org_acme_001",
+      "from": "Sarah Jenkins (Meridian Corp)",
+      "fromEmail": "s.jenkins@meridiancorp.com",
+      "toEmail": "sales@acmedesign.co",
+      "subject": "Re: Q4 Brand & Web Development Retainer Proposal",
+      "preview": "We reviewed the proposal internally this morning. The dedicated SLA looks great…",
+      "body": "Hi Alex,\n\nThank you for sending the updated proposal yesterday. The leadership team and I reviewed the project scope this morning.\n\nWe are very happy with the dedicated SLA and the multi-region hosting allocation you specified. I just have two brief questions regarding the milestone rollout schedule:\n1. Can the initial brand guidelines be delivered by the third week of November?\n2. Does the retainer cover ongoing analytics reporting?\n\nIf so, we are ready to sign off on the contract! Let's arrange a 15-minute sync tomorrow afternoon if you are available.\n\nBest regards,\nSarah Jenkins\nVP Operations, Meridian Corp",
+      "date": "10:42 AM",
+      "folder": "fld_proposals",
+      "isRead": false,
+      "attachments": [
+        {
+          "name": "Retainer-Scope-v2.pdf",
+          "size": "1.8 MB",
+          "type": "pdf"
+        },
+        {
+          "name": "Architecture-Spec.fig",
+          "size": "2.4 MB",
+          "type": "figma"
+        }
+      ],
+      "createdAt": "2026-10-11T15:09:21.102Z"
+    },
+    {
+      "id": "msg_2",
+      "orgId": "org_acme_001",
+      "from": "You (Tracked Outbound)",
+      "fromEmail": "sales@acmedesign.co",
+      "toEmail": "s.jenkins@meridiancorp.com",
+      "subject": "Proposal: Q4 Brand & Web Development Retainer",
+      "preview": "Attached is our comprehensive retainer scope for Q4. We have locked in the dedicated SLA…",
+      "body": "Hi Sarah,\n\nAttached is our comprehensive retainer scope for Q4. We’ve locked in the dedicated SLA and custom API endpoint allocation you requested.\n\nKey highlights included in this proposal:\n• Full responsive redesign & web application UI system\n• Custom domain routing and email infrastructure setup\n• 24/7 priority response guarantee with 99.99% uptime SLA\n\nLet me know if 2:00 PM tomorrow works for a quick 10-minute kickoff review!\n\nWarm regards,\nAlex Carter\nPrincipal, Acme Creative Studio",
+      "date": "Yesterday",
+      "folder": "spam",
+      "isRead": true,
+      "tracked": true,
+      "openCount": 3,
+      "lastOpened": "4 minutes ago",
+      "device": "Chrome 129 on macOS 15.0",
+      "followUpDue": "Tomorrow, 9:00 AM",
+      "attachments": [
+        {
+          "name": "Contract-Draft-2026.pdf",
+          "size": "1.2 MB",
+          "type": "pdf"
+        }
+      ],
+      "createdAt": "2026-10-10T15:39:21.102Z"
+    },
+    {
+      "id": "msg_3",
+      "orgId": "org_acme_001",
+      "from": "ZegaCloud DNS Automation",
+      "fromEmail": "systems@zegacloud.com",
+      "toEmail": "admin@acmedesign.co",
+      "subject": "DNS Records Verified: DKIM, SPF and MX are Active",
+      "preview": "All DNS records for acmedesign.co have propagated successfully across the network…",
+      "body": "Hello Alex,\n\nGreat news! The DNS health-check worker has confirmed full propagation for your business domain: acmedesign.co.\n\nVerification Summary:\n• MX: mail.zegamail.com (Priority 10) — Passed\n• SPF: v=spf1 include:spf.zegamail.com ~all — Passed\n• DKIM: 2048-bit RSA selector (default._domainkey) — Passed\n• DMARC: v=DMARC1; p=quarantine; sp=quarantine — Passed\n\nYour outgoing emails now have the highest possible reputation score and will deliver directly into recipient inboxes.\n\nZegaCloud Infrastructure Team",
+      "date": "Oct 9",
+      "folder": "archive",
+      "isRead": true,
+      "createdAt": "2026-10-09T15:39:21.102Z"
+    },
+    {
+      "id": "msg_13c19196",
+      "orgId": "org_dcf42ae2",
+      "from": "ZegaCloud Infrastructure",
+      "fromEmail": "welcome@zegacloud.com",
+      "toEmail": "marcus@vanguardmedia.com",
+      "subject": "Welcome to Zega Mail — Vanguard Media Group",
+      "preview": "Your business email environment is live with verified DNS and client read receipts…",
+      "body": "Hello Marcus Thorne,\n\nWelcome to Zega Mail! Your organization \"Vanguard Media Group\" has been registered and linked to your domain: vanguardmedia.com.\n\nYour Setup Details:\n• Primary Mailbox: marcus@vanguardmedia.com\n• WHMCS Client ID: WHMCS-CL-62992\n• Plan: GROWTH\n• DNS Status: MX, SPF, DKIM & DMARC Enforced\n\nYou can now send tracked proposals, use the Zega AI writer, and connect your phone via SSL IMAP/SMTP.\n\nWarm regards,\nZegaCloud Support Team",
+      "date": "Just now",
+      "folder": "inbox",
+      "isRead": false,
+      "createdAt": "2026-10-11T15:39:21.110Z"
+    },
+    {
+      "id": "msg_spam_1",
+      "orgId": "org_acme_001",
+      "from": "Crypto Yield Protocol",
+      "fromEmail": "rewards@fast-bit-yield.net",
+      "toEmail": "sales@acmedesign.co",
+      "subject": "URGENT: Claim $14,250 in Liquidity Allocation (Expires in 6h)",
+      "preview": "Your wallet address has been whitelisted for a 100% risk-free token distribution…",
+      "body": "Dear User,\n\nWe are pleased to inform you that your corporate domain has been selected for our VIP Liquidity Airdrop.\n\nYou have an unclaimed balance of $14,250 USD equivalent. Connect your private keys immediately using the link below to confirm identity.\n\nRisk-free guarantee! Do not reply to this email directly.\n\nAutomated Yield Bot",
+      "date": "Yesterday",
+      "folder": "spam",
+      "isRead": false,
+      "createdAt": "2026-10-10T22:17:48.068Z"
+    },
+    {
+      "id": "msg_spam_2",
+      "orgId": "org_acme_001",
+      "from": "SEO Blast Direct",
+      "fromEmail": "leads@rankfirst-online.biz",
+      "toEmail": "alex@acmedesign.co",
+      "subject": "Guaranteed #1 Google Ranking in 48 Hours — Buy Backlinks",
+      "preview": "Get 15,000 high PR backlinks for just $49! 100% free trial available…",
+      "body": "Hello Webmaster,\n\nWe noticed acmedesign.co is not ranking #1 for all high volume search terms.\n\nOur automated AI blast tool will generate 15,000 backlinks in 48 hours guaranteed. Click here to purchase our bulk package now!\n\nRankFirst Online",
+      "date": "Oct 8",
+      "folder": "spam",
+      "isRead": true,
+      "createdAt": "2026-10-08T16:17:48.068Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "ses_e8c953fc869c1130a93be11475ef94b649c8c2b81c25485e",
+      "userId": "usr_7b51aeee",
+      "expiresAt": "2026-10-18T15:39:21.110Z"
+    },
+    {
+      "token": "ses_e07f6d80c65efa48347aa1006992520a42107e652e3d1b73",
+      "userId": "usr_7b51aeee",
+      "expiresAt": "2026-10-18T15:39:21.383Z"
+    },
+    {
+      "token": "ses_465b3ef82087ff30c8698313b54e1893d59faf818fa508d9",
+      "userId": "usr_sales_002",
+      "expiresAt": "2026-10-18T15:41:38.317Z"
+    },
+    {
+      "token": "ses_4093408dfd9ab9caa8d66ae8478ca7a1675c4b0825fe0f82",
+      "userId": "usr_sales_002",
+      "expiresAt": "2026-10-20T11:42:02.672Z"
+    },
+    {
+      "token": "ses_e0a1ee0dfcd87f82220548a4fde966747d2b4c519728aa03",
+      "userId": "usr_owner_001",
+      "expiresAt": "2026-10-20T13:29:22.937Z"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "cmp_mv40dmrb_aoxp",
+      "orgId": "org_acme_001",
+      "name": "SaaS Founders Q4 Infrastructure Audit",
+      "goal": "cold_outreach",
+      "status": "paused",
+      "fromName": "Alex Carter",
+      "fromEmail": "sales@acmedesign.co",
+      "replyTo": "alex@acmedesign.co",
+      "sendingMailboxes": [
+        "sales@acmedesign.co",
+        "alex@acmedesign.co"
+      ],
+      "audienceCount": 2,
+      "targetListId": "custom_audience",
+      "schedule": {
+        "days": [
+          "Mon",
+          "Tue",
+          "Wed",
+          "Thu",
+          "Fri"
+        ],
+        "startTime": "09:00",
+        "endTime": "17:00",
+        "timezone": "America/New_York",
+        "maxPerDay": 50,
+        "delaySeconds": 120
+      },
+      "settings": {
+        "trackOpens": true,
+        "trackClicks": true,
+        "stopOnReply": true,
+        "stopOnClick": false,
+        "sendAsPlaintext": true,
+        "customTrackingDomain": true
+      },
+      "compliance": {
+        "physicalAddress": "100 Innovation Way, Suite 400, New York, NY 10001",
+        "includeUnsubscribeHeader": true,
+        "unsubscribeText": "Click here to unsubscribe"
+      },
+      "steps": [
+        {
+          "stepNumber": 1,
+          "delayDays": 0,
+          "subject": "Quick thought on {{companyName}}'s email deliverability",
+          "body": "Hi {{firstName}},\n\nSaw {{companyName}} grew rapidly this quarter.\n\nBest,\nAlex",
+          "sendAsReply": false
+        },
+        {
+          "stepNumber": 2,
+          "delayDays": 3,
+          "subject": "Re: Quick thought on {{companyName}}'s email deliverability",
+          "body": "Hi {{firstName}},\n\nFollowing up on my previous note regarding deliverability.\n\nCheers,\nAlex",
+          "sendAsReply": true
+        }
+      ],
+      "metrics": {
+        "sent": 0,
+        "delivered": 0,
+        "bounced": 0,
+        "opened": 0,
+        "clicked": 0,
+        "replied": 0,
+        "unsubscribed": 0
+      },
+      "createdAt": "2026-10-11T15:59:23.255Z"
+    },
+    {
+      "id": "cmp_enterprise_01",
+      "orgId": "org_acme_001",
+      "name": "Q4 Enterprise Retainer Outreach",
+      "goal": "cold_outreach",
+      "status": "active",
+      "fromName": "Alex Carter",
+      "fromEmail": "sales@acmedesign.co",
+      "replyTo": "alex@acmedesign.co",
+      "sendingMailboxes": [
+        "sales@acmedesign.co",
+        "alex@acmedesign.co"
+      ],
+      "audienceCount": 420,
+      "targetListId": "lst_tech_founders",
+      "schedule": {
+        "days": [
+          "Mon",
+          "Tue",
+          "Wed",
+          "Thu",
+          "Fri"
+        ],
+        "startTime": "09:00",
+        "endTime": "17:30",
+        "timezone": "America/New_York",
+        "maxPerDay": 50,
+        "delaySeconds": 120
+      },
+      "settings": {
+        "trackOpens": true,
+        "trackClicks": true,
+        "stopOnReply": true,
+        "stopOnClick": false,
+        "sendAsPlaintext": true,
+        "customTrackingDomain": true
+      },
+      "compliance": {
+        "physicalAddress": "100 Innovation Way, Suite 400, New York, NY 10001",
+        "includeUnsubscribeHeader": true,
+        "unsubscribeText": "If you'd prefer not to hear from us, click here to unsubscribe."
+      },
+      "steps": [
+        {
+          "stepNumber": 1,
+          "delayDays": 0,
+          "subject": "Quick thought on {{companyName}}'s web architecture",
+          "body": "Hi {{firstName}},\n\nI noticed {{companyName}} recently announced your international expansion—congratulations!\n\nGrowing infrastructure often introduces deliverability and latency bottlenecks. We built dedicated business mail infrastructure with verified 2048-bit DKIM and guaranteed 99.99% uptime.\n\nWould you be open to a 10-minute sync this Thursday at 3:00 PM?\n\nBest,\nAlex Carter",
+          "sendAsReply": false
+        },
+        {
+          "stepNumber": 2,
+          "delayDays": 3,
+          "subject": "Re: Quick thought on {{companyName}}'s web architecture",
+          "body": "Hi {{firstName}},\n\nFollowing up on my note from Tuesday. We recently helped Meridian Corp cut their email SaaS overhead by over $600/year while boosting deliverability to 99.8%.\n\nWould love to share the 1-page breakdown if you're exploring ways to streamline Q4 tooling.\n\nCheers,\nAlex",
+          "sendAsReply": true
+        },
+        {
+          "stepNumber": 3,
+          "delayDays": 5,
+          "subject": "Re: Quick thought on {{companyName}}'s web architecture",
+          "body": "Hi {{firstName}},\n\nI know you're super busy leading {{companyName}}. Should I check back with your team next quarter, or is infrastructure optimization on your radar this month?\n\nEither way, wishing you continued momentum!\n\nBest,\nAlex",
+          "sendAsReply": true
+        }
+      ],
+      "metrics": {
+        "sent": 420,
+        "delivered": 418,
+        "bounced": 2,
+        "opened": 284,
+        "clicked": 137,
+        "replied": 89,
+        "unsubscribed": 3
+      },
+      "createdAt": "2026-10-04T15:59:16.724Z"
+    },
+    {
+      "id": "cmp_invoice_02",
+      "orgId": "org_acme_001",
+      "name": "Automated Invoice Due & Renewal Notice",
+      "goal": "proposal_followup",
+      "status": "active",
+      "fromName": "Acme Billing Team",
+      "fromEmail": "sales@acmedesign.co",
+      "replyTo": "billing@acmedesign.co",
+      "sendingMailboxes": [
+        "sales@acmedesign.co"
+      ],
+      "audienceCount": 184,
+      "targetListId": "lst_active_clients",
+      "schedule": {
+        "days": [
+          "Mon",
+          "Tue",
+          "Wed",
+          "Thu",
+          "Fri"
+        ],
+        "startTime": "10:00",
+        "endTime": "16:00",
+        "timezone": "America/New_York",
+        "maxPerDay": 40,
+        "delaySeconds": 90
+      },
+      "settings": {
+        "trackOpens": true,
+        "trackClicks": true,
+        "stopOnReply": true,
+        "stopOnClick": false,
+        "sendAsPlaintext": false,
+        "customTrackingDomain": true
+      },
+      "compliance": {
+        "physicalAddress": "100 Innovation Way, Suite 400, New York, NY 10001",
+        "includeUnsubscribeHeader": false,
+        "unsubscribeText": "This is a transactional billing notice."
+      },
+      "steps": [
+        {
+          "stepNumber": 1,
+          "delayDays": 0,
+          "subject": "Statement for {{companyName}} — Invoice Due Date Reminder",
+          "body": "Hi {{firstName}},\n\nThis is a quick friendly reminder that Invoice #1094 for {{companyName}} is scheduled for processing.\n\nYou can view and download your verified receipt directly in your client portal.\n\nThank you for your partnership,\nAcme Creative Studio",
+          "sendAsReply": false
+        },
+        {
+          "stepNumber": 2,
+          "delayDays": 4,
+          "subject": "Re: Statement for {{companyName}} — Invoice Due Date Reminder",
+          "body": "Hi {{firstName}},\n\nFollowing up to ensure the billing details arrived safely. Let us know if you need any adjustments to payment routing.\n\nBest,\nAcme Accounting",
+          "sendAsReply": true
+        }
+      ],
+      "metrics": {
+        "sent": 184,
+        "delivered": 184,
+        "bounced": 0,
+        "opened": 155,
+        "clicked": 113,
+        "replied": 42,
+        "unsubscribed": 0
+      },
+      "createdAt": "2026-09-27T15:59:16.725Z"
+    }
+  ],
+  "leads": [
+    {
+      "id": "lead_1",
+      "campaignId": "cmp_enterprise_01",
+      "orgId": "org_acme_001",
+      "firstName": "Sarah",
+      "lastName": "Jenkins",
+      "email": "s.jenkins@meridiancorp.com",
+      "company": "Meridian Corp",
+      "jobTitle": "VP Operations",
+      "status": "replied",
+      "currentStep": 2,
+      "openCount": 3,
+      "lastEventTimestamp": "10:42 AM Today"
+    },
+    {
+      "id": "lead_2",
+      "campaignId": "cmp_enterprise_01",
+      "orgId": "org_acme_001",
+      "firstName": "David",
+      "lastName": "Miller",
+      "email": "david@hyperscaletech.com",
+      "company": "HyperScale Tech",
+      "jobTitle": "VP Marketing",
+      "status": "opened",
+      "currentStep": 1,
+      "openCount": 2,
+      "lastEventTimestamp": "Yesterday, 4:15 PM"
+    },
+    {
+      "id": "lead_3",
+      "campaignId": "cmp_enterprise_01",
+      "orgId": "org_acme_001",
+      "firstName": "Elena",
+      "lastName": "Rostova",
+      "email": "elena@vanguardrobotics.io",
+      "company": "Vanguard Robotics",
+      "jobTitle": "Head of Growth",
+      "status": "clicked",
+      "currentStep": 1,
+      "openCount": 4,
+      "lastEventTimestamp": "Yesterday, 2:30 PM"
+    },
+    {
+      "id": "lead_4",
+      "campaignId": "cmp_enterprise_01",
+      "orgId": "org_acme_001",
+      "firstName": "Marcus",
+      "lastName": "Thorne",
+      "email": "marcus@vanguardmedia.com",
+      "company": "Vanguard Media Group",
+      "jobTitle": "Managing Director",
+      "status": "sent",
+      "currentStep": 1,
+      "openCount": 0,
+      "lastEventTimestamp": "Today, 9:02 AM"
+    },
+    {
+      "id": "lead_mv40dmrc_0",
+      "campaignId": "cmp_mv40dmrb_aoxp",
+      "orgId": "org_acme_001",
+      "firstName": "Jason",
+      "lastName": "Calacanis",
+      "email": "jason@launch.co",
+      "company": "Launch Media",
+      "jobTitle": "Founding Partner",
+      "status": "queued",
+      "currentStep": 1,
+      "openCount": 0,
+      "lastEventTimestamp": "Queued"
+    },
+    {
+      "id": "lead_mv40dmrc_1",
+      "campaignId": "cmp_mv40dmrb_aoxp",
+      "orgId": "org_acme_001",
+      "firstName": "Claire",
+      "lastName": "Hughes",
+      "email": "claire@novaventures.com",
+      "company": "Nova Ventures",
+      "jobTitle": "Managing Director",
+      "status": "queued",
+      "currentStep": 1,
+      "openCount": 0,
+      "lastEventTimestamp": "Queued"
+    }
+  ],
+  "folders": [
+    {
+      "id": "fld_proposals",
+      "orgId": "org_acme_001",
+      "name": "Client Proposals",
+      "color": "#3b82f6",
+      "createdAt": "2026-10-11T16:17:48.066Z"
+    },
+    {
+      "id": "fld_invoices",
+      "orgId": "org_acme_001",
+      "name": "Invoices & Billing",
+      "color": "#10b981",
+      "createdAt": "2026-10-11T16:17:48.066Z"
+    },
+    {
+      "id": "fld_legal",
+      "orgId": "org_acme_001",
+      "name": "Contracts & Legal",
+      "color": "#8b5cf6",
+      "createdAt": "2026-10-11T16:17:48.066Z"
+    },
+    {
+      "id": "fld_mv411f98_0cuk",
+      "orgId": "org_acme_001",
+      "name": "VIP Investors",
+      "color": "#f59e0b",
+      "createdAt": "2026-10-11T16:17:53.276Z"
+    }
+  ],
+  "templates": [
+    {
+      "id": "tmpl_proposal",
+      "orgId": "org_acme_001",
+      "name": "Retainer & Scope Proposal",
+      "category": "proposals",
+      "subject": "Scope of Work & Retainer Agreement — {{companyName}}",
+      "body": "Hi {{firstName}},\n\nFollowing our discussion, please find attached our comprehensive retainer proposal for {{companyName}}.\n\nKey Deliverables:\n• Dedicated cloud email and DNS architecture\n• Verified 2048-bit DKIM encryption and 99.99% SLA\n• Custom domain configuration and mailbox onboarding\n\nNext Steps:\n1. Review scope details in the attached agreement\n2. Authorize digital sign-off via client portal\n3. Schedule our 30-minute kickoff sync\n\nBest regards,\n{{fromName}}\nAcme Creative Studio",
+      "createdAt": "2026-10-11T16:17:48.067Z"
+    },
+    {
+      "id": "tmpl_meeting_recap",
+      "orgId": "org_acme_001",
+      "name": "Meeting Action Items & Next Steps",
+      "category": "followups",
+      "subject": "Recap & Next Steps: Sync with {{companyName}}",
+      "body": "Hi {{firstName}},\n\nThank you for your time today. Here is a summary of the core items we aligned on:\n\nKey Decisions:\n• Project milestone target: End of month\n• Domain routing: Maintained on primary enterprise DNS\n\nAction Items:\n- [ ] Acme Studio: Deliver technical architecture spec\n- [ ] {{companyName}}: Provide DNS registrar delegation\n\nLooking forward to our next checkpoint!\n\nBest,\n{{fromName}}",
+      "createdAt": "2026-10-11T16:17:48.067Z"
+    },
+    {
+      "id": "tmpl_invoice_reminder",
+      "orgId": "org_acme_001",
+      "name": "Statement & Payment Due Notice",
+      "category": "billing",
+      "subject": "Statement Due: Invoice for {{companyName}}",
+      "body": "Hi {{firstName}},\n\nThis is a quick notification that invoice #INV-40192 for {{companyName}} is due for processing on the 1st.\n\nYou can access your verified statement directly in your account dashboard.\n\nThank you for your continued partnership!\n\nBest,\nAcme Creative Studio Accounts",
+      "createdAt": "2026-10-11T16:17:48.067Z"
+    },
+    {
+      "id": "tmpl_onboarding",
+      "orgId": "org_acme_001",
+      "name": "Client Welcome & Onboarding Brief",
+      "category": "onboarding",
+      "subject": "Welcome to Acme Studio — {{companyName}} Kickoff Guide",
+      "body": "Hi {{firstName}},\n\nWe are thrilled to officially welcome {{companyName}}!\n\nWe have initialized your dedicated client workspace and configured your business mail infrastructure.\n\nPlease check the onboarding link below to complete your profile setup:\nhttps://client.acmedesign.co/onboarding\n\nWarmly,\n{{fromName}}",
+      "createdAt": "2026-10-11T16:17:48.067Z"
+    }
+  ]
+}

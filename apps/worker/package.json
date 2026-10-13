@@ -1,0 +1,25 @@
+{
+  "name": "@zegabytez/worker",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@zegabytez/database": "workspace:*",
+    "@zegabytez/mail-core": "workspace:*",
+    "@zegabytez/shared": "workspace:*",
+    "bullmq": "^5.41.0",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.3",
+    "ioredis": "^5.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
