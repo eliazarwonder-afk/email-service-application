@@ -534,10 +534,10 @@ export function FullComposeWorkspace({
           <div>
             <h3 className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4 text-emerald-500" />
-              Deliverability Pre-Flight
+              Deliverability & Security
             </h3>
             <p className="text-[11px] text-neutral-500 mt-0.5">
-              Verified 2048-bit DKIM & client read-receipt tracking.
+              Verified 2048-bit DKIM & SMTP delivery confirmation.
             </p>
           </div>
 
@@ -548,14 +548,14 @@ export function FullComposeWorkspace({
                 type="checkbox"
                 checked={enableTracking}
                 onChange={(e) => setEnableTracking(e.target.checked)}
-                className="mt-0.5 rounded border-neutral-300 text-blue-600"
+                className="mt-0.5 rounded border-neutral-300 text-emerald-600 focus:ring-emerald-500"
               />
               <div>
                 <p className="font-semibold text-neutral-800 dark:text-neutral-200">
-                  Read Receipt Tracking
+                  Delivery Confirmation (DSN Tick)
                 </p>
                 <p className="text-[10px] text-neutral-400">
-                  Record exact open timestamp, device, and frequency.
+                  Request recipient MTA delivery confirmation tick (Zoho/Gmail style double-tick ✓✓).
                 </p>
               </div>
             </label>

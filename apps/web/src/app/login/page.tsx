@@ -32,7 +32,7 @@ export default function LoginPage() {
       email: "sales@acmedesign.co",
       pass: "SalesDemo#2026",
       role: "Client Outreach",
-      badge: "Active Read Receipts",
+      badge: "Delivery Ticks",
     },
     {
       id: "support",
@@ -118,7 +118,7 @@ export default function LoginPage() {
             </div>
 
             <p className="text-[11px] text-blue-800 dark:text-blue-300 leading-snug">
-              Select a persona to test live read receipts, AI proposal generator, and automated domain DNS sync:
+              Select a persona to test live delivery status ticks, AI proposal generator, and automated domain DNS sync:
             </p>
 
             <div className="grid grid-cols-3 gap-1.5">

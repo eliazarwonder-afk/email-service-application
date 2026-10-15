@@ -94,7 +94,7 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
               </li>
               <li>
                 <Link href="/app?tab=mail" className="hover:text-[#121212] dark:hover:text-white transition-colors">
-                  Client Read Receipts
+                  Delivery Status Ticks
                 </Link>
               </li>
               <li>

@@ -35,6 +35,15 @@
       "role": "owner",
       "orgId": "org_dcf42ae2",
       "createdAt": "2026-10-11T15:39:21.109Z"
+    },
+    {
+      "id": "usr_af51b31c",
+      "name": "Redemption Ehaoleudu",
+      "email": "redemptionnewton@gmail.com",
+      "passwordHash": "4ca721c11ca317fb573f2b4c2c8ce3a468a72185a7f2f6de5c84ed81366100d8",
+      "role": "owner",
+      "orgId": "org_5e75a942",
+      "createdAt": "2026-10-14T14:53:26.451Z"
     }
   ],
   "orgs": [
@@ -42,7 +51,7 @@
       "id": "org_acme_001",
       "name": "Acme Creative Studio Ltd",
       "ownerId": "usr_owner_001",
-      "plan": "growth",
+      "plan": "pro",
       "whmcsClientId": "WHMCS-CL-40192",
       "createdAt": "2026-10-11T15:39:21.102Z"
     },
@@ -53,6 +62,14 @@
       "plan": "growth",
       "whmcsClientId": "WHMCS-CL-62992",
       "createdAt": "2026-10-11T15:39:21.110Z"
+    },
+    {
+      "id": "org_5e75a942",
+      "name": "PixelPath Digital Agency",
+      "ownerId": "usr_af51b31c",
+      "plan": "growth",
+      "whmcsClientId": "ZCL-CL-97975",
+      "createdAt": "2026-10-14T14:53:26.451Z"
     }
   ],
   "domains": [
@@ -107,6 +124,45 @@
       "dmarcStatus": "verified",
       "whmcsOrderId": "ZCL-DOM-35483",
       "createdAt": "2026-10-11T16:18:31.931Z"
+    },
+    {
+      "id": "dom_a880bdb1",
+      "orgId": "org_acme_001",
+      "domainName": "hehsh.com",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-36955",
+      "createdAt": "2026-10-13T14:55:11.749Z"
+    },
+    {
+      "id": "dom_395d9844",
+      "orgId": "org_5e75a942",
+      "domainName": "fagsehrsj.com",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-61424",
+      "createdAt": "2026-10-14T14:53:26.451Z"
+    },
+    {
+      "id": "dom_3947f959",
+      "orgId": "org_5e75a942",
+      "domainName": "cscs",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-79154",
+      "createdAt": "2026-10-14T14:54:17.569Z"
     }
   ],
   "mailboxes": [
@@ -159,6 +215,26 @@
       "usedMb": 0,
       "status": "active",
       "createdAt": "2026-10-11T15:39:21.110Z"
+    },
+    {
+      "id": "mbx_814bf6c4",
+      "orgId": "org_5e75a942",
+      "emailAddress": "redemptionnewton@fagsehrsj.com",
+      "role": "Organization Owner",
+      "quotaMb": 5000,
+      "usedMb": 12,
+      "status": "active",
+      "createdAt": "2026-10-14T14:53:26.451Z"
+    },
+    {
+      "id": "mbx_30f0f424",
+      "orgId": "org_5e75a942",
+      "emailAddress": "info@fagsehrsj.com",
+      "role": "General Inquiries",
+      "quotaMb": 5000,
+      "usedMb": 0,
+      "status": "active",
+      "createdAt": "2026-10-14T14:53:26.451Z"
     }
   ],
   "messages": [
@@ -172,12 +248,13 @@
       "preview": "Hi team, Attached is our comprehensive Q4 media strategy. We look forward t…",
       "body": "Hi team, Attached is our comprehensive Q4 media strategy. We look forward to your feedback.",
       "date": "Just now",
-      "folder": "tracked",
+      "folder": "sent",
       "isRead": true,
-      "tracked": true,
+      "tracked": false,
+      "deliveryStatus": "delivered",
       "openCount": 0,
-      "lastOpened": "Awaiting recipient open…",
-      "device": "Tracking pixel active (2048-bit DKIM)",
+      "lastOpened": "Delivered to remote MTA (250 OK)",
+      "device": "SMTP DSN RFC 3461 Verified",
       "followUpDue": "In 2 days",
       "createdAt": "2026-10-11T15:39:21.440Z"
     },
@@ -288,6 +365,20 @@
       "folder": "spam",
       "isRead": true,
       "createdAt": "2026-10-08T16:17:48.068Z"
+    },
+    {
+      "id": "msg_f1891b28",
+      "orgId": "org_5e75a942",
+      "from": "ZegaCloud Infrastructure",
+      "fromEmail": "welcome@zegacloud.com",
+      "toEmail": "redemptionnewton@fagsehrsj.com",
+      "subject": "Welcome to Zega Mail — PixelPath Digital Agency",
+      "preview": "Your business email environment is live with verified DNS and delivery confirmation ticks…",
+      "body": "Hello Redemption Ehaoleudu,\n\nWelcome to Zega Mail! Your organization \"PixelPath Digital Agency\" has been registered and linked to your domain: fagsehrsj.com.\n\nYour Setup Details:\n• Primary Mailbox: redemptionnewton@fagsehrsj.com\n• Client Account ID: ZCL-CL-97975\n• Plan: GROWTH\n• DNS Status: MX, SPF, DKIM & DMARC Enforced\n\nYou can now send business proposals with delivery confirmation ticks, use the Zega AI writer, and connect your phone via SSL IMAP/SMTP.\n\nWarm regards,\nZegaCloud Support Team",
+      "date": "Just now",
+      "folder": "inbox",
+      "isRead": false,
+      "createdAt": "2026-10-14T14:53:26.451Z"
     }
   ],
   "sessions": [
@@ -315,9 +406,101 @@
       "token": "ses_e0a1ee0dfcd87f82220548a4fde966747d2b4c519728aa03",
       "userId": "usr_owner_001",
       "expiresAt": "2026-10-20T13:29:22.937Z"
+    },
+    {
+      "token": "ses_b47d71bb14a2aef3000521e5fff44ac0327ceed5afc17730",
+      "userId": "usr_owner_001",
+      "expiresAt": "2026-10-20T14:50:59.219Z"
+    },
+    {
+      "token": "ses_5098d24699a7e3e621995b8185bdb56dc44a79b41de09d76",
+      "userId": "usr_af51b31c",
+      "expiresAt": "2026-10-21T14:53:26.453Z"
     }
   ],
   "campaigns": [
+    {
+      "id": "cmp_mv6sy9dr_fkuv",
+      "orgId": "org_acme_001",
+      "name": "Enterprise Q4 Cold Outreach",
+      "goal": "cold_outreach",
+      "status": "active",
+      "fromName": "Alex Carter",
+      "fromEmail": "alex@acmedesign.co",
+      "replyTo": "alex@acmedesign.co",
+      "sendingMailboxes": [
+        "alex@acmedesign.co"
+      ],
+      "audienceCount": 4,
+      "targetListId": "custom_audience",
+      "schedule": {
+        "days": [
+          "Mon",
+          "Tue",
+          "Wed",
+          "Thu",
+          "Fri"
+        ],
+        "startTime": "09:00",
+        "endTime": "17:00",
+        "timezone": "America/New_York",
+        "maxPerDay": 20,
+        "delaySeconds": 120
+      },
+      "settings": {
+        "trackOpens": true,
+        "trackClicks": true,
+        "stopOnReply": true,
+        "stopOnClick": false,
+        "sendAsPlaintext": true,
+        "customTrackingDomain": true
+      },
+      "compliance": {
+        "physicalAddress": "100 Innovation Way, Suite 400, New York, NY 10001",
+        "includeUnsubscribeHeader": true,
+        "unsubscribeText": "If you'd prefer not to hear from us, click here to unsubscribe."
+      },
+      "steps": [
+        {
+          "stepNumber": 1,
+          "delayDays": 0,
+          "subject": "Quick observation on {{companyName}}'s web architecture",
+          "body": "Hi {{firstName}},\n\nI noticed {{companyName}} recently announced your international expansion—congratulations!\n\nGrowing infrastructure often introduces deliverability and latency bottlenecks. We built dedicated business mail infrastructure with verified 2048-bit DKIM and guaranteed 99.99% uptime.\n\nWould you be open to a 10-minute sync this Thursday at 3:00 PM?\n\nBest,\n{{fromName}}",
+          "sendAsReply": false
+        },
+        {
+          "stepNumber": 2,
+          "delayDays": 3,
+          "subject": "Re: Quick observation on {{companyName}}'s web architecture",
+          "body": "Hi {{firstName}},\n\nFollowing up on my note from Tuesday. We recently helped a peer company in your sector cut email SaaS overhead by over $600/year while boosting deliverability to 99.8%.\n\nWould love to share the 1-page breakdown if you're exploring ways to streamline Q4 tooling.\n\nCheers,\n{{fromName}}",
+          "sendAsReply": true
+        },
+        {
+          "stepNumber": 3,
+          "delayDays": 4,
+          "subject": "Re: Quick observation on {{companyName}}'s web architecture",
+          "body": "Hi {{firstName}},\n\nI know you're super busy leading {{companyName}}. Should I check back with your team next quarter, or is infrastructure optimization on your radar this month?\n\nEither way, wishing you continued momentum!\n\nBest,\n{{fromName}}",
+          "sendAsReply": true
+        },
+        {
+          "stepNumber": 4,
+          "delayDays": 3,
+          "subject": "Re: Quick observation on {{companyName}}'s web architecture",
+          "body": "Hi {{firstName}},\n\nJust floating this to the top of your inbox in case you were traveling.\n\nBest,\n{{fromName}}",
+          "sendAsReply": true
+        }
+      ],
+      "metrics": {
+        "sent": 0,
+        "delivered": 0,
+        "bounced": 0,
+        "opened": 0,
+        "clicked": 0,
+        "replied": 0,
+        "unsubscribed": 0
+      },
+      "createdAt": "2026-10-13T14:54:47.295Z"
+    },
     {
       "id": "cmp_mv40dmrb_aoxp",
       "orgId": "org_acme_001",
@@ -616,6 +799,62 @@
       "currentStep": 1,
       "openCount": 0,
       "lastEventTimestamp": "Queued"
+    },
+    {
+      "id": "lead_mv6sy9dr_0",
+      "campaignId": "cmp_mv6sy9dr_fkuv",
+      "orgId": "org_acme_001",
+      "firstName": "Sarah",
+      "lastName": "Jenkins",
+      "email": "s.jenkins@meridiancorp.com",
+      "company": "Meridian Corp",
+      "jobTitle": "VP Operations",
+      "status": "queued",
+      "currentStep": 1,
+      "openCount": 0,
+      "lastEventTimestamp": "Queued"
+    },
+    {
+      "id": "lead_mv6sy9dr_1",
+      "campaignId": "cmp_mv6sy9dr_fkuv",
+      "orgId": "org_acme_001",
+      "firstName": "David",
+      "lastName": "Miller",
+      "email": "david@hyperscaletech.com",
+      "company": "HyperScale Tech",
+      "jobTitle": "VP Marketing",
+      "status": "queued",
+      "currentStep": 1,
+      "openCount": 0,
+      "lastEventTimestamp": "Queued"
+    },
+    {
+      "id": "lead_mv6sy9dr_2",
+      "campaignId": "cmp_mv6sy9dr_fkuv",
+      "orgId": "org_acme_001",
+      "firstName": "Elena",
+      "lastName": "Rostova",
+      "email": "elena@vanguardrobotics.io",
+      "company": "Vanguard Robotics",
+      "jobTitle": "Head of Growth",
+      "status": "queued",
+      "currentStep": 1,
+      "openCount": 0,
+      "lastEventTimestamp": "Queued"
+    },
+    {
+      "id": "lead_mv6sy9dr_3",
+      "campaignId": "cmp_mv6sy9dr_fkuv",
+      "orgId": "org_acme_001",
+      "firstName": "Marcus",
+      "lastName": "Thorne",
+      "email": "marcus@vanguardmedia.com",
+      "company": "Vanguard Media Group",
+      "jobTitle": "Managing Director",
+      "status": "queued",
+      "currentStep": 1,
+      "openCount": 0,
+      "lastEventTimestamp": "Queued"
     }
   ],
   "folders": [
@@ -684,6 +923,186 @@
       "subject": "Welcome to Acme Studio — {{companyName}} Kickoff Guide",
       "body": "Hi {{firstName}},\n\nWe are thrilled to officially welcome {{companyName}}!\n\nWe have initialized your dedicated client workspace and configured your business mail infrastructure.\n\nPlease check the onboarding link below to complete your profile setup:\nhttps://client.acmedesign.co/onboarding\n\nWarmly,\n{{fromName}}",
       "createdAt": "2026-10-11T16:17:48.067Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord_mv89kagz",
+      "orderNumber": "WHMCS-ORD-2026-6376",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "clientEmail": "owner@zegacloud.com",
+      "clientName": "Alex Carter",
+      "planId": "growth",
+      "planName": "ZegaMail Business Growth",
+      "billingCycle": "annually",
+      "amount": 30.72,
+      "currency": "USD",
+      "paymentMethod": "crypto_usdt_trc20",
+      "paymentMethodName": "Tether USDT (TRC-20)",
+      "status": "active",
+      "invoiceId": "WHMCS-INV-74254",
+      "cryptoDetails": {
+        "cryptoCurrency": "USDT_TRC20",
+        "cryptoAmount": "30.72",
+        "walletAddress": "TX7k1dZega9xMailTRC20Wallet88NVMe",
+        "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=tron:TX7k1dZega9xMailTRC20Wallet88NVMe?amount=30.72",
+        "network": "TRON (TRC-20)",
+        "txHash": "0xabc1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+        "submittedAt": "2026-10-14T15:27:48.547Z",
+        "verifiedAt": "2026-10-14T15:31:21.151Z"
+      },
+      "whmcsOrderId": "6376",
+      "whmcsInvoiceId": "74254",
+      "createdAt": "2026-10-14T15:27:35.171Z",
+      "updatedAt": "2026-10-14T15:31:21.151Z"
+    },
+    {
+      "id": "ord_mv89jizt",
+      "orderNumber": "WHMCS-ORD-2026-3899",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "clientEmail": "owner@zegacloud.com",
+      "clientName": "Alex Carter",
+      "planId": "growth",
+      "planName": "ZegaMail Business Growth",
+      "billingCycle": "annually",
+      "amount": 30.72,
+      "currency": "USD",
+      "paymentMethod": "crypto_usdt_trc20",
+      "paymentMethodName": "Tether USDT (TRC-20)",
+      "status": "pending",
+      "invoiceId": "WHMCS-INV-52816",
+      "cryptoDetails": {
+        "cryptoCurrency": "USDT_TRC20",
+        "cryptoAmount": "30.72",
+        "walletAddress": "TX7k1dZega9xMailTRC20Wallet88NVMe",
+        "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=tron:TX7k1dZega9xMailTRC20Wallet88NVMe?amount=30.72",
+        "network": "TRON (TRC-20)"
+      },
+      "whmcsOrderId": "3899",
+      "whmcsInvoiceId": "52816",
+      "createdAt": "2026-10-14T15:26:59.561Z",
+      "updatedAt": "2026-10-14T15:26:59.561Z"
+    },
+    {
+      "id": "ord_init_001",
+      "orderNumber": "WHMCS-ORD-2026-8819",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "clientEmail": "owner@zegacloud.com",
+      "clientName": "Alex Carter",
+      "planId": "growth",
+      "planName": "ZegaMail Business Growth",
+      "billingCycle": "annually",
+      "amount": 30.72,
+      "currency": "USD",
+      "paymentMethod": "crypto_usdt_trc20",
+      "paymentMethodName": "Tether USDT (TRC-20)",
+      "status": "active",
+      "invoiceId": "WHMCS-INV-10941",
+      "cryptoDetails": {
+        "cryptoCurrency": "USDT_TRC20",
+        "cryptoAmount": "30.72",
+        "walletAddress": "TX7k1dZega9xMailTRC20Wallet88NVMe",
+        "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=tron:TX7k1dZega9xMailTRC20Wallet88NVMe?amount=30.72",
+        "network": "TRON (TRC-20)",
+        "txHash": "e49f82bc7190ad3f7748ca52011b02ea9174dfb2923761cc2467d021c1f589c3",
+        "submittedAt": "2026-10-04T15:26:59.497Z",
+        "verifiedAt": "2026-10-04T15:28:59.497Z"
+      },
+      "whmcsOrderId": "8819",
+      "whmcsInvoiceId": "10941",
+      "createdAt": "2026-10-04T15:26:59.497Z",
+      "updatedAt": "2026-10-04T15:26:59.497Z"
+    },
+    {
+      "id": "ord_init_002",
+      "orderNumber": "WHMCS-ORD-2026-9482",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "clientEmail": "owner@zegacloud.com",
+      "clientName": "Alex Carter",
+      "planId": "pro",
+      "planName": "ZegaMail Pro Scale",
+      "billingCycle": "monthly",
+      "amount": 6.5,
+      "currency": "USD",
+      "paymentMethod": "crypto_btc",
+      "paymentMethodName": "Bitcoin (BTC)",
+      "status": "active",
+      "invoiceId": "WHMCS-INV-10942",
+      "cryptoDetails": {
+        "cryptoCurrency": "BTC",
+        "cryptoAmount": "0.000098",
+        "walletAddress": "bc1qzega9xmailcloud77anycast001btc",
+        "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=bitcoin:bc1qzega9xmailcloud77anycast001btc?amount=0.000098",
+        "network": "Bitcoin Mainnet",
+        "txHash": "7b4df1209caef890218734208a9f65349071cf3183884cb4592dae04318c2049",
+        "submittedAt": "2026-10-14T15:01:59.498Z",
+        "verifiedAt": "2026-10-15T12:11:08.578Z"
+      },
+      "whmcsOrderId": "9482",
+      "whmcsInvoiceId": "10942",
+      "createdAt": "2026-10-14T14:56:59.498Z",
+      "updatedAt": "2026-10-15T12:11:08.575Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "WHMCS-INV-74254",
+      "orderId": "ord_mv89kagz",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "amount": 30.72,
+      "currency": "USD",
+      "status": "paid",
+      "dueDate": "2026-10-21",
+      "paymentMethod": "Tether USDT (TRC-20)",
+      "description": "ZegaMail Business Growth (Annual billing)",
+      "createdAt": "2026-10-14T15:27:35.172Z",
+      "datePaid": "2026-10-14T15:31:21.151Z"
+    },
+    {
+      "id": "WHMCS-INV-52816",
+      "orderId": "ord_mv89jizt",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "amount": 30.72,
+      "currency": "USD",
+      "status": "unpaid",
+      "dueDate": "2026-10-21",
+      "paymentMethod": "Tether USDT (TRC-20)",
+      "description": "ZegaMail Business Growth (Annual billing)",
+      "createdAt": "2026-10-14T15:26:59.561Z"
+    },
+    {
+      "id": "WHMCS-INV-10941",
+      "orderId": "ord_init_001",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "amount": 30.72,
+      "currency": "USD",
+      "status": "paid",
+      "dueDate": "2026-10-04",
+      "datePaid": "2026-10-04",
+      "paymentMethod": "USDT (TRC-20)",
+      "description": "ZegaMail Business Growth (Annual Subscription - 10 Mailboxes)",
+      "createdAt": "2026-10-04T15:26:59.498Z"
+    },
+    {
+      "id": "WHMCS-INV-10942",
+      "orderId": "ord_init_002",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "amount": 6.5,
+      "currency": "USD",
+      "status": "paid",
+      "dueDate": "2026-10-15",
+      "paymentMethod": "Bitcoin (BTC)",
+      "description": "ZegaMail Pro Scale Upgrade (Unlimited Mailboxes + 100GB NVMe Storage)",
+      "createdAt": "2026-10-14T14:56:59.498Z",
+      "datePaid": "2026-10-15T12:11:08.578Z"
     }
   ]
 }

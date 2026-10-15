@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 export const metadata: Metadata = {
   title: "Zega Mail — Professional Business Email & Client Outreach | A product of ZegaCloud",
   description:
-    "Ad-free, secure business email with built-in client read receipts, AI proposal generator, cold outreach campaigns, and flat-rate pricing. A product of ZegaCloud.",
+    "Ad-free, secure business email with verified delivery status ticks (Zoho style Sent / Delivered), AI proposal generator, cold outreach campaigns, and flat-rate pricing. A product of ZegaCloud.",
 };
 
 export default function RootLayout({

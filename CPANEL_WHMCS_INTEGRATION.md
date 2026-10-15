@@ -17,7 +17,7 @@
 For over twenty years, web hosting providers and digital agencies have provided business email powered by **cPanel**, **Exim**, and **Dovecot**. However, the user-facing webmail interfaces bundled with cPanel (**Roundcube**, **Horde**, and **SquirrelMail**) suffer from several critical shortcomings:
 * **Outdated UI/UX**: Difficult for modern business owners to navigate on smartphones or tablets.
 * **No AI Integration**: Lacks proposal drafting, lead classification, smart replies, or cold sequences.
-* **No Client Read Receipts**: No tracking pixel or proposal read receipt confirmation.
+* **No Modern Delivery Ticks**: Traditional cPanel webmail lacks clean delivery status ticks (Sent ✓ / Delivered ✓✓).
 * **Expensive Alternatives**: Competing solutions like Google Workspace or Microsoft 365 charge \$6–\$18/user/month, squeezing hosting margins.
 
 **ZegaMail** solves this challenge by serving as an ultra-modern, high-performance webmail front-end and automation layer. It integrates directly with your existing **cPanel/WHM** servers and **WHMCS** billing automation, giving your clients an interface comparable to Gmail or Titan Mail while leveraging your existing cPanel infrastructure.
@@ -77,41 +77,69 @@ ZegaMail integrates with cPanel via its official **UAPI (User API)** and with WH
 
 ---
 
-## 4. WHMCS Server Module Integration Guide
+## 4. WHMCS Complete Integration Suite
 
-ZegaMail ships with a native, production-tested WHMCS Server Provisioning Module located at:
-`whmcs-module/modules/servers/zegabytezmail/zegabytezmail.php`
+ZegaMail ships with an enterprise-grade WHMCS integration suite comprising three components:
 
-### Step 1: Copy Module Files
-Copy the module folder into your active WHMCS installation:
-```bash
-cp -r whmcs-module/modules/servers/zegabytezmail /path/to/whmcs/modules/servers/
+```text
+whmcs-module/
+├── modules/
+│   ├── servers/
+│   │   └── zegabytezmail/
+│   │       └── zegabytezmail.php        <-- Server Provisioning & In-Portal Mailbox Manager
+│   └── addons/
+│       └── zegabytezmail_addon/
+│           └── zegabytezmail_addon.php  <-- Master Multi-Tenant Control Dashboard
+└── includes/
+    └── hooks/
+        └── zegabytezmail_hooks.php      <-- Domain Registration & DNS Auto-Config Hooks
 ```
 
-### Step 2: Configure Product in WHMCS
-1. Log into your **WHMCS Admin Area**.
-2. Navigate to **Setup > Products/Services > Products/Services**.
-3. Click **Create a New Product**:
-   * **Product Type**: *Other* or *Hosting Account*
-   * **Product Group**: *Business Email*
-   * **Product Name**: *ZegaMail Business Growth*
-4. Go to the **Module Settings** tab:
-   * **Module Name**: Select `Zegabytez Mail`
-   * **API URL**: `https://api-mail.yourhosting.com` (or `http://localhost:4000` for testing)
-   * **Webhook Secret**: Paste your `WHMCS_INTERNAL_WEBHOOK_SECRET`
-   * **Package Plan**: `growth` (or `starter`, `unlimited`)
-   * **Max Mailboxes**: `10`
-   * **Storage Quota (MB)**: `50000`
-5. Set **Automated Setup** to:
-   * *Automatically setup the product as soon as the first payment is received*
+---
 
-### Step 3: Client Area Single Sign-On (SSO)
-When your clients view their active service in the WHMCS Client Area, the module automatically renders:
-* **1-Click "Log in to Webmail" Button**: Generates a cryptographically signed HMAC token for zero-password entry.
-* **Server Connection Details**: Copyable IMAP/SMTP hostnames, ports, and SSL settings for iPhone, Android, and Outlook.
-* **Real-time Quota Bar**: Visual storage gauge synced directly from cPanel.
+### A. Component 1: Server Provisioning Module (`modules/servers/zegabytezmail`)
+
+#### 1. Full In-Portal Client Area Management (`_ClientArea`)
+Clients manage their entire business email directly inside their WHMCS Client Area service details page:
+* **Interactive Disk Meter**: Live visual progress bar showing allocated storage (e.g. `2.5 GB / 50.0 GB`) and active mailbox seats (`4 / 10 Used`).
+* **In-Portal Mailbox Provisioner**: Clients create new mailboxes (`sales@domain.com`, `billing@domain.com`), set passwords, and assign individual mailbox storage limits without leaving WHMCS.
+* **Mailbox Directory**: Real-time table of mailboxes with 1-click delete, password change, and status indicators.
+* **1-Click Webmail SSO**: Cryptographically signed HMAC token launcher logging clients directly into their ZegaMail webmail interface.
+* **Mobile & Desktop Setup Card**: Instant copy settings for iOS, Android, macOS Mail, Outlook, and Thunderbird (IMAP `993 SSL`, SMTP `465 SSL`).
+
+#### 2. WHMCS Admin Area Service Controls (`_AdminCustomButtonArray`)
+Inside `clientsservices.php`, administrators have 1-click operational controls:
+* **Sync cPanel UAPI**: Forces an immediate live re-sync of all mailboxes and disk usage from the cPanel server.
+* **Verify DNS & DKIM**: Tests MX records, 2048-bit DKIM selectors, SPF inclusion, and DMARC quarantine policies on the host.
+* **Reset Master Password**: Resets the tenant's primary administrative account password and emails secure recovery credentials.
+* **Update Quota & Seats**: Dynamically resizes disk storage and seat caps without interrupting active mail sessions.
+
+#### 3. Automated Lifecycle Handlers
+* **`_CreateAccount`**: Provisions the dedicated cPanel account via WHM, sets up the organization tenant, and initial mailbox upon order payment.
+* **`_SuspendAccount`**: Locks webmail access and suspends outbound mail dispatch upon overdue invoices.
+* **`_UnsuspendAccount`**: Instantly restores service upon payment settlement.
+* **`_TerminateAccount`**: Cleans up mailbox storage upon service cancellation.
+* **`_ChangePackage`**: Resizes mailbox limits and storage allowances dynamically when clients upgrade tiers.
 
 ---
+
+### B. Component 2: Master Addon Module (`modules/addons/zegabytezmail_addon`)
+
+Accessible via **WHMCS Admin > Addons > ZegaMail Master Cluster**:
+* **Cluster Overview KPIs**: Global aggregate metrics across all active hosting nodes:
+  * Total Active Business Tenants
+  * Total Provisioned Mailbox Seats
+  * Total Ingested NVMe Storage (GB)
+  * cPanel Cluster Health (`Exim/Dovecot 250 OK`)
+* **Multi-Tenant Directory Table**: Searchable ledger of every tenant organization, domain, client name, service status, and 1-click **"Login As Admin"** SSO launcher.
+* **Global Server Configuration**: Configure master cPanel/WHM hostnames, default storage templates, and monthly AI Token grants.
+
+---
+
+### C. Component 3: Domain Order & Billing Automation Hooks (`includes/hooks/`)
+
+* **`AfterRegistrarRegistration`**: When a client purchases or transfers a domain through WHMCS's standard cart, this hook automatically generates and injects the verified DNS Zone records (MX, SPF, DKIM, and DMARC) into the cPanel server silently.
+* **`InvoicePaid`**: Automatically detects settled upgrade invoices and applies expanded quotas, or unsuspends previously locked accounts.
 
 ## 5. Security & Decoupled Credentials Architecture
 

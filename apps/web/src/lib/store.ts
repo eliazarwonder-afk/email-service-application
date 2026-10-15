@@ -62,6 +62,7 @@ export interface StoredMessage {
   folder: "inbox" | "sent" | "tracked" | "drafts" | "archive" | "spam" | string;
   isRead: boolean;
   tracked?: boolean;
+  deliveryStatus?: "sent" | "delivered" | "bounced" | "failed";
   openCount?: number;
   lastOpened?: string;
   device?: string;
@@ -173,6 +174,55 @@ export interface StoredSession {
   expiresAt: string;
 }
 
+export interface CryptoPaymentDetails {
+  cryptoCurrency: "BTC" | "ETH" | "USDT_TRC20" | "USDT_ERC20" | "SOL";
+  cryptoAmount: string;
+  walletAddress: string;
+  qrCodeUrl: string;
+  network: string;
+  txHash?: string;
+  submittedAt?: string;
+  verifiedAt?: string;
+}
+
+export interface StoredOrder {
+  id: string; // e.g. "ord_94821"
+  orderNumber: string; // "WHMCS-ORD-2026-9482"
+  orgId: string;
+  userId: string;
+  clientEmail: string;
+  clientName: string;
+  planId: "starter" | "growth" | "pro";
+  planName: string;
+  billingCycle: "monthly" | "annually";
+  amount: number;
+  currency: string;
+  paymentMethod: "crypto_usdt_trc20" | "crypto_btc" | "crypto_eth" | "crypto_sol" | "stripe_card";
+  paymentMethodName: string;
+  status: "pending" | "paid" | "active" | "cancelled";
+  invoiceId: string; // "WHMCS-INV-10942"
+  cryptoDetails?: CryptoPaymentDetails;
+  whmcsOrderId: string;
+  whmcsInvoiceId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StoredInvoice {
+  id: string; // "WHMCS-INV-10942"
+  orderId: string;
+  orgId: string;
+  userId: string;
+  amount: number;
+  currency: string;
+  status: "unpaid" | "paid" | "cancelled";
+  dueDate: string;
+  datePaid?: string;
+  paymentMethod: string;
+  description: string;
+  createdAt: string;
+}
+
 export interface DatabaseSchema {
   users: StoredUser[];
   orgs: StoredOrg[];
@@ -183,6 +233,8 @@ export interface DatabaseSchema {
   templates: StoredTemplate[];
   campaigns: StoredCampaign[];
   leads: StoredCampaignLead[];
+  orders: StoredOrder[];
+  invoices: StoredInvoice[];
   sessions: StoredSession[];
 }
 
@@ -331,19 +383,20 @@ function getInitialDatabase(): DatabaseSchema {
       {
         id: "msg_2",
         orgId: orgId,
-        from: "You (Tracked Outbound)",
+        from: "You (Outbound Proposal)",
         fromEmail: "sales@acmedesign.co",
         toEmail: "s.jenkins@meridiancorp.com",
         subject: "Proposal: Q4 Brand & Web Development Retainer",
         preview: "Attached is our comprehensive retainer scope for Q4. We have locked in the dedicated SLA…",
         body: `Hi Sarah,\n\nAttached is our comprehensive retainer scope for Q4. We’ve locked in the dedicated SLA and custom API endpoint allocation you requested.\n\nKey highlights included in this proposal:\n• Full responsive redesign & web application UI system\n• Custom domain routing and email infrastructure setup\n• 24/7 priority response guarantee with 99.99% uptime SLA\n\nLet me know if 2:00 PM tomorrow works for a quick 10-minute kickoff review!\n\nWarm regards,\nAlex Carter\nPrincipal, Acme Creative Studio`,
         date: "Yesterday",
-        folder: "tracked",
+        folder: "sent",
         isRead: true,
-        tracked: true,
-        openCount: 3,
-        lastOpened: "4 minutes ago",
-        device: "Chrome 129 on macOS 15.0",
+        tracked: false,
+        deliveryStatus: "delivered",
+        openCount: 0,
+        lastOpened: "Delivered to remote MTA (250 OK)",
+        device: "SMTP DSN RFC 3461 Verified",
         followUpDue: "Tomorrow, 9:00 AM",
         attachments: [{ name: "Contract-Draft-2026.pdf", size: "1.2 MB", type: "pdf" }],
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
@@ -639,6 +692,98 @@ function getInitialDatabase(): DatabaseSchema {
         lastEventTimestamp: "Today, 9:02 AM",
       },
     ],
+    orders: [
+      {
+        id: "ord_init_001",
+        orderNumber: "WHMCS-ORD-2026-8819",
+        orgId: orgId,
+        userId: ownerId,
+        clientEmail: "owner@zegacloud.com",
+        clientName: "Alex Carter",
+        planId: "growth",
+        planName: "ZegaMail Business Growth",
+        billingCycle: "annually",
+        amount: 30.72,
+        currency: "USD",
+        paymentMethod: "crypto_usdt_trc20",
+        paymentMethodName: "Tether USDT (TRC-20)",
+        status: "active",
+        invoiceId: "WHMCS-INV-10941",
+        cryptoDetails: {
+          cryptoCurrency: "USDT_TRC20",
+          cryptoAmount: "30.72",
+          walletAddress: "TX7k1dZega9xMailTRC20Wallet88NVMe",
+          qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=tron:TX7k1dZega9xMailTRC20Wallet88NVMe?amount=30.72",
+          network: "TRON (TRC-20)",
+          txHash: "e49f82bc7190ad3f7748ca52011b02ea9174dfb2923761cc2467d021c1f589c3",
+          submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
+          verifiedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10 + 120000).toISOString(),
+        },
+        whmcsOrderId: "8819",
+        whmcsInvoiceId: "10941",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
+        updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
+      },
+      {
+        id: "ord_init_002",
+        orderNumber: "WHMCS-ORD-2026-9482",
+        orgId: orgId,
+        userId: ownerId,
+        clientEmail: "owner@zegacloud.com",
+        clientName: "Alex Carter",
+        planId: "pro",
+        planName: "ZegaMail Pro Scale",
+        billingCycle: "monthly",
+        amount: 6.50,
+        currency: "USD",
+        paymentMethod: "crypto_btc",
+        paymentMethodName: "Bitcoin (BTC)",
+        status: "pending",
+        invoiceId: "WHMCS-INV-10942",
+        cryptoDetails: {
+          cryptoCurrency: "BTC",
+          cryptoAmount: "0.000098",
+          walletAddress: "bc1qzega9xmailcloud77anycast001btc",
+          qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=bitcoin:bc1qzega9xmailcloud77anycast001btc?amount=0.000098",
+          network: "Bitcoin Mainnet",
+          txHash: "7b4df1209caef890218734208a9f65349071cf3183884cb4592dae04318c2049",
+          submittedAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+        },
+        whmcsOrderId: "9482",
+        whmcsInvoiceId: "10942",
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+        updatedAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+      }
+    ],
+    invoices: [
+      {
+        id: "WHMCS-INV-10941",
+        orderId: "ord_init_001",
+        orgId: orgId,
+        userId: ownerId,
+        amount: 30.72,
+        currency: "USD",
+        status: "paid",
+        dueDate: "2026-10-04",
+        datePaid: "2026-10-04",
+        paymentMethod: "USDT (TRC-20)",
+        description: "ZegaMail Business Growth (Annual Subscription - 10 Mailboxes)",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
+      },
+      {
+        id: "WHMCS-INV-10942",
+        orderId: "ord_init_002",
+        orgId: orgId,
+        userId: ownerId,
+        amount: 6.50,
+        currency: "USD",
+        status: "unpaid",
+        dueDate: "2026-10-15",
+        paymentMethod: "Bitcoin (BTC)",
+        description: "ZegaMail Pro Scale Upgrade (Unlimited Mailboxes + 100GB NVMe Storage)",
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+      }
+    ],
     sessions: [],
   };
 }
@@ -672,6 +817,14 @@ export function readDb(): DatabaseSchema {
     }
     if (!parsed.templates) {
       parsed.templates = getInitialDatabase().templates;
+      needsSync = true;
+    }
+    if (!parsed.orders || parsed.orders.length === 0) {
+      parsed.orders = getInitialDatabase().orders;
+      needsSync = true;
+    }
+    if (!parsed.invoices || parsed.invoices.length === 0) {
+      parsed.invoices = getInitialDatabase().invoices;
       needsSync = true;
     }
     if (parsed.messages && !parsed.messages.some((m: any) => m.folder === "spam")) {
@@ -944,4 +1097,209 @@ export function verifyDomain(domainId: string): StoredDomain | null {
 
   writeDb(db);
   return domain;
+}
+
+// -------------------------------------------------------------
+// Orders, Invoices & Crypto Payment Management
+// -------------------------------------------------------------
+
+export function getOrders(orgId?: string): StoredOrder[] {
+  const db = readDb();
+  if (!db.orders) return [];
+  if (!orgId) return db.orders;
+  return db.orders.filter((o) => o.orgId === orgId);
+}
+
+export function getOrderById(orderId: string): StoredOrder | undefined {
+  const db = readDb();
+  return (db.orders || []).find((o) => o.id === orderId || o.orderNumber === orderId || o.whmcsOrderId === orderId);
+}
+
+export function getInvoices(orgId?: string): StoredInvoice[] {
+  const db = readDb();
+  if (!db.invoices) return [];
+  if (!orgId) return db.invoices;
+  return db.invoices.filter((i) => i.orgId === orgId);
+}
+
+export function createOrderAndInvoice({
+  orgId,
+  userId,
+  clientEmail,
+  clientName,
+  planId,
+  billingCycle,
+  paymentMethod,
+}: {
+  orgId: string;
+  userId: string;
+  clientEmail: string;
+  clientName: string;
+  planId: "starter" | "growth" | "pro";
+  billingCycle: "monthly" | "annually";
+  paymentMethod: "crypto_usdt_trc20" | "crypto_btc" | "crypto_eth" | "crypto_sol" | "stripe_card";
+}): { order: StoredOrder; invoice: StoredInvoice } {
+  const db = readDb();
+  if (!db.orders) db.orders = [];
+  if (!db.invoices) db.invoices = [];
+
+  const planPricing: Record<string, { monthly: number; annually: number; name: string }> = {
+    starter: { monthly: 1.50, annually: 14.40, name: "ZegaMail Starter" },
+    growth: { monthly: 3.20, annually: 30.72, name: "ZegaMail Business Growth" },
+    pro: { monthly: 6.50, annually: 62.40, name: "ZegaMail Pro Scale" },
+  };
+
+  const selectedPlan = planPricing[planId] || planPricing.growth;
+  const amount = billingCycle === "annually" ? selectedPlan.annually : selectedPlan.monthly;
+  const whmcsOrderIdNum = Math.floor(1000 + Math.random() * 9000).toString();
+  const whmcsInvoiceIdNum = Math.floor(10000 + Math.random() * 90000).toString();
+  const orderId = "ord_" + Date.now().toString(36);
+  const invoiceId = "WHMCS-INV-" + whmcsInvoiceIdNum;
+  const orderNumber = "WHMCS-ORD-2026-" + whmcsOrderIdNum;
+
+  // Crypto wallet address & amount calculations
+  let cryptoDetails: CryptoPaymentDetails | undefined = undefined;
+
+  if (paymentMethod === "crypto_usdt_trc20") {
+    const usdtAmt = amount.toFixed(2);
+    const addr = "TX7k1dZega9xMailTRC20Wallet88NVMe";
+    cryptoDetails = {
+      cryptoCurrency: "USDT_TRC20",
+      cryptoAmount: usdtAmt,
+      walletAddress: addr,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=tron:${addr}?amount=${usdtAmt}`,
+      network: "TRON (TRC-20)",
+    };
+  } else if (paymentMethod === "crypto_btc") {
+    const btcAmt = (amount / 65000).toFixed(6);
+    const addr = "bc1qzega9xmailcloud77anycast001btc";
+    cryptoDetails = {
+      cryptoCurrency: "BTC",
+      cryptoAmount: btcAmt,
+      walletAddress: addr,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=bitcoin:${addr}?amount=${btcAmt}`,
+      network: "Bitcoin Mainnet",
+    };
+  } else if (paymentMethod === "crypto_eth") {
+    const ethAmt = (amount / 3500).toFixed(5);
+    const addr = "0x71C2ega9xMailAnycastNVMeCluster8842";
+    cryptoDetails = {
+      cryptoCurrency: "ETH",
+      cryptoAmount: ethAmt,
+      walletAddress: addr,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=ethereum:${addr}?amount=${ethAmt}`,
+      network: "Ethereum (ERC-20)",
+    };
+  } else if (paymentMethod === "crypto_sol") {
+    const solAmt = (amount / 160).toFixed(4);
+    const addr = "ZegaSoL9xMailAnycastClusterSolana99";
+    cryptoDetails = {
+      cryptoCurrency: "SOL",
+      cryptoAmount: solAmt,
+      walletAddress: addr,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=solana:${addr}?amount=${solAmt}`,
+      network: "Solana Network",
+    };
+  }
+
+  const paymentNames: Record<string, string> = {
+    crypto_usdt_trc20: "Tether USDT (TRC-20)",
+    crypto_btc: "Bitcoin (BTC)",
+    crypto_eth: "Ethereum (ETH)",
+    crypto_sol: "Solana (SOL)",
+    stripe_card: "Credit / Debit Card (Stripe)",
+  };
+
+  const newOrder: StoredOrder = {
+    id: orderId,
+    orderNumber,
+    orgId,
+    userId,
+    clientEmail,
+    clientName,
+    planId,
+    planName: selectedPlan.name,
+    billingCycle,
+    amount,
+    currency: "USD",
+    paymentMethod,
+    paymentMethodName: paymentNames[paymentMethod] || paymentMethod,
+    status: paymentMethod === "stripe_card" ? "active" : "pending",
+    invoiceId,
+    cryptoDetails,
+    whmcsOrderId: whmcsOrderIdNum,
+    whmcsInvoiceId: whmcsInvoiceIdNum,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  const newInvoice: StoredInvoice = {
+    id: invoiceId,
+    orderId,
+    orgId,
+    userId,
+    amount,
+    currency: "USD",
+    status: paymentMethod === "stripe_card" ? "paid" : "unpaid",
+    dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString().split("T")[0],
+    datePaid: paymentMethod === "stripe_card" ? new Date().toISOString() : undefined,
+    paymentMethod: paymentNames[paymentMethod] || paymentMethod,
+    description: `${selectedPlan.name} (${billingCycle === "annually" ? "Annual" : "Monthly"} billing)`,
+    createdAt: new Date().toISOString(),
+  };
+
+  // If card payment, automatically upgrade organization plan
+  if (paymentMethod === "stripe_card") {
+    const org = db.orgs.find((o) => o.id === orgId);
+    if (org) {
+      org.plan = planId;
+    }
+  }
+
+  db.orders.unshift(newOrder);
+  db.invoices.unshift(newInvoice);
+  writeDb(db);
+
+  return { order: newOrder, invoice: newInvoice };
+}
+
+export function submitOrderCryptoTx(orderId: string, txHash: string): StoredOrder | null {
+  const db = readDb();
+  const order = (db.orders || []).find((o) => o.id === orderId || o.orderNumber === orderId || o.whmcsOrderId === orderId);
+  if (!order || !order.cryptoDetails) return null;
+
+  order.cryptoDetails.txHash = txHash.trim();
+  order.cryptoDetails.submittedAt = new Date().toISOString();
+  order.updatedAt = new Date().toISOString();
+
+  writeDb(db);
+  return order;
+}
+
+export function verifyAndActivateOrder(orderId: string): StoredOrder | null {
+  const db = readDb();
+  const order = (db.orders || []).find((o) => o.id === orderId || o.orderNumber === orderId || o.whmcsOrderId === orderId);
+  if (!order) return null;
+
+  order.status = "active";
+  order.updatedAt = new Date().toISOString();
+  if (order.cryptoDetails) {
+    order.cryptoDetails.verifiedAt = new Date().toISOString();
+  }
+
+  // Update associated invoice to paid
+  const invoice = (db.invoices || []).find((i) => i.id === order.invoiceId || i.orderId === order.id);
+  if (invoice) {
+    invoice.status = "paid";
+    invoice.datePaid = new Date().toISOString();
+  }
+
+  // Upgrade the organization plan
+  const org = db.orgs.find((o) => o.id === order.orgId);
+  if (org) {
+    org.plan = order.planId;
+  }
+
+  writeDb(db);
+  return order;
 }

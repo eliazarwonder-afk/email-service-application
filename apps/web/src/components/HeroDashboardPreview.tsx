@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Mail,
   Send,
+  CheckCheck,
   Eye,
   Sparkles,
   BarChart3,
@@ -20,7 +21,8 @@ import {
   TrendingUp,
   RefreshCw,
   Sun,
-  Moon
+  Moon,
+  X
 } from "lucide-react";
 
 import { useTheme } from "./ThemeProvider";
@@ -29,20 +31,62 @@ export function HeroDashboardPreview() {
   const { theme } = useTheme();
   const [activePreviewTab, setActivePreviewTab] = useState<"mail" | "ai" | "campaigns">("mail");
   const [previewTheme, setPreviewTheme] = useState<"light" | "dark">(theme || "light");
+  const [isMiniComposeOpen, setIsMiniComposeOpen] = useState(false);
+  const [miniSubject, setMiniSubject] = useState("Enterprise Retainer Scope Confirmation");
+  const [miniRecipient, setMiniRecipient] = useState("s.jenkins@meridiancorp.com");
+  const [miniStatus, setMiniStatus] = useState<string | null>(null);
+  const [aiSendStatus, setAiSendStatus] = useState<string | null>(null);
+  const [campaignNotice, setCampaignNotice] = useState<string | null>(null);
+  const [previewNotice, setPreviewNotice] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (theme) setPreviewTheme(theme);
   }, [theme]);
 
+  const handleMiniSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    setMiniStatus("Delivering via Anycast MTA…");
+    setTimeout(() => {
+      setMiniStatus("Delivered ✓✓ (250 OK • TLS 1.3)");
+      setTimeout(() => {
+        setIsMiniComposeOpen(false);
+        setMiniStatus(null);
+      }, 1500);
+    }, 600);
+  };
+
+  const handleAiSend = () => {
+    setAiSendStatus("Dispatched to Client (250 OK)");
+    setTimeout(() => setAiSendStatus(null), 3000);
+  };
+
+  const handleCreateMockCampaign = () => {
+    setCampaignNotice("New Cold Sequence Draft Created (#CMP-904)");
+    setTimeout(() => setCampaignNotice(null), 3000);
+  };
+
+  const handleShowPreviewNotice = (text: string) => {
+    setPreviewNotice(text);
+    setTimeout(() => setPreviewNotice(null), 2500);
+  };
+
   return (
-    <div className="mt-14 max-w-5xl mx-auto rounded-[2rem] p-1.5 sm:p-2.5 bg-neutral-200/70 dark:bg-white/5 border border-neutral-300/70 dark:border-white/10 shadow-2xl backdrop-blur-md transition-all">
-      <div className={`rounded-[calc(2rem-0.5rem)] border transition-all duration-300 overflow-hidden shadow-sm ${
+    <div className="mt-14 max-w-5xl mx-auto rounded-[2rem] p-1.5 sm:p-2.5 bg-neutral-200/70 dark:bg-white/5 border border-neutral-300/70 dark:border-white/10 shadow-2xl backdrop-blur-md transition-all relative">
+      <div className={`rounded-[calc(2rem-0.5rem)] border transition-all duration-300 overflow-hidden shadow-sm relative ${
         previewTheme === "dark"
           ? "bg-[#0f121a] border-[#252c3d] text-white shadow-black/60"
           : "bg-white border-[#eaeaea] text-[#121212] shadow-neutral-200/50"
       }`}>
+        {/* Floating In-Preview Toast */}
+        {(previewNotice || campaignNotice || aiSendStatus) && (
+          <div className="absolute top-14 right-4 z-30 flex items-center gap-2 rounded-xl bg-neutral-900/95 dark:bg-white/95 text-white dark:text-neutral-900 px-3.5 py-2 text-xs font-semibold shadow-xl border border-neutral-700 dark:border-neutral-200 animate-in fade-in slide-in-from-top-2">
+            <CheckCircle2 className="h-4 w-4 text-emerald-400 dark:text-emerald-600 shrink-0" />
+            <span>{previewNotice || campaignNotice || aiSendStatus}</span>
+          </div>
+        )}
+
         {/* Window Title Bar */}
-        <div className={`flex items-center justify-between px-4 py-2.5 border-b text-xs transition-colors ${
+        <div className={`flex items-center justify-between px-4 py-2.5 border-b text-xs transition-colors flex-wrap gap-2 ${
           previewTheme === "dark"
             ? "bg-[#161a25] border-[#252c3d] text-neutral-400"
             : "bg-[#faf9f6] border-[#eaeaea] text-[#706f6c]"
@@ -58,8 +102,8 @@ export function HeroDashboardPreview() {
           </span>
         </div>
 
-        {/* Mockup Controls: View Switcher + Theme Toggle */}
-        <div className="flex items-center gap-2">
+        {/* Mockup Controls: View Switcher + Theme Toggle + Dedicated ONLY View Demo Button */}
+        <div className="flex items-center gap-2.5">
           <div className={`flex items-center rounded-lg p-0.5 text-[11px] font-medium border ${
             previewTheme === "dark" ? "bg-[#10131c] border-[#252c3d]" : "bg-neutral-100 border-[#eaeaea]"
           }`}>
@@ -72,7 +116,7 @@ export function HeroDashboardPreview() {
                   : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
-              Inbox & Tracking
+              Inbox &amp; Tracking
             </button>
             <button
               type="button"
@@ -112,6 +156,15 @@ export function HeroDashboardPreview() {
           >
             {previewTheme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
+
+          {/* DEDICATED ONLY VIEW DEMO BUTTON THAT NAVIGATES TO /app */}
+          <Link
+            href="/app"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-sm hover:opacity-90 hover:scale-[1.03] active:scale-[0.98] transition-all"
+          >
+            <span>View Demo</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
 
@@ -165,22 +218,24 @@ export function HeroDashboardPreview() {
               <BarChart3 className="h-4 w-4" />
             </button>
 
-            <Link
-              href="/app"
+            <button
+              type="button"
+              onClick={() => handleShowPreviewNotice("Contacts & Leads directory: Click 'View Demo' above to explore live contacts")}
               className="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-white"
               title="Contacts & Leads"
             >
               <Users className="h-4 w-4" />
-            </Link>
+            </button>
           </div>
 
-          <Link
-            href="/app"
+          <button
+            type="button"
+            onClick={() => handleShowPreviewNotice("Admin & Organization Settings: Click 'View Demo' above to manage DNS & team")}
             className="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-white"
             title="Admin & Organization Settings"
           >
             <Settings className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
 
         {/* TAB 1: MAILBOX & TITAN-STYLE READ RECEIPTS */}
@@ -190,14 +245,15 @@ export function HeroDashboardPreview() {
             <div className={`hidden md:block md:col-span-3 border-r p-3.5 space-y-4 ${
               previewTheme === "dark" ? "bg-[#11141d] border-[#252c3d]" : "bg-[#faf9f6]/40 border-[#eaeaea]"
             }`}>
-              <Link
-                href="/app"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#121212] dark:bg-white text-white dark:text-[#121212] py-2 px-3 text-xs font-semibold shadow-sm"
+              <button
+                type="button"
+                onClick={() => setIsMiniComposeOpen(!isMiniComposeOpen)}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#121212] dark:bg-white text-white dark:text-[#121212] py-2 px-3 text-xs font-semibold shadow-sm hover:opacity-95 transition-opacity"
               >
                 <Send className="h-3.5 w-3.5" />
                 <span>Write Email</span>
                 <kbd className="ml-auto bg-neutral-800 dark:bg-neutral-200 text-neutral-300 dark:text-neutral-700 text-[9px]">C</kbd>
-              </Link>
+              </button>
 
               <div className="space-y-1 text-xs">
                 <div className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg font-semibold ${
@@ -208,11 +264,13 @@ export function HeroDashboardPreview() {
                   </span>
                   <span className="font-mono text-[10px] bg-neutral-100 dark:bg-neutral-800 px-1.5 rounded">3</span>
                 </div>
-                <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-neutral-100 dark:hover:bg-neutral-800/50 cursor-pointer">
+                <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-neutral-100 dark:hover:bg-neutral-800/50 cursor-pointer">
                   <span className="flex items-center gap-2">
-                    <Eye className="h-3.5 w-3.5" /> Tracked Proposals
+                    <Send className="h-3.5 w-3.5" /> Sent Mail
                   </span>
-                  <span className="text-[10px] font-semibold bg-blue-100 dark:bg-blue-950 px-1.5 rounded">2 opens</span>
+                  <span className="text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950 px-1.5 rounded flex items-center gap-1">
+                    <CheckCheck className="h-3 w-3" /> Delivered
+                  </span>
                 </div>
                 <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800/50 cursor-pointer">
                   <span className="flex items-center gap-2">
@@ -294,17 +352,17 @@ export function HeroDashboardPreview() {
               previewTheme === "dark" ? "bg-[#11141d]" : "bg-white"
             }`}>
               <div className="space-y-3">
-                {/* Titan-style Read Receipt Callout */}
+                {/* Zoho/Gmail-style Delivery Status Callout */}
                 <div className={`rounded-xl border p-3 flex items-start gap-2.5 text-xs ${
                   previewTheme === "dark"
-                    ? "bg-blue-950/40 border-blue-900/60 text-blue-300"
-                    : "bg-blue-50/70 border-blue-200 text-blue-900"
+                    ? "bg-emerald-950/40 border-emerald-900/60 text-emerald-300"
+                    : "bg-emerald-50/70 border-emerald-200 text-emerald-900"
                 }`}>
-                  <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                  <CheckCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <p className="font-semibold">Client Read Receipt Alert</p>
+                    <p className="font-semibold">MTA Delivery Status: 250 OK</p>
                     <p className="text-[11px] leading-relaxed">
-                      Sarah Jenkins opened your proposal <strong>4m ago</strong> on macOS (Chrome). Attached PDF viewed 2 times.
+                      Delivered to recipient mail server with TLS 1.3 encryption &amp; verified 2048-bit DKIM signature.
                     </p>
                   </div>
                 </div>
@@ -356,12 +414,13 @@ export function HeroDashboardPreview() {
                   <Clock className="h-3 w-3 text-amber-500" />
                   Auto follow-up set for tomorrow 9 AM
                 </span>
-                <Link
-                  href="/app"
-                  className="font-semibold underline hover:text-blue-500"
+                <button
+                  type="button"
+                  onClick={() => handleShowPreviewNotice("Verified 2048-bit DKIM signature • Delivered to MX server (250 OK)")}
+                  className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  Open in App →
-                </Link>
+                  Verify DSN →
+                </button>
               </div>
             </div>
           </>
@@ -379,7 +438,7 @@ export function HeroDashboardPreview() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-xs">Zega AI Outreach Studio</h3>
-                    <p className="text-[10px] text-neutral-400">Generate high-converting cold emails & smart replies</p>
+                    <p className="text-[10px] text-neutral-400">Generate high-converting cold emails &amp; smart replies</p>
                   </div>
                 </div>
                 <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 text-[10px] font-mono">
@@ -403,7 +462,7 @@ export function HeroDashboardPreview() {
               </div>
 
               <div className="space-y-1.5 text-xs">
-                <label className="font-semibold text-[11px]">Goal & Tone of Email</label>
+                <label className="font-semibold text-[11px]">Goal &amp; Tone of Email</label>
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
                   <div className={`p-2 rounded-lg border text-center font-medium ${
                     previewTheme === "dark" ? "bg-amber-950/30 border-amber-800 text-amber-300" : "bg-amber-50 border-amber-300 text-amber-900"
@@ -432,7 +491,8 @@ export function HeroDashboardPreview() {
 
               <button
                 type="button"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#121212] dark:bg-white text-white dark:text-[#121212] py-2 text-xs font-semibold shadow-sm"
+                onClick={() => handleShowPreviewNotice("AI draft regenerated with updated value proposition")}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#121212] dark:bg-white text-white dark:text-[#121212] py-2 text-xs font-semibold shadow-sm hover:opacity-95"
               >
                 <Wand2 className="h-3.5 w-3.5 text-amber-400" />
                 <span>Regenerate with Zega AI</span>
@@ -463,7 +523,7 @@ export function HeroDashboardPreview() {
                     I noticed HyperScale Tech recently announced your European expansion—congratulations on the milestone!
                   </p>
                   <p>
-                    Growing traffic often introduces unexpected latency and mail deliverability spikes. We built dedicated hybrid mail infrastructure that maintains guaranteed 99.99% inbox placement without paying \$7/seat enterprise penalties.
+                    Growing traffic often introduces unexpected latency and mail deliverability spikes. We built dedicated hybrid mail infrastructure that maintains guaranteed 99.99% inbox placement without paying $7/seat enterprise penalties.
                   </p>
                   <p>
                     Would you be open to a 10-minute sync this Thursday at 3:00 PM to review a quick deliverability diagnostic we ran for your domain?
@@ -475,12 +535,13 @@ export function HeroDashboardPreview() {
                 <span className="text-[11px] text-neutral-400 font-mono">
                   Personalized using LinkedIn + DNS signals
                 </span>
-                <Link
-                  href="/app"
+                <button
+                  type="button"
+                  onClick={handleAiSend}
                   className="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  Send to Client →
-                </Link>
+                  {aiSendStatus || "Send to Client →"}
+                </button>
               </div>
             </div>
           </div>
@@ -494,12 +555,13 @@ export function HeroDashboardPreview() {
                 <h3 className="font-semibold text-sm">Email Campaign Performance</h3>
                 <p className="text-[11px] text-neutral-400">Real-time statistics across active client sequences</p>
               </div>
-              <Link
-                href="/app"
+              <button
+                type="button"
+                onClick={handleCreateMockCampaign}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold shadow-sm hover:bg-emerald-700 transition-colors"
               >
-                <span>+ Create Campaign</span>
-              </Link>
+                <span>{campaignNotice || "+ Create Campaign"}</span>
+              </button>
             </div>
 
             {/* 4 Stat Cards */}
@@ -587,6 +649,87 @@ export function HeroDashboardPreview() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* In-Preview Interactive Quick Composer */}
+        {isMiniComposeOpen && (
+          <div className="absolute inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+            <div className={`w-full max-w-lg rounded-2xl border p-4 shadow-2xl transition-all ${
+              previewTheme === "dark" ? "bg-[#141824] border-[#2f394e] text-white" : "bg-white border-[#eaeaea] text-[#121212]"
+            }`}>
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
+                <div className="flex items-center gap-2">
+                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-semibold text-xs">Simulated In-Frame Mail Composer</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMiniComposeOpen(false)}
+                  className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleMiniSend} className="space-y-3 mt-3 text-xs">
+                <div>
+                  <label className="text-[10px] uppercase font-mono text-neutral-400">To Recipient</label>
+                  <input
+                    type="email"
+                    value={miniRecipient}
+                    onChange={(e) => setMiniRecipient(e.target.value)}
+                    className={`w-full mt-1 px-3 py-1.5 rounded-lg border text-xs ${
+                      previewTheme === "dark" ? "bg-[#1c2232] border-[#2f394e] text-white" : "bg-neutral-50 border-[#eaeaea]"
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-mono text-neutral-400">Subject</label>
+                  <input
+                    type="text"
+                    value={miniSubject}
+                    onChange={(e) => setMiniSubject(e.target.value)}
+                    className={`w-full mt-1 px-3 py-1.5 rounded-lg border text-xs ${
+                      previewTheme === "dark" ? "bg-[#1c2232] border-[#2f394e] text-white" : "bg-neutral-50 border-[#eaeaea]"
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-mono text-neutral-400">Message Body</label>
+                  <textarea
+                    rows={3}
+                    defaultValue="Hi Sarah, following up on the dedicated cloud mail endpoint SLA and Anycast MX routing. Looking forward to our kickoff call!"
+                    className={`w-full mt-1 p-2.5 rounded-lg border text-xs resize-none ${
+                      previewTheme === "dark" ? "bg-[#1c2232] border-[#2f394e] text-white" : "bg-neutral-50 border-[#eaeaea]"
+                    }`}
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+                  <span className="text-[11px] text-neutral-500 font-mono">
+                    {miniStatus || "Dedicated MTA Gateway • RFC 3461 DSN"}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsMiniComposeOpen(false)}
+                      className="px-3 py-1 rounded-lg border text-xs text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={!!miniStatus}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-xs font-semibold shadow-sm hover:opacity-90 disabled:opacity-50"
+                    >
+                      <Send className="h-3 w-3" />
+                      <span>Send via Anycast MTA</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         )}

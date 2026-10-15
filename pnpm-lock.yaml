@@ -105,6 +105,9 @@ importers:
       next:
         specifier: ^15.1.7
         version: 15.5.27(@types/node@22.20.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      nodemailer:
+        specifier: ^6.10.1
+        version: 6.10.1
       react:
         specifier: ^19.0.0
         version: 19.3.0
@@ -118,6 +121,9 @@ importers:
       '@types/node':
         specifier: ^22.13.4
         version: 22.20.5
+      '@types/nodemailer':
+        specifier: ^6.4.24
+        version: 6.4.24
       '@types/react':
         specifier: ^19.0.8
         version: 19.3.0

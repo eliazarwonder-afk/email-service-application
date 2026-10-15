@@ -11,3 +11,4 @@ out
 .env.*.local
 !.env.example
 coverage
+.agents/

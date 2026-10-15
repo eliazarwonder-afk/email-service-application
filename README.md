@@ -33,7 +33,7 @@ ZegaMail transforms your existing cPanel server into a modern, revenue-generatin
 
 * 🚀 **Gmail / Titan Mail User Experience**: Fast, responsive webmail interface with real-time push notifications and dark mode.
 * 🤖 **Zega AI Outreach Studio**: Built-in AI proposal writer, cold email sequences, and high-converting smart replies.
-* 👁️ **Client Read Receipts**: Real-time proposal and invoice tracking pixels that notify clients the second their email is opened.
+* 👁️ **Delivery Status Ticks (Sent ✓ / Delivered ✓✓)**: Zoho/Gmail style delivery confirmation that verifies messages reached the recipient mail server via RFC 3461 DSN.
 * ⚡ **cPanel UAPI Provisioning**: Automatically creates mailboxes, assigns quotas, and manages DKIM/SPF DNS records.
 * 💼 **WHMCS Server Module**: 1-click install into WHMCS with automated service provisioning, invoice billing, and tokenized client area Single Sign-On (SSO).
 * 🔒 **AES-256-GCM Credential Vault**: User SaaS credentials are cryptographically decoupled from raw IMAP/SMTP passwords.
@@ -219,7 +219,7 @@ node scripts/test-live-site.js
 
 * **License**: MIT License — open, extensible, and white-label ready.
 * **Roadmap**:
-  * [x] Next.js 15 Webmail Interface with Read Receipts & AI Studio
+  * [x] Next.js 15 Webmail Interface with Delivery Status Ticks & AI Studio
   * [x] cPanel UAPI Mailbox Provisioning (`Email::add_pop`, Quotas, DKIM)
   * [x] WHM Hosting Account Automation (`createacct`, `suspendacct`)
   * [x] Native WHMCS Server Provisioning Module with 1-Click SSO

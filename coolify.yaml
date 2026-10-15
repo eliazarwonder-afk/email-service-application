@@ -1,0 +1,60 @@
+# Coolify Stack Specification for ZegaMail
+# https://coolify.io/docs/services
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - DATABASE_URL=postgresql://zegabytez:zegabytez_secure_pass@postgres:5432/zegabytez_mail
+      - REDIS_URL=redis://redis:6379
+      - NEXT_PUBLIC_APP_URL=${COOLIFY_FQDN:-http://localhost:3000}
+      - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-mail.zegacloud.com}
+      - CPANEL_SMTP_PORT=${CPANEL_SMTP_PORT:-465}
+      - WHMCS_INTERNAL_WEBHOOK_SECRET=${WHMCS_INTERNAL_WEBHOOK_SECRET:-super_secret_whmcs_webhook_token}
+      - CRON_SECRET=${CRON_SECRET:-zegacloud-cron-secret}
+      - CRYPTO_VERIFICATION_MODE=${CRYPTO_VERIFICATION_MODE:-auto_scanner}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zegabytez
+      POSTGRES_PASSWORD: zegabytez_secure_pass
+      POSTGRES_DB: zegabytez_mail
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zegabytez -d zegabytez_mail"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

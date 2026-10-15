@@ -254,7 +254,7 @@ export function CampaignDetailModal({
 
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="font-semibold text-neutral-700 dark:text-neutral-300">2. Opened (Read Receipts)</span>
+                          <span className="font-semibold text-neutral-700 dark:text-neutral-300">2. Opened (Engagement)</span>
                           <span className="font-mono text-blue-600 font-bold">{metrics.opened} ({openRate}%)</span>
                         </div>
                         <div className="w-full bg-neutral-100 dark:bg-neutral-800 h-2.5 rounded-full overflow-hidden">

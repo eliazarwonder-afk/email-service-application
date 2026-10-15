@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readDb, writeDb, StoredMessage } from "@/lib/store";
 import { cookies } from "next/headers";
 import crypto from "crypto";
+import { sendViaCPanelExim } from "@/lib/cpanel-mail-bridge";
 
 export async function GET() {
   try {
@@ -60,6 +61,19 @@ export async function POST(req: Request) {
       ? content.replace(/<[^>]*>?/gm, "").slice(0, 75) + "…"
       : content.slice(0, 75) + "…";
 
+    // Dispatch message through live cPanel Exim MTA gateway
+    const sendResult = await sendViaCPanelExim({
+      from: `${senderName} <${senderEmail}>`,
+      to: toEmail.trim(),
+      subject: subject.trim(),
+      text: !isHtml ? content : undefined,
+      html: isHtml ? content : undefined,
+      attachments: attachments.map((a: any) => ({
+        filename: a.name || a.filename,
+        content: a.content || a.preview || "",
+      })),
+    });
+
     const newMessage: StoredMessage = {
       id: "msg_" + crypto.randomUUID().slice(0, 8),
       orgId: orgId,
@@ -70,12 +84,13 @@ export async function POST(req: Request) {
       preview: plainPreview,
       body: content,
       date: "Just now",
-      folder: enableTracking ? "tracked" : "sent",
+      folder: "sent",
       isRead: true,
-      tracked: enableTracking,
+      tracked: false,
+      deliveryStatus: sendResult.deliveryStatus,
       openCount: 0,
-      lastOpened: "Awaiting recipient open…",
-      device: "Tracking pixel active (2048-bit DKIM)",
+      lastOpened: sendResult.mtaStatus,
+      device: "cPanel Exim SMTP (TLS 1.3)",
       followUpDue: "In 2 days",
       isHtml: isHtml,
       attachments: attachments,
@@ -85,7 +100,12 @@ export async function POST(req: Request) {
     db.messages.unshift(newMessage);
     writeDb(db);
 
-    return NextResponse.json({ success: true, message: newMessage });
+    return NextResponse.json({
+      success: true,
+      message: newMessage,
+      mtaStatus: sendResult.mtaStatus,
+      deliveryStatus: sendResult.deliveryStatus,
+    });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

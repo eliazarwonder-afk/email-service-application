@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Mail,
   CheckCircle2,
+  CheckCheck,
   Eye,
   ShieldCheck,
   Zap,
@@ -74,7 +75,7 @@ export default function HomePage() {
               New: Zega AI Studio
             </span>
             <span>
-              Now with AI Proposal Generator, Client Read Receipts & Instant Domain DNS Sync.
+              Now with AI Proposal Generator, Real-time Delivery Status Ticks & Instant Domain DNS Sync.
             </span>
             <Link
               href="/pricing"
@@ -112,7 +113,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-[#706f6c] dark:text-[#9ca3af] leading-relaxed max-w-2xl mx-auto font-normal">
-              Dedicated cloud mail infrastructure with built-in client read receipts, Zega AI proposal writer, automated cold sequences, and instant custom domain DNS routing. Stop paying Google Workspace \$7/mo for every single mailbox.
+              Dedicated cloud mail infrastructure with verified delivery ticks, Zega AI proposal writer, automated cold sequences, and instant custom domain DNS routing. Stop paying Google Workspace \$7/mo for every single mailbox.
             </p>
 
             {/* High-End Nested Island CTAs (Button-in-Button Architecture) */}
@@ -244,8 +245,8 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="pt-4 border-t border-[#eaeaea] dark:border-[#202636]">
-                  <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 bg-[#e1f3fe] dark:bg-blue-950/50 border border-[#cbe4fb] dark:border-blue-800 p-2.5 rounded-lg">
-                    <strong>The Zega Mail Fix:</strong> Native read receipts & open notifications built straight into your webmail.
+                  <p className="text-xs font-semibold text-emerald-900 dark:text-emerald-300 bg-[#edf3ec] dark:bg-emerald-950/50 border border-[#d6e6d5] dark:border-emerald-800 p-2.5 rounded-lg">
+                    <strong>The Zega Mail Fix:</strong> Verified delivery status ticks (Zoho style Sent ✓ / Delivered ✓✓) built straight into your webmail.
                   </p>
                 </div>
               </div>
@@ -394,25 +395,25 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Feature 2: Titan-Style Read Receipts */}
-              <div className="rounded-[1.75rem] p-1.5 bg-neutral-200/60 dark:bg-white/5 border border-neutral-300/80 dark:border-white/10 hover:border-blue-400 dark:hover:border-blue-500/50 transition-all shadow-sm">
+              {/* Feature 2: Zoho/Gmail-Style Delivery Ticks */}
+              <div className="rounded-[1.75rem] p-1.5 bg-neutral-200/60 dark:bg-white/5 border border-neutral-300/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all shadow-sm">
                 <div className="rounded-[calc(1.75rem-0.375rem)] bg-white dark:bg-[#11141e] p-6 space-y-4 h-full flex flex-col justify-between">
                   <div className="space-y-3">
-                    <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                      <Eye className="h-5 w-5" />
+                    <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                      <CheckCheck className="h-5 w-5" />
                     </div>
                     <h3 className="font-semibold text-[#121212] dark:text-white text-base">
-                      Native Client Read Receipts
+                      Verified Delivery Status Ticks
                     </h3>
                     <p className="text-sm text-[#706f6c] dark:text-[#9ca3af] leading-relaxed">
-                      Receive discreet timestamped alerts the exact moment a prospective customer opens your quotation, estimate, or contract proposal.
+                      Instant delivery verification (Sent ✓ / Delivered ✓✓) confirming your proposal or invoice reached the recipient mail server via RFC 3461 DSN.
                     </p>
                   </div>
                   <Link
                     href="/app?tab=mail"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline pt-2"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline pt-2"
                   >
-                    <span>Test Read Receipts in App</span>
+                    <span>View Delivery Ticks in App</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>

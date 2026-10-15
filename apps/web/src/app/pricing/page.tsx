@@ -5,9 +5,12 @@ import Link from "next/link";
 import { Check, ArrowRight, HelpCircle, Shield, Sparkles, X, Wand2, TrendingUp } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { CryptoPaymentCheckoutModal } from "@/components/billing/CryptoPaymentCheckoutModal";
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("annual");
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState<"starter" | "growth" | "pro">("growth");
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6] transition-colors">
@@ -27,7 +30,7 @@ export default function PricingPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-[#706f6c] dark:text-[#9ca3af] leading-relaxed">
-            Stop paying \$7 every month for every new employee or intern. One flat monthly rate gives your business professional mailboxes, AI proposal drafting, and client read receipts.
+            Stop paying \$7 every month for every new employee or intern. One flat monthly rate gives your business professional mailboxes, AI proposal drafting, and verified delivery status ticks.
           </p>
 
           {/* Billing Cycle Switch */}
@@ -168,12 +171,16 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <Link
-              href="/signup?plan=starter"
+            <button
+              type="button"
+              onClick={() => {
+                setCheckoutPlan("starter");
+                setIsCheckoutModalOpen(true);
+              }}
               className="w-full text-center rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] py-2.5 text-xs font-semibold text-[#121212] dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
-              Get Started Starter
-            </Link>
+              Get Started Starter (Crypto / Card)
+            </button>
           </div>
 
           {/* Card 3: Business Growth (Featured) */}
@@ -219,9 +226,9 @@ export default function PricingPage() {
                   <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
                   <span><strong>3,000 AI Credits</strong>/mo (Proposals & Smart Replies)</span>
                 </div>
-                <div className="flex items-start gap-2 text-blue-900 dark:text-blue-300 bg-blue-50/70 dark:bg-blue-950/40 p-1.5 rounded font-medium">
-                  <Check className="h-4 w-4 text-blue-700 dark:text-blue-400 shrink-0 mt-0.5" />
-                  <span><strong>Native Client Read Receipts</strong></span>
+                <div className="flex items-start gap-2 text-emerald-900 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/40 p-1.5 rounded font-medium">
+                  <Check className="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong>Verified Delivery Status Ticks (Sent / Delivered ✓✓)</strong></span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
@@ -234,12 +241,16 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <Link
-              href="/signup?plan=growth"
+            <button
+              type="button"
+              onClick={() => {
+                setCheckoutPlan("growth");
+                setIsCheckoutModalOpen(true);
+              }}
               className="w-full text-center rounded-lg bg-[#121212] dark:bg-white py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors shadow-md"
             >
-              Start 14-Day Free Trial
-            </Link>
+              Start 14-Day Free Trial (Crypto / Card)
+            </button>
           </div>
 
           {/* Card 4: Unlimited Pro */}
@@ -291,12 +302,16 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <Link
-              href="/signup?plan=pro"
+            <button
+              type="button"
+              onClick={() => {
+                setCheckoutPlan("pro");
+                setIsCheckoutModalOpen(true);
+              }}
               className="w-full text-center rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] py-2.5 text-xs font-semibold text-[#121212] dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
-              Choose Unlimited Pro
-            </Link>
+              Choose Unlimited Pro (Crypto / Card)
+            </button>
           </div>
         </div>
 
@@ -340,9 +355,9 @@ export default function PricingPage() {
                 <td className="py-3 px-3 text-neutral-500">Basic / Limited</td>
               </tr>
               <tr>
-                <td className="py-3 font-medium text-[#121212] dark:text-white">Client Read Receipts & Open Tracking</td>
+                <td className="py-3 font-medium text-[#121212] dark:text-white">Delivery Status Ticks (Sent ✓ / Delivered ✓✓)</td>
                 <td className="py-3 px-3 bg-[#edf3ec]/40 dark:bg-emerald-950/20 font-semibold text-emerald-700 dark:text-emerald-300">
-                  ✓ Built-in
+                  ✓ Built-in (DSN RFC 3461)
                 </td>
                 <td className="py-3 px-3 text-neutral-500">Requires \$20+/mo extensions</td>
                 <td className="py-3 px-3 text-neutral-500">Basic / manual confirmation</td>
@@ -367,6 +382,13 @@ export default function PricingPage() {
           </table>
         </div>
       </main>
+
+      {/* Crypto & Card Payment Checkout Modal */}
+      <CryptoPaymentCheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        defaultPlan={checkoutPlan}
+      />
 
       <Footer />
     </div>

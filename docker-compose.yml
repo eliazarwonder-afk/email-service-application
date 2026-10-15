@@ -1,27 +1,84 @@
-name: zegabytez-mail-local
+# ==============================================================================
+# ZegaMail Fullstack Docker Compose for Coolify & Production
+# Multi-service stack: Next.js Frontend/API + PostgreSQL 16 + Redis 7 + PgAdmin
+# ==============================================================================
+version: "3.8"
 
 services:
+  # ---------------------------------------------------------------------------
+  # 1. CORE APPLICATION (Next.js 15 Web App + REST API)
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zegabytez-mail-app:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      
+      # Database connection using internal docker service DNS
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-zegabytez}:${SERVICE_PASSWORD_POSTGRES:-zegabytez_secure_pass}@mail-postgres:5432/${POSTGRES_DB:-zegabytez_mail}
+      - REDIS_URL=redis://mail-redis:6379
+      
+      # Coolify Magic Variable: Resolves automatically to the domain assigned in Coolify UI
+      - NEXT_PUBLIC_APP_URL=${SERVICE_FQDN_APP:-http://localhost:3000}
+      
+      # cPanel Exim/Dovecot Mail Gateway Bridge
+      - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-mail.zegacloud.com}
+      - CPANEL_SMTP_PORT=${CPANEL_SMTP_PORT:-465}
+      - CPANEL_SMTP_SECURE=${CPANEL_SMTP_SECURE:-true}
+      
+      # WHMCS Addon Module Secret & Cron Scanner
+      - WHMCS_INTERNAL_WEBHOOK_SECRET=${WHMCS_INTERNAL_WEBHOOK_SECRET:-super_secret_whmcs_webhook_token}
+      - CRON_SECRET=${CRON_SECRET:-zegacloud-cron-secret}
+      - CRYPTO_VERIFICATION_MODE=${CRYPTO_VERIFICATION_MODE:-auto_scanner}
+      - CRYPTO_MIN_CONFIRMATIONS=${CRYPTO_MIN_CONFIRMATIONS:-1}
+      - SESSION_SECRET=${SESSION_SECRET:-zegacloud_session_secret_production_key}
+    depends_on:
+      mail-postgres:
+        condition: service_healthy
+      mail-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    labels:
+      - "coolify.managed=true"
+
+  # ---------------------------------------------------------------------------
+  # 2. DEDICATED DATABASE (PostgreSQL 16 Alpine)
+  # ---------------------------------------------------------------------------
   mail-postgres:
     image: postgres:16-alpine
-    container_name: zegabytez-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: zegabytez
-      POSTGRES_PASSWORD: zegabytez_password_local
-      POSTGRES_DB: zegabytez_mail
+      POSTGRES_USER: ${POSTGRES_USER:-zegabytez}
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES:-zegabytez_secure_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-zegabytez_mail}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U zegabytez -d zegabytez_mail"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zegabytez} -d ${POSTGRES_DB:-zegabytez_mail}"]
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
+  # ---------------------------------------------------------------------------
+  # 3. CACHE & QUEUE ENGINE (Redis 7 Alpine)
+  # ---------------------------------------------------------------------------
   mail-redis:
     image: redis:7-alpine
-    container_name: zegabytez-redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     ports:
@@ -33,14 +90,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 5s
 
+  # ---------------------------------------------------------------------------
+  # 4. DATABASE ADMIN UI (Optional PgAdmin 4)
+  # ---------------------------------------------------------------------------
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: zegabytez-pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@zegabytez.local
-      PGADMIN_DEFAULT_PASSWORD: admin_password_local
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@zegabytez.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin_password_local}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
       - "5050:80"
