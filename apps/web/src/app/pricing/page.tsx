@@ -2,395 +2,586 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Check, ArrowRight, HelpCircle, Shield, Sparkles, X, Wand2, TrendingUp } from "lucide-react";
+import {
+  Check,
+  ArrowRight,
+  HelpCircle,
+  X,
+  CreditCard,
+  Zap,
+  Building,
+  ShieldCheck,
+  CheckCircle2,
+  Sparkles,
+  Layers,
+  ChevronDown
+} from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { CryptoPaymentCheckoutModal } from "@/components/billing/CryptoPaymentCheckoutModal";
+import { useCurrency } from "@/components/CurrencyProvider";
+import { formatPlanPrice, SupportedCurrency, CURRENCY_SYMBOLS } from "@/lib/geo";
+import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
+import {
+  AnimatedShield,
+  AnimatedMail,
+  AnimatedServer,
+  AnimatedGlobe,
+  AnimatedSparkles,
+  AnimatedCheckCheck,
+  AnimatedCreditCard,
+} from "@/components/ui/AnimatedIcon";
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("annual");
+  const { currency, setCurrency, symbol, isAfrica, isNigeria } = useCurrency();
+  const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [checkoutPlan, setCheckoutPlan] = useState<"starter" | "growth" | "pro">("growth");
 
+  // Calculated Pricing Tiers based on selected currency and billing cycle
+  const starterPrice = formatPlanPrice("starter", currency, billingCycle === "annual");
+  const growthPrice = formatPlanPrice("growth", currency, billingCycle === "annual");
+  const proPrice = formatPlanPrice("pro", currency, billingCycle === "annual");
+
+  const openCheckout = (plan: "starter" | "growth" | "pro") => {
+    setCheckoutPlan(plan);
+    setIsCheckoutModalOpen(true);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6] transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6] transition-colors selection:bg-blue-500/20">
       <Navbar />
 
-      <main className="flex-1 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-16">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] px-3.5 py-1 text-xs text-[#706f6c] dark:text-[#9ca3af]">
-            <span className="font-semibold text-neutral-900 dark:text-white">Flat-Rate Pricing</span>
+      <main className="flex-1 py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-16">
+        {/* HEADER SECTION */}
+        <section className="text-center max-w-3xl mx-auto space-y-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 shadow-xs">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-slate-900 dark:text-white">Predictable Flat-Rate Email</span>
             <span>•</span>
-            <span>Includes Zega AI Assistant</span>
+            <span className="text-blue-600 dark:text-blue-400 font-medium">Zero Per-Seat Taxes</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-[#121212] dark:text-white">
-            Predictable Pricing For Your Business Email.
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.1]">
+            Enterprise Business Email. <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
+              Without the Monopoly Tax.
+            </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-[#706f6c] dark:text-[#9ca3af] leading-relaxed">
-            Stop paying \$7 every month for every new employee or intern. One flat monthly rate gives your business professional mailboxes, AI proposal drafting, and verified delivery status ticks.
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
+            Google Workspace and Microsoft charge <strong className="text-slate-900 dark:text-white">\$7 to \$12 per user every month</strong>. 
+            ZegaMail gives your entire team private, NVMe-hosted mailboxes, verified delivery status ticks, and outreach tools at one flat rate.
           </p>
 
-          {/* Billing Cycle Switch */}
-          <div className="pt-4 flex items-center justify-center gap-3">
-            <div className="inline-flex items-center rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-1 text-xs font-medium">
+          {/* CURRENCY & BILLING CYCLE TOGGLE CONTROLS */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* Currency Selector Pills */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] shadow-xs">
+              {(["USD", "NGN", "EUR", "GBP"] as SupportedCurrency[]).map((cur) => (
+                <button
+                  key={cur}
+                  type="button"
+                  onClick={() => setCurrency(cur)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    currency === cur
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  {CURRENCY_SYMBOLS[cur]} {cur}
+                </button>
+              ))}
+            </div>
+
+            {/* Annual vs Monthly Toggle */}
+            <div className="flex items-center p-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] shadow-xs">
               <button
                 type="button"
                 onClick={() => setBillingCycle("monthly")}
-                className={`rounded-md px-3.5 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   billingCycle === "monthly"
-                    ? "bg-[#121212] dark:bg-white text-white dark:text-[#121212] shadow-sm"
-                    : "text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white"
+                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
-                Monthly Billing
+                Monthly
               </button>
               <button
                 type="button"
                 onClick={() => setBillingCycle("annual")}
-                className={`rounded-md px-3.5 py-1.5 transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   billingCycle === "annual"
-                    ? "bg-[#121212] dark:bg-white text-white dark:text-[#121212] shadow-sm"
-                    : "text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white"
+                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <span>Annual Billing</span>
-                <span className="rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.2">
+                <span className="rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.5">
                   Save 20%
                 </span>
               </button>
             </div>
           </div>
-        </div>
 
-        {/* 4 Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1: Free Forever */}
-          <div className="rounded-2xl border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between space-y-6 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors shadow-sm">
+          {/* Geo-Detection Indicator */}
+          <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <AnimatedGlobe size={16} />
+            <span>
+              {isNigeria
+                ? "Auto-detected location: Nigeria. Instant Paystack & Flutterwave checkout enabled."
+                : isAfrica
+                ? "Auto-detected location: Africa. Local Mobile Money & Card payment active."
+                : "Auto-detected location: Global. Instant Stripe Card & Crypto payments active."}
+            </span>
+          </div>
+        </section>
+
+        {/* 4 CORE PRICING CARDS */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* CARD 1: Domain-Linked Free Tier */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between space-y-6 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-xs">
             <div className="space-y-4">
               <div className="space-y-1">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                  Domain-Linked
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Domain Owners
                 </span>
-                <h2 className="text-xl font-semibold text-[#121212] dark:text-white">Free Forever</h2>
-                <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                  Free with any domain registered or hosted via ZegaCloud.
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                  <span>Free Forever</span>
+                  <AnimatedMail size={22} />
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  Included free with any active domain registered or hosted on ZegaCloud.
                 </p>
               </div>
 
               <div className="pt-2">
                 <div className="flex items-baseline gap-1 font-mono">
-                  <span className="text-3xl font-bold text-[#121212] dark:text-white tabular-nums">\$0</span>
-                  <span className="text-xs text-[#706f6c] dark:text-[#9ca3af]">/month</span>
+                  <span className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                    {symbol}0
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/month</span>
                 </div>
-                <p className="text-[11px] text-[#706f6c] dark:text-[#9ca3af] mt-1 font-sans">
-                  Free for the lifetime of your active domain.
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Lifetime free with your domain.
                 </p>
               </div>
 
-              <div className="border-t border-[#eaeaea] dark:border-[#202636] pt-4 space-y-2.5 text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                <div className="flex items-start gap-2 text-[#121212] dark:text-white font-medium">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>2 Free Mailboxes</strong> (`info@`, `support@`)</span>
+              <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <div className="flex items-start gap-2 font-medium text-slate-900 dark:text-white">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span><strong>2 Free Mailboxes</strong> (e.g., info@, support@)</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>2 GB storage per mailbox</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>2 GB Pooled Storage</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Webmail + SSL IMAP/POP3</span>
-                </div>
-                <div className="flex items-start gap-2 text-amber-700 dark:text-amber-400">
-                  <Sparkles className="h-4 w-4 shrink-0 mt-0.5" />
-                  <span><strong>50 AI Generation Credits</strong>/mo</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Verified Delivery Ticks (Sent ✓)</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Anti-spam & virus filter</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Webmail & SSL IMAP/POP3</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>SpamAssassin & Virus Shield</span>
                 </div>
               </div>
             </div>
 
             <Link
               href="/signup?plan=free"
-              className="w-full text-center rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] py-2.5 text-xs font-semibold text-[#121212] dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               Claim Free Mailboxes
             </Link>
           </div>
 
-          {/* Card 2: Starter / Solo */}
-          <div className="rounded-2xl border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between space-y-6 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors shadow-sm">
+          {/* CARD 2: Starter Plan */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between space-y-6 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-xs">
             <div className="space-y-4">
               <div className="space-y-1">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                  Solo Founder
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  Solo Founders & Creators
                 </span>
-                <h2 className="text-xl font-semibold text-[#121212] dark:text-white">Starter</h2>
-                <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                  Bring any custom domain from GoDaddy, Namecheap or Cloudflare.
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                  <span>Starter</span>
+                  <AnimatedShield size={22} />
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  Bring your existing domain or buy a new one. Full business email suite.
                 </p>
               </div>
 
               <div className="pt-2">
                 <div className="flex items-baseline gap-1 font-mono">
-                  <span className="text-3xl font-bold text-[#121212] dark:text-white tabular-nums">
-                    {billingCycle === "annual" ? "\$1.00" : "\$1.20"}
+                  <span className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                    {starterPrice.formatted}
                   </span>
-                  <span className="text-xs text-[#706f6c] dark:text-[#9ca3af]">/month flat</span>
+                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
                 </div>
-                <p className="text-[11px] text-[#706f6c] dark:text-[#9ca3af] mt-1 font-sans">
-                  Total for all mailboxes combined.
+                <p className="text-[11px] text-slate-500 mt-1">
+                  {billingCycle === "annual" ? "Billed annually (Save 20%)" : "Billed monthly"}
                 </p>
               </div>
 
-              <div className="border-t border-[#eaeaea] dark:border-[#202636] pt-4 space-y-2.5 text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                <div className="flex items-start gap-2 text-[#121212] dark:text-white font-medium">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Up to 3 Mailboxes</strong></span>
+              <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <div className="flex items-start gap-2 font-medium text-slate-900 dark:text-white">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span><strong>Up to 10 Mailboxes</strong></span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>10 GB shared cloud storage</span>
-                </div>
-                <div className="flex items-start gap-2 text-amber-700 dark:text-amber-400">
-                  <Sparkles className="h-4 w-4 shrink-0 mt-0.5" />
-                  <span><strong>500 AI Generation Credits</strong>/mo</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>25 GB Fast NVMe Storage Pool</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Use any custom domain</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>1 Custom Domain Connection</span>
+                </div>
+                <div className="flex items-start gap-2 font-medium text-blue-700 dark:text-blue-300">
+                  <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span><strong>Sent ✓ & Delivered ✓✓ Ticks</strong></span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Apple Mail & Outlook sync</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>500 AI Assistant Credits/mo</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Apple Mail & Outlook IMAP/SMTP</span>
                 </div>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => {
-                setCheckoutPlan("starter");
-                setIsCheckoutModalOpen(true);
-              }}
-              className="w-full text-center rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] py-2.5 text-xs font-semibold text-[#121212] dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              onClick={() => openCheckout("starter")}
+              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs"
             >
-              Get Started Starter (Crypto / Card)
+              Get Starter
             </button>
           </div>
 
-          {/* Card 3: Business Growth (Featured) */}
-          <div className="relative rounded-2xl border-2 border-neutral-900 dark:border-neutral-100 bg-white dark:bg-[#151924] p-6 flex flex-col justify-between space-y-6 shadow-xl">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#121212] dark:bg-white text-white dark:text-[#121212] px-3.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm">
-              Most Popular
+          {/* CARD 3: Business Growth (Featured / Google Killer) */}
+          <div className="relative rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-[#151924] p-6 flex flex-col justify-between space-y-6 shadow-xl">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 text-white px-3.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
+              <AnimatedSparkles size={13} />
+              <span>Most Popular</span>
             </div>
 
             <div className="space-y-4">
               <div className="space-y-1">
-                <span className="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-                  The Google Killer
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  The Google Workspace Killer
                 </span>
-                <h2 className="text-xl font-semibold text-[#121212] dark:text-white">Business Growth</h2>
-                <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                  Complete client outreach suite for growing agencies and teams.
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                  <span>Growth</span>
+                  <AnimatedServer size={22} />
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  For growing agencies, creative studios, and multi-team businesses.
                 </p>
               </div>
 
               <div className="pt-2">
                 <div className="flex items-baseline gap-1 font-mono">
-                  <span className="text-3xl font-bold text-[#121212] dark:text-white tabular-nums">
-                    {billingCycle === "annual" ? "\$3.75" : "\$4.50"}
+                  <span className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                    {growthPrice.formatted}
                   </span>
-                  <span className="text-xs text-[#706f6c] dark:text-[#9ca3af]">/month flat</span>
+                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
                 </div>
-                <p className="text-[11px] text-[#2b5930] dark:text-emerald-400 font-medium mt-1 font-sans">
-                  Saves \$600+/yr vs Google Workspace.
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                  Saves \$600+/year compared to per-seat billing.
                 </p>
               </div>
 
-              <div className="border-t border-[#eaeaea] dark:border-[#202636] pt-4 space-y-2.5 text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                <div className="flex items-start gap-2 text-[#121212] dark:text-white font-medium">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Up to 10 Mailboxes</strong></span>
+              <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <div className="flex items-start gap-2 font-medium text-slate-900 dark:text-white">
+                  <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span><strong>Up to 30 Mailboxes</strong></span>
                 </div>
-                <div className="flex items-start gap-2 text-[#121212] dark:text-white font-medium">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>50 GB</strong> shared fast storage</span>
-                </div>
-                <div className="flex items-start gap-2 text-amber-700 dark:text-amber-400 bg-amber-50/70 dark:bg-amber-950/40 p-1.5 rounded font-medium">
-                  <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                  <span><strong>3,000 AI Credits</strong>/mo (Proposals & Smart Replies)</span>
-                </div>
-                <div className="flex items-start gap-2 text-emerald-900 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/40 p-1.5 rounded font-medium">
-                  <Check className="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Verified Delivery Status Ticks (Sent / Delivered ✓✓)</strong></span>
+                <div className="flex items-start gap-2 font-medium text-slate-900 dark:text-white">
+                  <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span><strong>75 GB</strong> High-Speed NVMe Pool</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>5 Custom Domains Setup</span>
+                </div>
+                <div className="flex items-start gap-2 text-blue-900 dark:text-blue-200 bg-blue-50/70 dark:bg-blue-950/40 p-2 rounded-lg font-medium">
+                  <AnimatedCheckCheck size={16} />
+                  <span>Verified 250 OK Server Delivery Status</span>
+                </div>
+                <div className="flex items-start gap-2 text-indigo-900 dark:text-indigo-200 bg-indigo-50/70 dark:bg-indigo-950/40 p-2 rounded-lg font-medium">
+                  <AnimatedSparkles size={16} />
+                  <span>3,000 AI Outreach & Proposal Credits/mo</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span>Outreach Campaigns Engine (1,500 leads/mo)</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>1-Click Automated DNS verification</span>
+                  <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>1-Click Automated DNS Telemetry (SPF, DKIM, DMARC)</span>
                 </div>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => {
-                setCheckoutPlan("growth");
-                setIsCheckoutModalOpen(true);
-              }}
-              className="w-full text-center rounded-lg bg-[#121212] dark:bg-white py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors shadow-md"
+              onClick={() => openCheckout("growth")}
+              className="w-full text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white py-2.5 text-xs font-semibold shadow-md transition-colors flex items-center justify-center gap-1.5"
             >
-              Start 14-Day Free Trial (Crypto / Card)
+              <span>Get Growth Plan</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Card 4: Unlimited Pro */}
-          <div className="rounded-2xl border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between space-y-6 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors shadow-sm">
+          {/* CARD 4: Enterprise Pro */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between space-y-6 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-xs">
             <div className="space-y-4">
               <div className="space-y-1">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Scale & High Volume
                 </span>
-                <h2 className="text-xl font-semibold text-[#121212] dark:text-white">Unlimited Pro</h2>
-                <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                  Zero limits on mailbox count. Built for high-volume delivery.
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                  <span>Enterprise Pro</span>
+                  <AnimatedCreditCard size={22} />
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  For large agencies, corporate fleets, and high-volume outreach teams.
                 </p>
               </div>
 
               <div className="pt-2">
                 <div className="flex items-baseline gap-1 font-mono">
-                  <span className="text-3xl font-bold text-[#121212] dark:text-white tabular-nums">
-                    {billingCycle === "annual" ? "\$10.00" : "\$12.00"}
+                  <span className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                    {proPrice.formatted}
                   </span>
-                  <span className="text-xs text-[#706f6c] dark:text-[#9ca3af]">/month flat</span>
+                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
                 </div>
-                <p className="text-[11px] text-[#706f6c] dark:text-[#9ca3af] mt-1 font-sans">
-                  Unlimited mailboxes on 1 domain.
+                <p className="text-[11px] text-slate-500 mt-1">
+                  {billingCycle === "annual" ? "Billed annually (Save 20%)" : "Billed monthly"}
                 </p>
               </div>
 
-              <div className="border-t border-[#eaeaea] dark:border-[#202636] pt-4 space-y-2.5 text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                <div className="flex items-start gap-2 text-[#121212] dark:text-white font-medium">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <div className="flex items-start gap-2 font-medium text-slate-900 dark:text-white">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span><strong>Unlimited Mailboxes</strong></span>
                 </div>
-                <div className="flex items-start gap-2 text-[#121212] dark:text-white font-medium">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>200 GB</strong> storage pool</span>
-                </div>
-                <div className="flex items-start gap-2 text-amber-700 dark:text-amber-400 font-semibold">
-                  <Sparkles className="h-4 w-4 shrink-0 mt-0.5" />
-                  <span><strong>Unlimited AI Credits</strong> & Auto-Sequences</span>
+                <div className="flex items-start gap-2 font-medium text-slate-900 dark:text-white">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span><strong>200 GB</strong> High-Speed NVMe Storage</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Dedicated Outbound IP pool & Warmup</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Unlimited Custom Domains</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Audit logging & 30-day backups</span>
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Dedicated IP Reputation & Warmup Shield</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>10,000 AI Credits/mo</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>1-Click ZegaCloud Client Area SSO</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Priority 24/7 SLA Phone & Ticket Support</span>
                 </div>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => {
-                setCheckoutPlan("pro");
-                setIsCheckoutModalOpen(true);
-              }}
-              className="w-full text-center rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] py-2.5 text-xs font-semibold text-[#121212] dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              onClick={() => openCheckout("pro")}
+              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs"
             >
-              Choose Unlimited Pro (Crypto / Card)
+              Get Enterprise Pro
             </button>
           </div>
-        </div>
+        </section>
 
-        {/* DETAILED HEAD-TO-HEAD COMPARISON TABLE */}
-        <div className="rounded-2xl border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-8 space-y-6 shadow-sm overflow-x-auto">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-[#121212] dark:text-white">
-              Feature Comparison vs Google & Zoho
+        {/* COMPARISON TABLE: ZEGA MAIL VS GOOGLE WORKSPACE */}
+        <section className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-8 sm:p-10 shadow-sm space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+              Transparent Feature Comparison
             </h2>
-            <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-              How Zega Mail saves your budget while delivering modern AI and business tools.
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Why thousands of businesses are leaving per-seat SaaS platforms.
             </p>
           </div>
 
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-[#eaeaea] dark:border-[#202636] text-[#706f6c] dark:text-[#9ca3af]">
-                <th className="py-3 font-semibold text-neutral-900 dark:text-white w-1/3">Feature</th>
-                <th className="py-3 font-semibold text-[#121212] dark:text-white bg-[#edf3ec]/60 dark:bg-emerald-950/40 px-3 rounded-t-lg">
-                  Zega Mail (Growth)
-                </th>
-                <th className="py-3 font-semibold text-neutral-600 dark:text-neutral-300 px-3">Google Workspace</th>
-                <th className="py-3 font-semibold text-neutral-600 dark:text-neutral-300 px-3">Zoho Mail (Standard)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#eaeaea] dark:divide-[#202636]">
-              <tr>
-                <td className="py-3 font-medium text-[#121212] dark:text-white">Monthly Cost for 10 Mailboxes</td>
-                <td className="py-3 px-3 bg-[#edf3ec]/40 dark:bg-emerald-950/20 font-mono font-bold text-[#2b5930] dark:text-emerald-400">
-                  \$4.50 / mo flat
-                </td>
-                <td className="py-3 px-3 font-mono text-red-600">\$72.00 / mo (\$7.20/user)</td>
-                <td className="py-3 px-3 font-mono">\$12.50 to \$40.00 / mo</td>
-              </tr>
-              <tr>
-                <td className="py-3 font-medium text-[#121212] dark:text-white">AI Proposal & Reply Assistant</td>
-                <td className="py-3 px-3 bg-[#edf3ec]/40 dark:bg-emerald-950/20 font-semibold text-emerald-700 dark:text-emerald-300">
-                  ✓ 3,000 credits included
-                </td>
-                <td className="py-3 px-3 text-neutral-500">Requires \$30/mo Gemini add-on</td>
-                <td className="py-3 px-3 text-neutral-500">Basic / Limited</td>
-              </tr>
-              <tr>
-                <td className="py-3 font-medium text-[#121212] dark:text-white">Delivery Status Ticks (Sent ✓ / Delivered ✓✓)</td>
-                <td className="py-3 px-3 bg-[#edf3ec]/40 dark:bg-emerald-950/20 font-semibold text-emerald-700 dark:text-emerald-300">
-                  ✓ Built-in (DSN RFC 3461)
-                </td>
-                <td className="py-3 px-3 text-neutral-500">Requires \$20+/mo extensions</td>
-                <td className="py-3 px-3 text-neutral-500">Basic / manual confirmation</td>
-              </tr>
-              <tr>
-                <td className="py-3 font-medium text-[#121212] dark:text-white">IMAP & POP3 External Client Access</td>
-                <td className="py-3 px-3 bg-[#edf3ec]/40 dark:bg-emerald-950/20 font-semibold text-emerald-700 dark:text-emerald-300">
-                  ✓ Free on all plans
-                </td>
-                <td className="py-3 px-3 text-neutral-700 dark:text-neutral-300">✓ Included</td>
-                <td className="py-3 px-3 text-red-600 font-medium">Locked on free tier</td>
-              </tr>
-              <tr>
-                <td className="py-3 font-medium text-[#121212] dark:text-white">Automated Domain Provisioning & DNS Sync</td>
-                <td className="py-3 px-3 bg-[#edf3ec]/40 dark:bg-emerald-950/20 font-semibold text-emerald-700 dark:text-emerald-300">
-                  ✓ Native integration
-                </td>
-                <td className="py-3 px-3 text-neutral-500">Not supported</td>
-                <td className="py-3 px-3 text-neutral-500">Not supported</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold uppercase tracking-wider">
+                  <th className="py-3 px-4">Feature & Capability</th>
+                  <th className="py-3 px-4 text-blue-600 dark:text-blue-400 font-bold bg-blue-50/50 dark:bg-blue-950/20 rounded-t-lg">
+                    ZegaMail Flat-Rate
+                  </th>
+                  <th className="py-3 px-4">Google Workspace</th>
+                  <th className="py-3 px-4">Microsoft 365</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
+                <tr>
+                  <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
+                    Cost for 10 Mailboxes
+                  </td>
+                  <td className="py-3.5 px-4 font-bold text-emerald-600 dark:text-emerald-400 bg-blue-50/50 dark:bg-blue-950/20">
+                    {currency === "NGN" ? "₦6,500/mo flat" : "\$4.50/mo flat"}
+                  </td>
+                  <td className="py-3.5 px-4 text-red-600 dark:text-red-400 font-mono">
+                    \$72.00/mo (\$7.20/user)
+                  </td>
+                  <td className="py-3.5 px-4 text-red-600 dark:text-red-400 font-mono">
+                    \$60.00/mo (\$6.00/user)
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
+                    Verified Delivery Status Ticks
+                  </td>
+                  <td className="py-3.5 px-4 text-blue-600 dark:text-blue-400 font-medium bg-blue-50/50 dark:bg-blue-950/20">
+                    Sent ✓ & Delivered ✓✓ (RFC 3461)
+                  </td>
+                  <td className="py-3.5 px-4 text-slate-400">None (Requires invasive 3rd-party plugins)</td>
+                  <td className="py-3.5 px-4 text-slate-400">None without manual read receipts</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
+                    AI Cold Outreach & Lead Engine
+                  </td>
+                  <td className="py-3.5 px-4 text-blue-600 dark:text-blue-400 font-medium bg-blue-50/50 dark:bg-blue-950/20">
+                    Built-in (Multi-step Sequences)
+                  </td>
+                  <td className="py-3.5 px-4 text-slate-400">Requires Lemlist / Instantly (+\$59/mo)</td>
+                  <td className="py-3.5 px-4 text-slate-400">Not supported natively</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
+                    Data Privacy & Ad Profiling
+                  </td>
+                  <td className="py-3.5 px-4 text-emerald-600 dark:text-emerald-400 font-medium bg-blue-50/50 dark:bg-blue-950/20">
+                    100% Zero-Ad Policy (Private NVMe)
+                  </td>
+                  <td className="py-3.5 px-4 text-slate-400">Data ingested for Google ecosystem profiles</td>
+                  <td className="py-3.5 px-4 text-slate-400">Telemetry tracked across MS Graph</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
+                    Global & African Payment Gateways
+                  </td>
+                  <td className="py-3.5 px-4 text-blue-600 dark:text-blue-400 font-medium bg-blue-50/50 dark:bg-blue-950/20">
+                    Paystack, Flutterwave, Stripe, Crypto
+                  </td>
+                  <td className="py-3.5 px-4 text-slate-400">Only US Dollar cards (Fails in Africa)</td>
+                  <td className="py-3.5 px-4 text-slate-400">US Dollar Credit Cards Only</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* FREQUENTLY ASKED QUESTIONS */}
+        <section className="max-w-3xl mx-auto space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Clear answers regarding domains, setup, billing, and mailbox migrations.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: "Can I bring my own domain name?",
+                a: "Yes. You can connect any domain from GoDaddy, Namecheap, Cloudflare, NameSilo, or WHMCS. We provide one-click DNS records (MX, SPF, 2048-bit DKIM, and DMARC) that set up in under 2 minutes.",
+              },
+              {
+                q: "How does the flat-rate pricing work?",
+                a: "Instead of paying $7.20 for every new employee, intern, or contractor, ZegaMail charges one fixed rate for your business. For example, on the Growth plan, you can create up to 30 mailboxes for just $12/month (or ₦18,000/month) total.",
+              },
+              {
+                q: "Which payment methods are accepted?",
+                a: "We support Paystack for Nigerian bank accounts and cards, Flutterwave for Pan-African mobile money and cards, Stripe for global credit and debit cards, and automated Crypto settlement (USDT TRC-20, BTC, ETH, and SOL).",
+              },
+              {
+                q: "What are Verified Delivery Status Ticks?",
+                a: "Unlike email trackers that insert invisible spying images (which spam filters often block), ZegaMail queries the receiving mail server using RFC 3461 SMTP acknowledgement. You receive a checkmark (Sent ✓) and a double checkmark (Delivered ✓✓) when the remote server returns 250 OK.",
+              },
+              {
+                q: "Does ZegaMail work with Apple Mail, Outlook, and mobile apps?",
+                a: "Yes. Every mailbox includes full IMAP, POP3, and SMTP support with TLS 1.3 encryption. You can connect iPhone Mail, Android, Thunderbird, and Outlook seamlessly.",
+              },
+            ].map((faq, i) => (
+              <details
+                key={i}
+                className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-5 [&_summary::-webkit-details-marker]:hidden cursor-pointer"
+              >
+                <summary className="flex items-center justify-between font-semibold text-sm text-slate-900 dark:text-white">
+                  <span>{faq.q}</span>
+                  <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" />
+                </summary>
+                <p className="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {/* CALL TO ACTION BANNER */}
+        <section className="rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-700 to-slate-900 p-8 sm:p-12 text-white text-center space-y-6 shadow-xl">
+          <div className="max-w-2xl mx-auto space-y-3">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              Ready to Upgrade Your Business Email?
+            </h2>
+            <p className="text-sm sm:text-base text-blue-100 leading-relaxed">
+              Join thousands of businesses saving over 80% on email costs with enterprise deliverability and 100% privacy.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => openCheckout("growth")}
+              className="px-6 py-3 rounded-xl bg-white text-slate-900 font-bold text-xs hover:bg-slate-100 transition-colors shadow-lg"
+            >
+              Start 14-Day Free Growth Trial
+            </button>
+            <Link
+              href="/app"
+              className="px-6 py-3 rounded-xl border border-white/30 text-white font-semibold text-xs hover:bg-white/10 transition-colors"
+            >
+              Explore Interactive Demo
+            </Link>
+          </div>
+        </section>
       </main>
 
-      {/* Crypto & Card Payment Checkout Modal */}
-      <CryptoPaymentCheckoutModal
+      <Footer />
+
+      {/* MULTI-GATEWAY CHECKOUT MODAL */}
+      <UnifiedPaymentCheckoutModal
         isOpen={isCheckoutModalOpen}
         onClose={() => setIsCheckoutModalOpen(false)}
         defaultPlan={checkoutPlan}
+        onPaymentSuccess={(plan) => {
+          setIsCheckoutModalOpen(false);
+          window.location.href = `/app?upgraded=${plan}`;
+        }}
       />
-
-      <Footer />
     </div>
   );
 }

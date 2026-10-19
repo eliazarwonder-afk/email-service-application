@@ -19,7 +19,8 @@ import { DashboardModals } from "@/components/dashboard/DashboardModals";
 import { CampaignsWorkspace } from "@/components/campaigns/CampaignsWorkspace";
 import { FullComposeWorkspace } from "@/components/mail/FullComposeWorkspace";
 import { DomainsWorkspace } from "@/components/domains/DomainsWorkspace";
-import { CryptoPaymentCheckoutModal } from "@/components/billing/CryptoPaymentCheckoutModal";
+import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
+import { MailboxSkeletonLoader } from "@/components/mail/MailboxSkeletonLoader";
 
 export default function WebmailAppPage() {
   const router = useRouter();
@@ -519,8 +520,8 @@ export default function WebmailAppPage() {
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#07090e] text-slate-900 dark:text-slate-100 overflow-hidden font-sans transition-colors">
-      {/* WHMCS BILLING & CRYPTO CHECKOUT MODAL */}
-      <CryptoPaymentCheckoutModal
+      {/* WHMCS BILLING & MULTI-GATEWAY CHECKOUT MODAL */}
+      <UnifiedPaymentCheckoutModal
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
         defaultPlan={currentOrg?.plan === "pro" ? "pro" : currentOrg?.plan === "starter" ? "starter" : "growth"}
@@ -647,7 +648,9 @@ export default function WebmailAppPage() {
                     mobileMailView === "message" ? "hidden" : "flex"
                   } md:flex flex-col w-full md:w-5/12 lg:w-4/12 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1017] overflow-y-auto shrink-0 select-none`}
                 >
-                  {filteredMessages.length === 0 ? (
+                  {isLoadingMessages ? (
+                    <MailboxSkeletonLoader />
+                  ) : filteredMessages.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
                       <p className="text-xs font-medium">No messages found in this folder.</p>
                       <p className="text-[11px] text-slate-400 mt-1">

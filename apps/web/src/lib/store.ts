@@ -197,7 +197,7 @@ export interface StoredOrder {
   billingCycle: "monthly" | "annually";
   amount: number;
   currency: string;
-  paymentMethod: "crypto_usdt_trc20" | "crypto_btc" | "crypto_eth" | "crypto_sol" | "stripe_card";
+  paymentMethod: string;
   paymentMethodName: string;
   status: "pending" | "paid" | "active" | "cancelled";
   invoiceId: string; // "WHMCS-INV-10942"
@@ -1130,6 +1130,8 @@ export function createOrderAndInvoice({
   planId,
   billingCycle,
   paymentMethod,
+  currency = "USD",
+  customAmount,
 }: {
   orgId: string;
   userId: string;
@@ -1137,20 +1139,38 @@ export function createOrderAndInvoice({
   clientName: string;
   planId: "starter" | "growth" | "pro";
   billingCycle: "monthly" | "annually";
-  paymentMethod: "crypto_usdt_trc20" | "crypto_btc" | "crypto_eth" | "crypto_sol" | "stripe_card";
+  paymentMethod: string;
+  currency?: string;
+  customAmount?: number;
 }): { order: StoredOrder; invoice: StoredInvoice } {
   const db = readDb();
   if (!db.orders) db.orders = [];
   if (!db.invoices) db.invoices = [];
 
-  const planPricing: Record<string, { monthly: number; annually: number; name: string }> = {
-    starter: { monthly: 1.50, annually: 14.40, name: "ZegaMail Starter" },
-    growth: { monthly: 3.20, annually: 30.72, name: "ZegaMail Business Growth" },
-    pro: { monthly: 6.50, annually: 62.40, name: "ZegaMail Pro Scale" },
+  const isNgn = currency === "NGN";
+  const planNames: Record<string, string> = {
+    starter: "ZegaMail Starter Business",
+    growth: "ZegaMail Business Growth",
+    pro: "ZegaMail Enterprise Pro",
   };
 
-  const selectedPlan = planPricing[planId] || planPricing.growth;
-  const amount = billingCycle === "annually" ? selectedPlan.annually : selectedPlan.monthly;
+  const defaultPricingUsd: Record<string, { monthly: number; annually: number }> = {
+    starter: { monthly: 5.00, annually: 43.20 }, // $4.50 * 12 * 0.8
+    growth: { monthly: 14.00, annually: 115.20 }, // $12.00 * 12 * 0.8
+    pro: { monthly: 35.00, annually: 278.40 }, // $29.00 * 12 * 0.8
+  };
+
+  const defaultPricingNgn: Record<string, { monthly: number; annually: number }> = {
+    starter: { monthly: 7500, annually: 62400 },
+    growth: { monthly: 21000, annually: 172800 },
+    pro: { monthly: 52000, annually: 417600 },
+  };
+
+  const pricingTable = isNgn ? defaultPricingNgn : defaultPricingUsd;
+  const planInfo = pricingTable[planId] || pricingTable.growth;
+  const calculatedAmount = billingCycle === "annually" ? planInfo.annually : planInfo.monthly;
+  const amount = customAmount !== undefined ? customAmount : calculatedAmount;
+
   const whmcsOrderIdNum = Math.floor(1000 + Math.random() * 9000).toString();
   const whmcsInvoiceIdNum = Math.floor(10000 + Math.random() * 90000).toString();
   const orderId = "ord_" + Date.now().toString(36);
@@ -1160,18 +1180,19 @@ export function createOrderAndInvoice({
   // Crypto wallet address & amount calculations
   let cryptoDetails: CryptoPaymentDetails | undefined = undefined;
 
-  if (paymentMethod === "crypto_usdt_trc20") {
-    const usdtAmt = amount.toFixed(2);
+  if (paymentMethod === "crypto_usdt_trc20" || paymentMethod === "usdt_trc20") {
+    const usdEquiv = isNgn ? (amount / 1500).toFixed(2) : amount.toFixed(2);
     const addr = "TX7k1dZega9xMailTRC20Wallet88NVMe";
     cryptoDetails = {
       cryptoCurrency: "USDT_TRC20",
-      cryptoAmount: usdtAmt,
+      cryptoAmount: usdEquiv,
       walletAddress: addr,
-      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=tron:${addr}?amount=${usdtAmt}`,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=tron:${addr}?amount=${usdEquiv}`,
       network: "TRON (TRC-20)",
     };
-  } else if (paymentMethod === "crypto_btc") {
-    const btcAmt = (amount / 65000).toFixed(6);
+  } else if (paymentMethod === "crypto_btc" || paymentMethod === "btc") {
+    const usdEquiv = isNgn ? amount / 1500 : amount;
+    const btcAmt = (usdEquiv / 65000).toFixed(6);
     const addr = "bc1qzega9xmailcloud77anycast001btc";
     cryptoDetails = {
       cryptoCurrency: "BTC",
@@ -1180,8 +1201,9 @@ export function createOrderAndInvoice({
       qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=bitcoin:${addr}?amount=${btcAmt}`,
       network: "Bitcoin Mainnet",
     };
-  } else if (paymentMethod === "crypto_eth") {
-    const ethAmt = (amount / 3500).toFixed(5);
+  } else if (paymentMethod === "crypto_eth" || paymentMethod === "eth") {
+    const usdEquiv = isNgn ? amount / 1500 : amount;
+    const ethAmt = (usdEquiv / 3500).toFixed(5);
     const addr = "0x71C2ega9xMailAnycastNVMeCluster8842";
     cryptoDetails = {
       cryptoCurrency: "ETH",
@@ -1190,8 +1212,9 @@ export function createOrderAndInvoice({
       qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=ethereum:${addr}?amount=${ethAmt}`,
       network: "Ethereum (ERC-20)",
     };
-  } else if (paymentMethod === "crypto_sol") {
-    const solAmt = (amount / 160).toFixed(4);
+  } else if (paymentMethod === "crypto_sol" || paymentMethod === "sol") {
+    const usdEquiv = isNgn ? amount / 1500 : amount;
+    const solAmt = (usdEquiv / 160).toFixed(4);
     const addr = "ZegaSoL9xMailAnycastClusterSolana99";
     cryptoDetails = {
       cryptoCurrency: "SOL",
@@ -1203,12 +1226,21 @@ export function createOrderAndInvoice({
   }
 
   const paymentNames: Record<string, string> = {
+    paystack: "Paystack (Cards, Bank Transfer & USSD)",
+    flutterwave: "Flutterwave (Pan-African Mobile Money & Cards)",
+    stripe: "Stripe (International Cards)",
+    stripe_card: "Credit / Debit Card (Stripe)",
     crypto_usdt_trc20: "Tether USDT (TRC-20)",
     crypto_btc: "Bitcoin (BTC)",
     crypto_eth: "Ethereum (ETH)",
     crypto_sol: "Solana (SOL)",
-    stripe_card: "Credit / Debit Card (Stripe)",
+    usdt_trc20: "Tether USDT (TRC-20)",
+    btc: "Bitcoin (BTC)",
+    eth: "Ethereum (ETH)",
+    sol: "Solana (SOL)",
   };
+
+  const isCardPrePaid = paymentMethod === "stripe_card";
 
   const newOrder: StoredOrder = {
     id: orderId,
@@ -1218,13 +1250,13 @@ export function createOrderAndInvoice({
     clientEmail,
     clientName,
     planId,
-    planName: selectedPlan.name,
+    planName: planNames[planId] || "ZegaMail Plan",
     billingCycle,
     amount,
-    currency: "USD",
+    currency,
     paymentMethod,
     paymentMethodName: paymentNames[paymentMethod] || paymentMethod,
-    status: paymentMethod === "stripe_card" ? "active" : "pending",
+    status: isCardPrePaid ? "active" : "pending",
     invoiceId,
     cryptoDetails,
     whmcsOrderId: whmcsOrderIdNum,
@@ -1239,17 +1271,16 @@ export function createOrderAndInvoice({
     orgId,
     userId,
     amount,
-    currency: "USD",
-    status: paymentMethod === "stripe_card" ? "paid" : "unpaid",
+    currency,
+    status: isCardPrePaid ? "paid" : "unpaid",
     dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString().split("T")[0],
-    datePaid: paymentMethod === "stripe_card" ? new Date().toISOString() : undefined,
+    datePaid: isCardPrePaid ? new Date().toISOString() : undefined,
     paymentMethod: paymentNames[paymentMethod] || paymentMethod,
-    description: `${selectedPlan.name} (${billingCycle === "annually" ? "Annual" : "Monthly"} billing)`,
+    description: `${planNames[planId] || planId} (${billingCycle === "annually" ? "Annual" : "Monthly"} billing)`,
     createdAt: new Date().toISOString(),
   };
 
-  // If card payment, automatically upgrade organization plan
-  if (paymentMethod === "stripe_card") {
+  if (isCardPrePaid) {
     const org = db.orgs.find((o) => o.id === orgId);
     if (org) {
       org.plan = planId;

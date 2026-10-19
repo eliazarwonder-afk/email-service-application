@@ -416,6 +416,11 @@
       "token": "ses_5098d24699a7e3e621995b8185bdb56dc44a79b41de09d76",
       "userId": "usr_af51b31c",
       "expiresAt": "2026-10-21T14:53:26.453Z"
+    },
+    {
+      "token": "ses_4dd0e27a75d2d41f0859e810ac64e433fb8eeda6cccba7ea",
+      "userId": "usr_af51b31c",
+      "expiresAt": "2026-10-26T13:15:29.966Z"
     }
   ],
   "campaigns": [
@@ -927,6 +932,34 @@
   ],
   "orders": [
     {
+      "id": "ord_mvfa9sfj",
+      "orderNumber": "WHMCS-ORD-2026-2761",
+      "orgId": "org_5e75a942",
+      "userId": "usr_af51b31c",
+      "clientEmail": "redemptionnewton@gmail.com",
+      "clientName": "Redemption Ehaoleudu",
+      "planId": "growth",
+      "planName": "ZegaMail Business Growth",
+      "billingCycle": "annually",
+      "amount": 30.72,
+      "currency": "USD",
+      "paymentMethod": "crypto_usdt_trc20",
+      "paymentMethodName": "Tether USDT (TRC-20)",
+      "status": "pending",
+      "invoiceId": "WHMCS-INV-83684",
+      "cryptoDetails": {
+        "cryptoCurrency": "USDT_TRC20",
+        "cryptoAmount": "30.72",
+        "walletAddress": "TX7k1dZega9xMailTRC20Wallet88NVMe",
+        "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=tron:TX7k1dZega9xMailTRC20Wallet88NVMe?amount=30.72",
+        "network": "TRON (TRC-20)"
+      },
+      "whmcsOrderId": "2761",
+      "whmcsInvoiceId": "83684",
+      "createdAt": "2026-10-19T13:21:48.079Z",
+      "updatedAt": "2026-10-19T13:21:48.079Z"
+    },
+    {
       "id": "ord_mv89kagz",
       "orderNumber": "WHMCS-ORD-2026-6376",
       "orgId": "org_acme_001",
@@ -1049,6 +1082,19 @@
     }
   ],
   "invoices": [
+    {
+      "id": "WHMCS-INV-83684",
+      "orderId": "ord_mvfa9sfj",
+      "orgId": "org_5e75a942",
+      "userId": "usr_af51b31c",
+      "amount": 30.72,
+      "currency": "USD",
+      "status": "unpaid",
+      "dueDate": "2026-10-26",
+      "paymentMethod": "Tether USDT (TRC-20)",
+      "description": "ZegaMail Business Growth (Annual billing)",
+      "createdAt": "2026-10-19T13:21:48.080Z"
+    },
     {
       "id": "WHMCS-INV-74254",
       "orderId": "ord_mv89kagz",

@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { CurrencyProvider } from "@/components/CurrencyProvider";
 
 export const metadata: Metadata = {
   title: "Zega Mail — Professional Business Email & Client Outreach | A product of ZegaCloud",
@@ -35,7 +36,9 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning className="antialiased min-h-screen selection:bg-neutral-200 dark:selection:bg-neutral-800 bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6]">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <CurrencyProvider>{children}</CurrencyProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

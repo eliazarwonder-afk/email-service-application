@@ -28,15 +28,31 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { HeroDashboardPreview } from "@/components/HeroDashboardPreview";
 import { ClientSetupModal } from "@/components/ClientSetupModal";
+import { useCurrency } from "@/components/CurrencyProvider";
+import { formatPlanPrice, SupportedCurrency, CURRENCY_SYMBOLS } from "@/lib/geo";
+import {
+  AnimatedShield,
+  AnimatedMail,
+  AnimatedServer,
+  AnimatedGlobe,
+  AnimatedSparkles,
+  AnimatedCheckCheck,
+  AnimatedCreditCard,
+} from "@/components/ui/AnimatedIcon";
 
 export default function HomePage() {
+  const { currency, setCurrency, symbol, isAfrica, isNigeria } = useCurrency();
   const [calculatorUsers, setCalculatorUsers] = useState<number>(6);
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  const starterPrice = formatPlanPrice("starter", currency, true);
+  const growthPrice = formatPlanPrice("growth", currency, true);
+  const proPrice = formatPlanPrice("pro", currency, true);
+
   const googleCost = calculatorUsers * 7.20 * 12; // $7.20/user/mo
-  const zegaCost = 4.50 * 12; // $4.50/mo flat for up to 10 users
-  const annualSavings = Math.max(0, Math.round(googleCost - zegaCost));
+  const zegaCost = (currency === "NGN" ? (6500 * 12) : (4.50 * 12));
+  const annualSavings = Math.max(0, Math.round(googleCost - (4.50 * 12)));
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -171,7 +187,7 @@ export default function HomePage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-7 flex flex-col justify-between shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 dark:border-blue-900">
-                  <DollarSign className="w-5 h-5" />
+                  <AnimatedCreditCard size={22} />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                   1. Eliminate the Per-Seat Tax
@@ -182,7 +198,7 @@ export default function HomePage() {
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                  <strong>ZegaMail Solution:</strong> Flat \$4.50/mo for up to 10 mailboxes. No per-user penalty.
+                  <strong>ZegaMail Solution:</strong> Flat {starterPrice.formatted}/mo for up to 10 mailboxes. No per-user penalty.
                 </p>
               </div>
             </div>
@@ -191,7 +207,7 @@ export default function HomePage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-7 flex flex-col justify-between shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
-                  <CheckCheck className="w-5 h-5" />
+                  <AnimatedCheckCheck size={22} />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                   2. Verified Delivery Status Ticks
@@ -211,7 +227,7 @@ export default function HomePage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-7 flex flex-col justify-between shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200 dark:border-purple-900">
-                  <Shield className="w-5 h-5" />
+                  <AnimatedShield size={22} />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                   3. 100% Privacy (Zero Ad Scraping)
@@ -292,7 +308,7 @@ export default function HomePage() {
 
         {/* TRANSPARENT PRICING GRID */}
         <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
+          <div className="text-center max-w-2xl mx-auto space-y-4">
             <span className="text-xs font-mono uppercase tracking-widest text-blue-600 dark:text-blue-400 font-bold">
               Simple, Honest Pricing
             </span>
@@ -302,6 +318,24 @@ export default function HomePage() {
             <p className="text-base text-slate-600 dark:text-slate-400">
               Pick the tier that fits your business. Upgrade or downgrade at any time.
             </p>
+
+            {/* Currency Switcher */}
+            <div className="pt-2 flex items-center justify-center gap-1.5">
+              {(["USD", "NGN", "EUR", "GBP"] as SupportedCurrency[]).map((cur) => (
+                <button
+                  key={cur}
+                  type="button"
+                  onClick={() => setCurrency(cur)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                    currency === cur
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  {CURRENCY_SYMBOLS[cur]} {cur}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -309,18 +343,20 @@ export default function HomePage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 flex flex-col justify-between shadow-sm">
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Starter</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white">\$4.50</span>
-                  <span className="text-xs text-slate-500 font-medium">/month</span>
+                <div className="flex items-baseline gap-1 font-mono">
+                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                    {starterPrice.formatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">Perfect for solo founders, freelancers, and small startups.</p>
 
                 <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Up to 5 Mailboxes included
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Up to 10 Mailboxes included
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> 10 GB Pooled NVMe Storage
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> 25 GB Pooled NVMe Storage
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> 1 Custom Domain Setup
@@ -344,33 +380,36 @@ export default function HomePage() {
 
             {/* Growth Plan (Recommended) */}
             <div className="rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-slate-900 p-8 flex flex-col justify-between shadow-xl relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-blue-600 text-white font-bold text-[10px] tracking-wide uppercase">
-                Most Popular
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-blue-600 text-white font-bold text-[10px] tracking-wide uppercase flex items-center gap-1">
+                <AnimatedSparkles size={12} />
+                <span>Most Popular</span>
               </div>
 
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Growth</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white">\$12.00</span>
-                  <span className="text-xs text-slate-500 font-medium">/month</span>
+                <div className="flex items-baseline gap-1 font-mono">
+                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                    {growthPrice.formatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">For growing agencies, creative studios, and sales teams.</p>
 
                 <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <li className="flex items-center gap-2 font-medium">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Up to 15 Mailboxes included
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Up to 30 Mailboxes included
                   </li>
                   <li className="flex items-center gap-2 font-medium">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> 50 GB Pooled Storage
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> 75 GB Pooled Storage
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> 3 Custom Domains
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> 5 Custom Domains
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Multi-Touch Cold Outreach Engine
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Automated On-Chain Crypto Settlement
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Automated Paystack, Stripe & Crypto Settlement
                   </li>
                 </ul>
               </div>
@@ -387,9 +426,11 @@ export default function HomePage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 flex flex-col justify-between shadow-sm">
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Enterprise Pro</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white">\$29.00</span>
-                  <span className="text-xs text-slate-500 font-medium">/month</span>
+                <div className="flex items-baseline gap-1 font-mono">
+                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                    {proPrice.formatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">For scaling organizations needing unlimited mailboxes and high volume.</p>
 
