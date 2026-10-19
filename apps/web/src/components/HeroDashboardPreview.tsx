@@ -132,12 +132,9 @@ export function HeroDashboardPreview() {
           <div className="flex-1 max-w-md mx-auto hidden md:block">
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                readOnly
-                value="Search in mail..."
-                className="w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-full pl-9 pr-4 py-1.5 text-xs text-slate-500 dark:text-slate-400 cursor-default focus:outline-none"
-              />
+              <div className="w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-full pl-9 pr-4 py-1.5 text-xs text-slate-400 select-none cursor-default">
+                Search in mail...
+              </div>
             </div>
           </div>
 

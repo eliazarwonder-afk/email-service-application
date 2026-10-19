@@ -19,7 +19,6 @@ import { DashboardModals } from "@/components/dashboard/DashboardModals";
 import { CampaignsWorkspace } from "@/components/campaigns/CampaignsWorkspace";
 import { FullComposeWorkspace } from "@/components/mail/FullComposeWorkspace";
 import { DomainsWorkspace } from "@/components/domains/DomainsWorkspace";
-import { DashboardLoadingSplash } from "@/components/DashboardLoadingSplash";
 import { CryptoPaymentCheckoutModal } from "@/components/billing/CryptoPaymentCheckoutModal";
 
 export default function WebmailAppPage() {
@@ -46,7 +45,6 @@ export default function WebmailAppPage() {
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const [isAppLoadingSplash, setIsAppLoadingSplash] = useState(true);
 
   // Custom Folders & Templates
   const [customFolders, setCustomFolders] = useState<any[]>([]);
@@ -521,14 +519,6 @@ export default function WebmailAppPage() {
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#07090e] text-slate-900 dark:text-slate-100 overflow-hidden font-sans transition-colors">
-      {/* BRANDED DASHBOARD LOADING ANIMATION */}
-      {isAppLoadingSplash && (
-        <DashboardLoadingSplash
-          onComplete={() => setIsAppLoadingSplash(false)}
-          minDurationMs={1000}
-        />
-      )}
-
       {/* WHMCS BILLING & CRYPTO CHECKOUT MODAL */}
       <CryptoPaymentCheckoutModal
         isOpen={isUpgradeModalOpen}

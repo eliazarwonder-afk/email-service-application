@@ -257,6 +257,7 @@ export default function HomePage() {
                 max="25"
                 value={calculatorUsers}
                 onChange={(e) => setCalculatorUsers(parseInt(e.target.value, 10))}
+                suppressHydrationWarning
                 className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
               />
 
