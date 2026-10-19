@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { readDb, writeDb, hashPassword } from "@/lib/store";
+import { checkRateLimit, timingSafeCompare } from "@/lib/security";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
     const body = await req.json();
     const { email, password } = body;
 
@@ -14,21 +16,36 @@ export async function POST(req: Request) {
       );
     }
 
-    const db = readDb();
     const cleanEmail = email.toLowerCase().trim();
+
+    // Security: Rate limit login attempts to prevent brute-force attacks
+    const rateCheck = checkRateLimit(`login_${ip}_${cleanEmail}`, 5, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Too many failed login attempts. Please wait 60 seconds before trying again.",
+          retryAfterMs: rateCheck.resetInMs,
+        },
+        { status: 429 }
+      );
+    }
+
+    const db = readDb();
     const user = db.users.find((u) => u.email.toLowerCase() === cleanEmail);
 
+    // Security: Generic error message to prevent user enumeration
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "Invalid credentials. No account found with this email." },
+        { success: false, error: "Invalid email or password." },
         { status: 401 }
       );
     }
 
     const calculatedHash = hashPassword(password);
-    if (user.passwordHash !== calculatedHash) {
+    if (!timingSafeCompare(user.passwordHash, calculatedHash)) {
       return NextResponse.json(
-        { success: false, error: "Invalid password. Please check your credentials and try again." },
+        { success: false, error: "Invalid email or password." },
         { status: 401 }
       );
     }

@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
 import { readDb } from "@/lib/store";
+import { timingSafeCompare } from "@/lib/security";
 
 export async function POST(req: Request) {
   try {
     const authSecret = req.headers.get("x-zegabytez-whmcs-secret");
+    const authBearer = req.headers.get("authorization")?.replace("Bearer ", "");
     const configuredSecret = process.env.WHMCS_INTERNAL_WEBHOOK_SECRET || "super_secret_whmcs_webhook_token";
 
-    if (process.env.NODE_ENV === "production" && authSecret !== configuredSecret) {
+    const isSecretValid = authSecret ? timingSafeCompare(authSecret, configuredSecret) : false;
+    const isBearerValid = authBearer ? timingSafeCompare(authBearer, configuredSecret) : false;
+
+    if (process.env.NODE_ENV === "production" && !isSecretValid && !isBearerValid) {
       return NextResponse.json({ success: false, error: "Unauthorized WHMCS secret." }, { status: 401 });
     }
 
