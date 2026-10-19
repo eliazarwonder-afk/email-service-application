@@ -1,42 +1,68 @@
 import { NextResponse } from "next/server";
-import { readDb, writeDb, hashPassword, StoredUser, StoredOrg, StoredDomain, StoredMailbox } from "@/lib/store";
+import { readDb, writeDb, hashPassword, StoredUser } from "@/lib/store";
+import { sendVerificationEmail } from "@/lib/email-service";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { fullName, email, password, companyName, domainName, domainType, plan } = body;
+    const { fullName, email, password, companyName, phoneNumber, cacNumber } = body;
 
-    if (!email || !password || !fullName || !companyName) {
+    if (!email || !password || !fullName) {
       return NextResponse.json(
-        { success: false, error: "Please provide full name, work email, company name, and password." },
+        { success: false, error: "Please provide your full name, work email address, and password." },
         { status: 400 }
       );
     }
 
-    const db = readDb();
+    if (password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: "Password must be at least 6 characters long." },
+        { status: 400 }
+      );
+    }
+
     const cleanEmail = email.toLowerCase().trim();
+    const db = readDb();
 
     // Check if user already exists
     const existing = db.users.find((u) => u.email.toLowerCase() === cleanEmail);
     if (existing) {
-      return NextResponse.json(
-        { success: false, error: "An account with this email address already exists. Please sign in instead." },
-        { status: 409 }
-      );
+      // If user exists and is already verified
+      if (existing.emailVerified) {
+        return NextResponse.json(
+          { success: false, error: "An account with this email address already exists. Please sign in instead." },
+          { status: 409 }
+        );
+      } else {
+        // If user exists but is unverified, regenerate code and prompt verification
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        existing.verificationCode = code;
+        existing.verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        existing.passwordHash = hashPassword(password);
+        existing.name = fullName.trim();
+        if (companyName) existing.companyName = companyName.trim();
+        if (phoneNumber) existing.phoneNumber = phoneNumber.trim();
+        if (cacNumber) existing.cacNumber = cacNumber.trim();
+
+        writeDb(db);
+        const emailRes = await sendVerificationEmail(cleanEmail, existing.name, code);
+
+        return NextResponse.json({
+          success: true,
+          requiresVerification: true,
+          email: cleanEmail,
+          previewCode: emailRes.previewCode,
+          message: "A confirmation code has been dispatched to your email address.",
+        });
+      }
     }
 
     const userId = "usr_" + crypto.randomUUID().slice(0, 8);
     const orgId = "org_" + crypto.randomUUID().slice(0, 8);
-    const domainId = "dom_" + crypto.randomUUID().slice(0, 8);
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const actualDomain = domainName
-      ? domainName.trim()
-      : cleanEmail.includes("@")
-      ? cleanEmail.split("@")[1]
-      : "mybrand.com";
-
-    // Create User
+    // Create User (unverified until 6-digit confirmation code is entered)
     const newUser: StoredUser = {
       id: userId,
       name: fullName.trim(),
@@ -44,108 +70,30 @@ export async function POST(req: Request) {
       passwordHash: hashPassword(password),
       role: "owner",
       orgId: orgId,
+      emailVerified: false,
+      verificationCode,
+      verificationCodeExpires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      authProvider: "email",
+      companyName: companyName ? companyName.trim() : undefined,
+      phoneNumber: phoneNumber ? phoneNumber.trim() : undefined,
+      cacNumber: cacNumber ? cacNumber.trim() : undefined,
       createdAt: new Date().toISOString(),
-    };
-
-    // Create Org
-    const newOrg: StoredOrg = {
-      id: orgId,
-      name: companyName.trim(),
-      ownerId: userId,
-      plan: plan || "growth",
-      whmcsClientId: "ZCL-CL-" + Math.floor(10000 + Math.random() * 90000),
-      createdAt: new Date().toISOString(),
-    };
-
-    // Create Domain
-    const newDomain: StoredDomain = {
-      id: domainId,
-      orgId: orgId,
-      domainName: actualDomain,
-      domainType: domainType || "existing",
-      verified: true,
-      mxStatus: "verified",
-      spfStatus: "verified",
-      dkimStatus: "verified",
-      dmarcStatus: "verified",
-      whmcsOrderId: "WHMCS-ORD-" + Math.floor(10000 + Math.random() * 90000),
-      createdAt: new Date().toISOString(),
-    };
-
-    // Create Default Mailboxes
-    const mailboxPrefix = cleanEmail.includes("@") ? cleanEmail.split("@")[0] : "alex";
-    const mailbox1: StoredMailbox = {
-      id: "mbx_" + crypto.randomUUID().slice(0, 8),
-      orgId: orgId,
-      emailAddress: `${mailboxPrefix}@${actualDomain}`,
-      role: "Organization Owner",
-      quotaMb: 5000,
-      usedMb: 12,
-      status: "active",
-      createdAt: new Date().toISOString(),
-    };
-
-    const mailbox2: StoredMailbox = {
-      id: "mbx_" + crypto.randomUUID().slice(0, 8),
-      orgId: orgId,
-      emailAddress: `info@${actualDomain}`,
-      role: "General Inquiries",
-      quotaMb: 5000,
-      usedMb: 0,
-      status: "active",
-      createdAt: new Date().toISOString(),
-    };
-
-    // Welcome email message
-    const welcomeMsg = {
-      id: "msg_" + crypto.randomUUID().slice(0, 8),
-      orgId: orgId,
-      from: "ZegaCloud Infrastructure",
-      fromEmail: "welcome@zegacloud.com",
-      toEmail: mailbox1.emailAddress,
-      subject: `Welcome to Zega Mail — ${newOrg.name}`,
-      preview: "Your business email environment is live with verified DNS and delivery confirmation ticks…",
-      body: `Hello ${newUser.name},\n\nWelcome to Zega Mail! Your organization "${newOrg.name}" has been registered and linked to your domain: ${newDomain.domainName}.\n\nYour Setup Details:\n• Primary Mailbox: ${mailbox1.emailAddress}\n• Client Account ID: ${newOrg.whmcsClientId}\n• Plan: ${newOrg.plan.toUpperCase()}\n• DNS Status: MX, SPF, DKIM & DMARC Enforced\n\nYou can now send business proposals with delivery confirmation ticks, use the Zega AI writer, and connect your phone via SSL IMAP/SMTP.\n\nWarm regards,\nZegaCloud Support Team`,
-      date: "Just now",
-      folder: "inbox" as const,
-      isRead: false,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Create Session
-    const sessionToken = "ses_" + crypto.randomBytes(24).toString("hex");
-    const newSession = {
-      token: sessionToken,
-      userId: userId,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(),
     };
 
     db.users.push(newUser);
-    db.orgs.push(newOrg);
-    db.domains.push(newDomain);
-    db.mailboxes.push(mailbox1, mailbox2);
-    db.messages.push(welcomeMsg);
-    db.sessions.push(newSession);
-
     writeDb(db);
 
-    const response = NextResponse.json({
+    // Send confirmation email
+    const emailResult = await sendVerificationEmail(cleanEmail, newUser.name, verificationCode);
+
+    return NextResponse.json({
       success: true,
-      user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role },
-      org: newOrg,
-      domain: newDomain,
-      mailboxes: [mailbox1, mailbox2],
+      requiresVerification: true,
+      email: cleanEmail,
+      userId: newUser.id,
+      previewCode: emailResult.previewCode,
+      message: "Account created! Please check your email for your 6-digit confirmation code.",
     });
-
-    response.cookies.set("zega_session", sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-      sameSite: "lax",
-    });
-
-    return response;
   } catch (err: any) {
     console.error("Signup error:", err);
     return NextResponse.json({ success: false, error: err.message || "Failed to create account." }, { status: 500 });

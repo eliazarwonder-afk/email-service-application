@@ -26,6 +26,10 @@ interface UnifiedPaymentCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultPlan?: "starter" | "growth" | "pro";
+  initialPlan?: "starter" | "growth" | "pro";
+  domainNameToRegister?: string;
+  clientEmail?: string;
+  clientName?: string;
   onPaymentSuccess?: (newPlan: string) => void;
 }
 
@@ -33,10 +37,14 @@ export function UnifiedPaymentCheckoutModal({
   isOpen,
   onClose,
   defaultPlan = "growth",
+  initialPlan,
+  domainNameToRegister,
+  clientEmail,
+  clientName,
   onPaymentSuccess,
 }: UnifiedPaymentCheckoutModalProps) {
   const { currency, setCurrency, isAfrica, isNigeria } = useCurrency();
-  const [selectedPlan, setSelectedPlan] = useState<"starter" | "growth" | "pro">(defaultPlan);
+  const [selectedPlan, setSelectedPlan] = useState<"starter" | "growth" | "pro">(initialPlan || defaultPlan);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("annually");
   
   // Payment Gateway Tab: paystack | flutterwave | stripe | crypto
@@ -102,6 +110,9 @@ export function UnifiedPaymentCheckoutModal({
           billingCycle,
           gateway,
           currency,
+          clientEmail,
+          clientName,
+          domainNameToRegister,
           cryptoAsset: gateway === "crypto" ? cryptoAsset : undefined,
         }),
       });
@@ -171,9 +182,13 @@ export function UnifiedPaymentCheckoutModal({
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                {step === "select" && "Upgrade Your Business Email Plan"}
-                {step === "pay" && "Complete Payment"}
-                {step === "confirmed" && "Subscription Activated!"}
+                {domainNameToRegister
+                  ? `Register ${domainNameToRegister} & Hosting`
+                  : step === "select"
+                  ? "Upgrade Your Business Email Plan"
+                  : step === "pay"
+                  ? "Complete Payment"
+                  : "Subscription Activated!"}
               </h2>
               <p className="text-[11px] text-slate-500 font-mono">
                 WHMCS Billing &bull; Encrypted TLS 1.3 &bull; Instant Mailbox Quota Allocation

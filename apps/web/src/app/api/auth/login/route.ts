@@ -42,6 +42,16 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!user.passwordHash) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `This account was registered using ${user.authProvider === "google" ? "Google" : "GitHub"}. Please sign in with ${user.authProvider === "google" ? "Google" : "GitHub"}.`,
+        },
+        { status: 400 }
+      );
+    }
+
     const calculatedHash = hashPassword(password);
     if (!timingSafeCompare(user.passwordHash, calculatedHash)) {
       return NextResponse.json(

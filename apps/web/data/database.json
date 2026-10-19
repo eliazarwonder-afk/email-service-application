@@ -44,6 +44,87 @@
       "role": "owner",
       "orgId": "org_5e75a942",
       "createdAt": "2026-10-14T14:53:26.451Z"
+    },
+    {
+      "id": "usr_6862acd9",
+      "name": "fwFf",
+      "email": "redemptidsadsonnewton@gmail.com",
+      "passwordHash": "950e0025ea779d1e7a52f79a3e68f0030386f1d61674f3075e7488248d3db50e",
+      "role": "owner",
+      "orgId": "org_6dfae194",
+      "createdAt": "2026-10-19T15:27:32.497Z"
+    },
+    {
+      "id": "usr_3e6a4717",
+      "name": "Lagos Tech Founder",
+      "email": "founder_1792424890847@lagostech.ng",
+      "passwordHash": "62e60a4319f17eb82974941a56d6c29dd6ca79105ee17353a4ae9c34e078360b",
+      "role": "owner",
+      "orgId": "org_77478b7a",
+      "emailVerified": true,
+      "authProvider": "email",
+      "companyName": "Lagos Tech Ventures Ltd",
+      "phoneNumber": "+234 803 123 4567",
+      "cacNumber": "RC-9988214",
+      "createdAt": "2026-10-19T15:48:14.999Z"
+    },
+    {
+      "id": "usr_bd529650",
+      "name": "Google Cloud Executive",
+      "email": "gexec_1792424901849@gmail.com",
+      "role": "owner",
+      "orgId": "org_271fea8c",
+      "emailVerified": true,
+      "authProvider": "google",
+      "avatarUrl": "https://lh3.googleusercontent.com/a/default-user=s96-c",
+      "createdAt": "2026-10-19T15:48:25.087Z"
+    },
+    {
+      "id": "usr_507aa130",
+      "name": "GitHub Developer",
+      "email": "octocat_1792424905124@github.com",
+      "role": "owner",
+      "orgId": "org_fc10b47f",
+      "emailVerified": true,
+      "authProvider": "github",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/9919?v=4",
+      "createdAt": "2026-10-19T15:48:25.191Z"
+    },
+    {
+      "id": "usr_6b39f3dd",
+      "name": "Lagos Tech Founder",
+      "email": "founder_1792425030826@lagostech.ng",
+      "passwordHash": "62e60a4319f17eb82974941a56d6c29dd6ca79105ee17353a4ae9c34e078360b",
+      "role": "owner",
+      "orgId": "org_b0eed786",
+      "emailVerified": true,
+      "authProvider": "email",
+      "companyName": "Lagos Tech Ventures Ltd",
+      "phoneNumber": "+234 803 123 4567",
+      "cacNumber": "RC-9988214",
+      "createdAt": "2026-10-19T15:50:32.129Z"
+    },
+    {
+      "id": "usr_3f9e07ae",
+      "name": "Google Cloud Executive",
+      "email": "gexec_1792425033373@gmail.com",
+      "role": "owner",
+      "orgId": "org_494d22e4",
+      "emailVerified": true,
+      "authProvider": "google",
+      "avatarUrl": "https://lh3.googleusercontent.com/a/default-user=s96-c",
+      "createdAt": "2026-10-19T15:50:35.363Z"
+    },
+    {
+      "id": "usr_d4c15703",
+      "name": "GitHub Developer",
+      "email": "octocat_1792425035392@github.com",
+      "role": "owner",
+      "orgId": "org_1827b648",
+      "emailVerified": true,
+      "authProvider": "github",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/9919?v=4",
+      "createdAt": "2026-10-19T15:50:35.823Z"
     }
   ],
   "orgs": [
@@ -70,6 +151,14 @@
       "plan": "growth",
       "whmcsClientId": "ZCL-CL-97975",
       "createdAt": "2026-10-14T14:53:26.451Z"
+    },
+    {
+      "id": "org_6dfae194",
+      "name": "savvsvsvs",
+      "ownerId": "usr_6862acd9",
+      "plan": "growth",
+      "whmcsClientId": "ZCL-CL-40000",
+      "createdAt": "2026-10-19T15:27:32.497Z"
     }
   ],
   "domains": [
@@ -163,6 +252,19 @@
       "dmarcStatus": "verified",
       "whmcsOrderId": "WHMCS-ORD-79154",
       "createdAt": "2026-10-14T14:54:17.569Z"
+    },
+    {
+      "id": "dom_1638a9fc",
+      "orgId": "org_6dfae194",
+      "domainName": "svsvffddfvdf.com",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-78236",
+      "createdAt": "2026-10-19T15:27:32.497Z"
     }
   ],
   "mailboxes": [
@@ -235,6 +337,26 @@
       "usedMb": 0,
       "status": "active",
       "createdAt": "2026-10-14T14:53:26.451Z"
+    },
+    {
+      "id": "mbx_0076cb89",
+      "orgId": "org_6dfae194",
+      "emailAddress": "redemptidsadsonnewton@svsvffddfvdf.com",
+      "role": "Organization Owner",
+      "quotaMb": 5000,
+      "usedMb": 12,
+      "status": "active",
+      "createdAt": "2026-10-19T15:27:32.497Z"
+    },
+    {
+      "id": "mbx_068dc93e",
+      "orgId": "org_6dfae194",
+      "emailAddress": "info@svsvffddfvdf.com",
+      "role": "General Inquiries",
+      "quotaMb": 5000,
+      "usedMb": 0,
+      "status": "active",
+      "createdAt": "2026-10-19T15:27:32.497Z"
     }
   ],
   "messages": [
@@ -379,6 +501,20 @@
       "folder": "inbox",
       "isRead": false,
       "createdAt": "2026-10-14T14:53:26.451Z"
+    },
+    {
+      "id": "msg_6c584d1c",
+      "orgId": "org_6dfae194",
+      "from": "ZegaCloud Infrastructure",
+      "fromEmail": "welcome@zegacloud.com",
+      "toEmail": "redemptidsadsonnewton@svsvffddfvdf.com",
+      "subject": "Welcome to Zega Mail — savvsvsvs",
+      "preview": "Your business email environment is live with verified DNS and delivery confirmation ticks…",
+      "body": "Hello fwFf,\n\nWelcome to Zega Mail! Your organization \"savvsvsvs\" has been registered and linked to your domain: svsvffddfvdf.com.\n\nYour Setup Details:\n• Primary Mailbox: redemptidsadsonnewton@svsvffddfvdf.com\n• Client Account ID: ZCL-CL-40000\n• Plan: GROWTH\n• DNS Status: MX, SPF, DKIM & DMARC Enforced\n\nYou can now send business proposals with delivery confirmation ticks, use the Zega AI writer, and connect your phone via SSL IMAP/SMTP.\n\nWarm regards,\nZegaCloud Support Team",
+      "date": "Just now",
+      "folder": "inbox",
+      "isRead": false,
+      "createdAt": "2026-10-19T15:27:32.497Z"
     }
   ],
   "sessions": [
@@ -421,6 +557,41 @@
       "token": "ses_4dd0e27a75d2d41f0859e810ac64e433fb8eeda6cccba7ea",
       "userId": "usr_af51b31c",
       "expiresAt": "2026-10-26T13:15:29.966Z"
+    },
+    {
+      "token": "ses_872c4cecbd59bc573eb8328bfbc5f4385fa569e6e2b3c296",
+      "userId": "usr_6862acd9",
+      "expiresAt": "2026-10-26T15:27:32.498Z"
+    },
+    {
+      "token": "ses_b14b47d8e3de918b4f1cea5f2d004ba5aca58a4788952976",
+      "userId": "usr_3e6a4717",
+      "expiresAt": "2026-10-26T15:48:20.865Z"
+    },
+    {
+      "token": "ses_b35c7e5d7992ffe1e1716a1d24c2f82aa6ba9a2ba1707615",
+      "userId": "usr_bd529650",
+      "expiresAt": "2026-10-26T15:48:25.091Z"
+    },
+    {
+      "token": "ses_9679ce3e1d1da501e0cec41aa3dfb1a69e985b958f9df1b0",
+      "userId": "usr_507aa130",
+      "expiresAt": "2026-10-26T15:48:25.192Z"
+    },
+    {
+      "token": "ses_0f959900ee2b26ba1ae630226430647293ce3bc87eef617d",
+      "userId": "usr_6b39f3dd",
+      "expiresAt": "2026-10-26T15:50:33.347Z"
+    },
+    {
+      "token": "ses_fb79b9a9e3a318952ae33c82a15a0e69fbe418421ff226a3",
+      "userId": "usr_3f9e07ae",
+      "expiresAt": "2026-10-26T15:50:35.364Z"
+    },
+    {
+      "token": "ses_e7816b273a6aea7c4edbddbaa31ffdd37219d361fbba9490",
+      "userId": "usr_d4c15703",
+      "expiresAt": "2026-10-26T15:50:35.824Z"
     }
   ],
   "campaigns": [

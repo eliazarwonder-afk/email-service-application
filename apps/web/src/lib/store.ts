@@ -9,9 +9,17 @@ export interface StoredUser {
   id: string;
   name: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   role: "owner" | "admin" | "member" | "mailbox_user";
   orgId: string;
+  emailVerified?: boolean;
+  verificationCode?: string;
+  verificationCodeExpires?: string;
+  authProvider?: "email" | "google" | "github";
+  avatarUrl?: string;
+  phoneNumber?: string;
+  companyName?: string;
+  cacNumber?: string;
   createdAt: string;
 }
 

@@ -67,6 +67,27 @@ export async function POST(req: Request) {
       customAmount: pricing.amount,
     });
 
+    const targetDomain = body.domainNameToRegister || domainName;
+    if (targetDomain) {
+      const cleanTarget = targetDomain.trim().toLowerCase();
+      if (!db.domains.some((d) => d.orgId === orgId && d.domainName.toLowerCase() === cleanTarget)) {
+        db.domains.push({
+          id: "dom_" + Math.random().toString(36).substring(2, 9),
+          orgId,
+          domainName: cleanTarget,
+          domainType: "zegacloud",
+          verified: true,
+          mxStatus: "verified",
+          spfStatus: "verified",
+          dkimStatus: "verified",
+          dmarcStatus: "verified",
+          whmcsOrderId: order.whmcsOrderId,
+          createdAt: new Date().toISOString(),
+        });
+        writeDb(db);
+      }
+    }
+
     // 1. Paystack Handler (Nigeria / Africa NGN)
     if (chosenGateway === "paystack") {
       const paystackRes = await initializePaystackTransaction({

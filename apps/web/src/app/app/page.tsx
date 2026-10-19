@@ -149,94 +149,69 @@ export default function WebmailAppPage() {
 
   const [billingOrders, setBillingOrders] = useState<any[]>([]);
 
-  // Database Loaders
-  const loadBillingOrders = async () => {
-    try {
-      const res = await fetch("/api/billing/orders");
-      const data = await res.json();
-      if (data.success) {
-        setBillingOrders(data.orders || []);
-      }
-    } catch (e) {
-      console.error("Failed to load billing orders", e);
-    }
-  };
-
-  const loadSession = async () => {
+  // Fast Unified Bootstrap Loader
+  const loadDashboardBootstrap = async () => {
     try {
       setIsLoadingAuth(true);
-      const res = await fetch("/api/auth/me");
+      setIsLoadingMessages(true);
+      const res = await fetch("/api/bootstrap");
       const data = await res.json();
 
-      if (data.authenticated && data.user) {
-        setCurrentUser(data.user);
-        setCurrentOrg(data.org);
-        setCurrentDomain(data.domain);
-        setMailboxes(data.mailboxes || []);
-        setIsDemoMode(false);
-      } else {
-        setCurrentUser(data.user || { name: "Alex Carter", email: "sales@acmedesign.co", role: "owner" });
-        setCurrentOrg(data.org || { name: "Acme Creative Studio Ltd", plan: "growth", whmcsClientId: "WHMCS-CL-40192" });
-        setCurrentDomain(data.domain || { domainName: "acmedesign.co" });
-        setMailboxes(data.mailboxes || []);
-        setIsDemoMode(true);
+      if (data.success) {
+        if (data.authenticated && data.user) {
+          setCurrentUser(data.user);
+          setCurrentOrg(data.org);
+          setCurrentDomain(data.domain);
+          setMailboxes(data.mailboxes || []);
+          setIsDemoMode(false);
+        } else {
+          setCurrentUser(data.user || { name: "Alex Carter", email: "sales@acmedesign.co", role: "owner" });
+          setCurrentOrg(data.org || { name: "Acme Creative Studio Ltd", plan: "growth", whmcsClientId: "WHMCS-CL-40192" });
+          setCurrentDomain(data.domain || { domainName: "acmedesign.co" });
+          setMailboxes(data.mailboxes || []);
+          setIsDemoMode(true);
+        }
+
+        if (data.messages && data.messages.length > 0) {
+          setMessages(data.messages);
+          if (!selectedMessageId) {
+            setSelectedMessageId(data.messages[0].id);
+          }
+        }
+        if (data.folders) setCustomFolders(data.folders);
+        if (data.templates) setTemplates(data.templates);
+        if (data.billingOrders) setBillingOrders(data.billingOrders);
       }
     } catch (err) {
-      console.error("Session load error", err);
+      console.error("Dashboard bootstrap error", err);
       setIsDemoMode(true);
     } finally {
       setIsLoadingAuth(false);
-    }
-  };
-
-  const loadMessages = async () => {
-    try {
-      setIsLoadingMessages(true);
-      const res = await fetch("/api/mail");
-      const data = await res.json();
-      if (data.success && data.messages) {
-        setMessages(data.messages);
-        if (data.messages.length > 0 && !selectedMessageId) {
-          setSelectedMessageId(data.messages[0].id);
-        }
-      }
-    } catch (err) {
-      console.error("Failed to load messages", err);
-    } finally {
       setIsLoadingMessages(false);
     }
   };
 
-  const loadFolders = async () => {
+  const loadBillingOrders = async () => {
     try {
-      const res = await fetch("/api/folders");
+      const res = await fetch("/api/billing/orders");
       const data = await res.json();
-      if (data.success && data.folders) {
-        setCustomFolders(data.folders);
-      }
-    } catch (err) {
-      console.error("Failed to load folders", err);
-    }
+      if (data.success) setBillingOrders(data.orders || []);
+    } catch (e) {}
   };
 
-  const loadTemplates = async () => {
+  const loadSession = loadDashboardBootstrap;
+  const loadMessages = async () => {
     try {
-      const res = await fetch("/api/templates");
+      const res = await fetch("/api/mail");
       const data = await res.json();
-      if (data.success && data.templates) {
-        setTemplates(data.templates);
-      }
-    } catch (err) {
-      console.error("Failed to load templates", err);
-    }
+      if (data.success && data.messages) setMessages(data.messages);
+    } catch (e) {}
   };
+  const loadFolders = async () => {};
+  const loadTemplates = async () => {};
 
   useEffect(() => {
-    loadSession();
-    loadMessages();
-    loadFolders();
-    loadTemplates();
-    loadBillingOrders();
+    loadDashboardBootstrap();
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get("tab");
