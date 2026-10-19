@@ -343,11 +343,22 @@ export default function HomePage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 flex flex-col justify-between shadow-sm">
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Starter</span>
-                <div className="flex items-baseline gap-1 font-mono">
+                <div className="flex items-baseline gap-2 font-mono">
                   <span className="text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums">
                     {starterPrice.formatted}
                   </span>
-                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
+                  <span className="text-sm line-through text-slate-400 font-sans">
+                    {starterPrice.regularFormatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/mo flat</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold px-1.5 py-0.5">
+                    Save {starterPrice.discountPercent}%
+                  </span>
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
+                    ({starterPrice.perMailboxFormatted})
+                  </span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">Perfect for solo founders, freelancers, and small startups.</p>
 
@@ -387,11 +398,22 @@ export default function HomePage() {
 
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Growth</span>
-                <div className="flex items-baseline gap-1 font-mono">
+                <div className="flex items-baseline gap-2 font-mono">
                   <span className="text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums">
                     {growthPrice.formatted}
                   </span>
-                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
+                  <span className="text-sm line-through text-slate-400 font-sans">
+                    {growthPrice.regularFormatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/mo flat</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold px-1.5 py-0.5">
+                    Save {growthPrice.discountPercent}%
+                  </span>
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
+                    ({growthPrice.perMailboxFormatted})
+                  </span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">For growing agencies, creative studios, and sales teams.</p>
 
@@ -426,11 +448,22 @@ export default function HomePage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 flex flex-col justify-between shadow-sm">
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Enterprise Pro</span>
-                <div className="flex items-baseline gap-1 font-mono">
+                <div className="flex items-baseline gap-2 font-mono">
                   <span className="text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums">
                     {proPrice.formatted}
                   </span>
-                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
+                  <span className="text-sm line-through text-slate-400 font-sans">
+                    {proPrice.regularFormatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/mo flat</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold px-1.5 py-0.5">
+                    Save {proPrice.discountPercent}%
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-medium font-sans">
+                    Unlimited Mailboxes
+                  </span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">For scaling organizations needing unlimited mailboxes and high volume.</p>
 

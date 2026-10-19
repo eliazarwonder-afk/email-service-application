@@ -134,6 +134,17 @@ export default function PricingPage() {
                 : "Auto-detected location: Global. Instant Stripe Card & Crypto payments active."}
             </span>
           </div>
+
+          {/* NIGERIA & GLOBAL LAUNCH PROMO BANNER */}
+          <div className="rounded-2xl border border-rose-300 dark:border-rose-900 bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 dark:from-rose-950/50 dark:via-amber-950/40 dark:to-orange-950/50 p-4 text-center shadow-xs">
+            <div className="inline-flex items-center gap-2 text-rose-700 dark:text-rose-400 font-extrabold text-xs uppercase tracking-wider">
+              <span className="flex h-2 w-2 rounded-full bg-rose-600 animate-ping" />
+              <span>🔥 Limited-Time Launch Promo — Drastically Reduced Flat-Rate Tiers (Up to 77% OFF)</span>
+            </div>
+            <p className="text-xs text-slate-700 dark:text-slate-300 mt-1 max-w-2xl mx-auto">
+              Get dedicated business email for your entire team starting at just <strong className="text-slate-900 dark:text-white font-mono">{starterPrice.formatted}/mo</strong> total. No per-seat penalties.
+            </p>
+          </div>
         </section>
 
         {/* 4 CORE PRICING CARDS */}
@@ -215,14 +226,25 @@ export default function PricingPage() {
               </div>
 
               <div className="pt-2">
-                <div className="flex items-baseline gap-1 font-mono">
+                <div className="flex items-baseline gap-2 font-mono">
                   <span className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums">
                     {starterPrice.formatted}
                   </span>
-                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
+                  <span className="text-sm line-through text-slate-400 font-sans">
+                    {starterPrice.regularFormatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/mo flat</span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <span className="rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold px-1.5 py-0.5">
+                    Save {starterPrice.discountPercent}%
+                  </span>
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
+                    ({starterPrice.perMailboxFormatted})
+                  </span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  {billingCycle === "annual" ? "Billed annually (Save 20%)" : "Billed monthly"}
+                  {billingCycle === "annual" ? "Billed annually (Launch Promo)" : "Billed monthly"}
                 </p>
               </div>
 
@@ -285,14 +307,25 @@ export default function PricingPage() {
               </div>
 
               <div className="pt-2">
-                <div className="flex items-baseline gap-1 font-mono">
+                <div className="flex items-baseline gap-2 font-mono">
                   <span className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums">
                     {growthPrice.formatted}
                   </span>
-                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
+                  <span className="text-sm line-through text-slate-400 font-sans">
+                    {growthPrice.regularFormatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/mo flat</span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <span className="rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold px-1.5 py-0.5">
+                    Save {growthPrice.discountPercent}%
+                  </span>
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
+                    ({growthPrice.perMailboxFormatted})
+                  </span>
                 </div>
                 <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1">
-                  Saves \$600+/year compared to per-seat billing.
+                  Saves \$600+ (₦1,000,000+) vs Google Workspace.
                 </p>
               </div>
 
@@ -355,14 +388,25 @@ export default function PricingPage() {
               </div>
 
               <div className="pt-2">
-                <div className="flex items-baseline gap-1 font-mono">
+                <div className="flex items-baseline gap-2 font-mono">
                   <span className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums">
                     {proPrice.formatted}
                   </span>
-                  <span className="text-xs text-slate-500 font-sans">/month flat</span>
+                  <span className="text-sm line-through text-slate-400 font-sans">
+                    {proPrice.regularFormatted}
+                  </span>
+                  <span className="text-xs text-slate-500 font-sans">/mo flat</span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <span className="rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold px-1.5 py-0.5">
+                    Save {proPrice.discountPercent}%
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-medium font-sans">
+                    Unlimited Mailboxes
+                  </span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  {billingCycle === "annual" ? "Billed annually (Save 20%)" : "Billed monthly"}
+                  {billingCycle === "annual" ? "Billed annually (Launch Promo)" : "Billed monthly"}
                 </p>
               </div>
 
@@ -437,13 +481,13 @@ export default function PricingPage() {
                     Cost for 10 Mailboxes
                   </td>
                   <td className="py-3.5 px-4 font-bold text-emerald-600 dark:text-emerald-400 bg-blue-50/50 dark:bg-blue-950/20">
-                    {currency === "NGN" ? "₦6,500/mo flat" : "\$4.50/mo flat"}
+                    {currency === "NGN" ? "₦1,500/mo flat (Promo)" : "$1.99/mo flat (Promo)"}
                   </td>
                   <td className="py-3.5 px-4 text-red-600 dark:text-red-400 font-mono">
-                    \$72.00/mo (\$7.20/user)
+                    {currency === "NGN" ? "₦110,000/mo ($7.20/user)" : "$72.00/mo ($7.20/user)"}
                   </td>
                   <td className="py-3.5 px-4 text-red-600 dark:text-red-400 font-mono">
-                    \$60.00/mo (\$6.00/user)
+                    {currency === "NGN" ? "₦90,000/mo ($6.00/user)" : "$60.00/mo ($6.00/user)"}
                   </td>
                 </tr>
                 <tr>

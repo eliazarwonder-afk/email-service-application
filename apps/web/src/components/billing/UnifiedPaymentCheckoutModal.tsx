@@ -284,10 +284,18 @@ export function UnifiedPaymentCheckoutModal({
                       </div>
 
                       <div className="mb-3">
-                        <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                          {price.formatted}
-                        </span>
-                        <span className="text-xs text-slate-400">/mo</span>
+                        <div className="flex items-baseline gap-1.5 font-mono">
+                          <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                            {price.formatted}
+                          </span>
+                          <span className="text-xs line-through text-slate-400">
+                            {price.regularFormatted}
+                          </span>
+                          <span className="text-xs text-slate-400 font-sans">/mo</span>
+                        </div>
+                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
+                          Save {price.discountPercent}% Promo
+                        </div>
                       </div>
 
                       <ul className="space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-3">

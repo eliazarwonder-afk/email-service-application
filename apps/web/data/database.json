@@ -932,6 +932,27 @@
   ],
   "orders": [
     {
+      "id": "ord_mvfbob8v",
+      "orderNumber": "WHMCS-ORD-2026-7981",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "clientEmail": "promo_founder@lagostech.ng",
+      "clientName": "Lagos Tech Founder",
+      "planId": "starter",
+      "planName": "ZegaMail Starter Business",
+      "billingCycle": "annually",
+      "amount": 1500,
+      "currency": "NGN",
+      "paymentMethod": "paystack",
+      "paymentMethodName": "Paystack (Cards, Bank Transfer & USSD)",
+      "status": "pending",
+      "invoiceId": "WHMCS-INV-37464",
+      "whmcsOrderId": "7981",
+      "whmcsInvoiceId": "37464",
+      "createdAt": "2026-10-19T14:01:05.264Z",
+      "updatedAt": "2026-10-19T14:01:05.264Z"
+    },
+    {
       "id": "ord_mvfa9sfj",
       "orderNumber": "WHMCS-ORD-2026-2761",
       "orgId": "org_5e75a942",
@@ -1082,6 +1103,19 @@
     }
   ],
   "invoices": [
+    {
+      "id": "WHMCS-INV-37464",
+      "orderId": "ord_mvfbob8v",
+      "orgId": "org_acme_001",
+      "userId": "usr_owner_001",
+      "amount": 1500,
+      "currency": "NGN",
+      "status": "unpaid",
+      "dueDate": "2026-10-26",
+      "paymentMethod": "Paystack (Cards, Bank Transfer & USSD)",
+      "description": "ZegaMail Starter Business (Annual billing)",
+      "createdAt": "2026-10-19T14:01:05.264Z"
+    },
     {
       "id": "WHMCS-INV-83684",
       "orderId": "ord_mvfa9sfj",

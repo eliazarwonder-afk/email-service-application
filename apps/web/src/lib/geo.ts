@@ -1,7 +1,7 @@
 /**
  * Geo-Location & Currency Telemetry
  * Automatically detects whether the visitor is connecting from Nigeria / Africa or Global
- * Provides currency conversion rates and formatting.
+ * Provides currency conversion rates, drastic promotional discounts, and formatting.
  */
 
 export type SupportedCurrency = "USD" | "NGN" | "EUR" | "GBP";
@@ -30,90 +30,168 @@ export const EXCHANGE_RATES: Record<SupportedCurrency, number> = {
 };
 
 /**
- * Standard Plan Pricing Definitions across USD & NGN
+ * Standard & Drastic Launch Promo Plan Pricing Definitions
+ * Calibrated specifically for the Nigerian market & global launch affordability.
  */
 export const PLAN_PRICING = {
   starter: {
-    monthlyUsd: 5.00,
-    annualMonthlyUsd: 4.50,
-    monthlyNgn: 7500,
-    annualMonthlyNgn: 6500,
     name: "Starter Business",
     mailboxes: "Up to 10 Mailboxes",
+    mailboxCount: 10,
     storage: "25 GB NVMe Pool",
     domains: "1 Custom Domain",
+    // Drastic Promotional Launch Pricing (70%+ OFF)
+    promo: {
+      monthlyUsd: 2.50,
+      annualMonthlyUsd: 1.99,
+      monthlyNgn: 1900,
+      annualMonthlyNgn: 1500,
+    },
+    // Standard Reference Pricing
+    regular: {
+      monthlyUsd: 5.00,
+      annualMonthlyUsd: 4.50,
+      monthlyNgn: 7500,
+      annualMonthlyNgn: 6500,
+    },
   },
   growth: {
-    monthlyUsd: 14.00,
-    annualMonthlyUsd: 12.00,
-    monthlyNgn: 21000,
-    annualMonthlyNgn: 18000,
     name: "Growth Agency",
     mailboxes: "Up to 30 Mailboxes",
+    mailboxCount: 30,
     storage: "75 GB NVMe Pool",
     domains: "5 Custom Domains",
     popular: true,
+    // Drastic Promotional Launch Pricing (75% OFF)
+    promo: {
+      monthlyUsd: 6.00,
+      annualMonthlyUsd: 4.99,
+      monthlyNgn: 5500,
+      annualMonthlyNgn: 4500,
+    },
+    // Standard Reference Pricing
+    regular: {
+      monthlyUsd: 14.00,
+      annualMonthlyUsd: 12.00,
+      monthlyNgn: 21000,
+      annualMonthlyNgn: 18000,
+    },
   },
   pro: {
-    monthlyUsd: 35.00,
-    annualMonthlyUsd: 29.00,
-    monthlyNgn: 52000,
-    annualMonthlyNgn: 43500,
     name: "Enterprise Pro",
     mailboxes: "Unlimited Mailboxes",
+    mailboxCount: 100, // baseline for calculation
     storage: "200 GB NVMe Pool",
     domains: "Unlimited Domains",
+    // Drastic Promotional Launch Pricing (70% OFF)
+    promo: {
+      monthlyUsd: 15.00,
+      annualMonthlyUsd: 12.99,
+      monthlyNgn: 15000,
+      annualMonthlyNgn: 12500,
+    },
+    // Standard Reference Pricing
+    regular: {
+      monthlyUsd: 35.00,
+      annualMonthlyUsd: 29.00,
+      monthlyNgn: 52000,
+      annualMonthlyNgn: 43500,
+    },
   },
 };
 
 /**
- * Formats a price nicely based on the selected currency.
+ * Formats a price nicely based on the selected currency, incorporating promotional pricing.
  */
 export function formatPlanPrice(
   planId: "starter" | "growth" | "pro",
   currency: SupportedCurrency,
   isAnnual: boolean = true
-): { formatted: string; amount: number; symbol: string; currency: SupportedCurrency } {
+): {
+  formatted: string;
+  amount: number;
+  regularFormatted: string;
+  regularAmount: number;
+  discountPercent: number;
+  perMailboxFormatted: string;
+  symbol: string;
+  currency: SupportedCurrency;
+} {
   const plan = PLAN_PRICING[planId];
-  const symbol = CURRENCY_SYMBOLS[currency];
+  const symbol = CURRENCY_SYMBOLS[currency] || "$";
+  const mailboxCount = plan.mailboxCount || 10;
 
   if (currency === "NGN") {
-    const amount = isAnnual ? plan.annualMonthlyNgn : plan.monthlyNgn;
+    const promoAmt = isAnnual ? plan.promo.annualMonthlyNgn : plan.promo.monthlyNgn;
+    const regularAmt = isAnnual ? plan.regular.annualMonthlyNgn : plan.regular.monthlyNgn;
+    const discount = Math.round(((regularAmt - promoAmt) / regularAmt) * 100);
+    const perMailbox = Math.round(promoAmt / mailboxCount);
+
     return {
-      formatted: `${symbol}${amount.toLocaleString()}`,
-      amount,
+      formatted: `${symbol}${promoAmt.toLocaleString()}`,
+      amount: promoAmt,
+      regularFormatted: `${symbol}${regularAmt.toLocaleString()}`,
+      regularAmount: regularAmt,
+      discountPercent: discount,
+      perMailboxFormatted: `${symbol}${perMailbox.toLocaleString()}/mailbox`,
       symbol,
       currency,
     };
   }
 
   if (currency === "EUR") {
-    const usdAmount = isAnnual ? plan.annualMonthlyUsd : plan.monthlyUsd;
-    const amount = Number((usdAmount * EXCHANGE_RATES.EUR).toFixed(2));
+    const usdPromo = isAnnual ? plan.promo.annualMonthlyUsd : plan.promo.monthlyUsd;
+    const usdRegular = isAnnual ? plan.regular.annualMonthlyUsd : plan.regular.monthlyUsd;
+    const promoAmt = Number((usdPromo * EXCHANGE_RATES.EUR).toFixed(2));
+    const regularAmt = Number((usdRegular * EXCHANGE_RATES.EUR).toFixed(2));
+    const discount = Math.round(((regularAmt - promoAmt) / regularAmt) * 100);
+    const perMailbox = (promoAmt / mailboxCount).toFixed(2);
+
     return {
-      formatted: `${symbol}${amount.toFixed(2)}`,
-      amount,
+      formatted: `${symbol}${promoAmt.toFixed(2)}`,
+      amount: promoAmt,
+      regularFormatted: `${symbol}${regularAmt.toFixed(2)}`,
+      regularAmount: regularAmt,
+      discountPercent: discount,
+      perMailboxFormatted: `${symbol}${perMailbox}/mailbox`,
       symbol,
       currency,
     };
   }
 
   if (currency === "GBP") {
-    const usdAmount = isAnnual ? plan.annualMonthlyUsd : plan.monthlyUsd;
-    const amount = Number((usdAmount * EXCHANGE_RATES.GBP).toFixed(2));
+    const usdPromo = isAnnual ? plan.promo.annualMonthlyUsd : plan.promo.monthlyUsd;
+    const usdRegular = isAnnual ? plan.regular.annualMonthlyUsd : plan.regular.monthlyUsd;
+    const promoAmt = Number((usdPromo * EXCHANGE_RATES.GBP).toFixed(2));
+    const regularAmt = Number((usdRegular * EXCHANGE_RATES.GBP).toFixed(2));
+    const discount = Math.round(((regularAmt - promoAmt) / regularAmt) * 100);
+    const perMailbox = (promoAmt / mailboxCount).toFixed(2);
+
     return {
-      formatted: `${symbol}${amount.toFixed(2)}`,
-      amount,
+      formatted: `${symbol}${promoAmt.toFixed(2)}`,
+      amount: promoAmt,
+      regularFormatted: `${symbol}${regularAmt.toFixed(2)}`,
+      regularAmount: regularAmt,
+      discountPercent: discount,
+      perMailboxFormatted: `${symbol}${perMailbox}/mailbox`,
       symbol,
       currency,
     };
   }
 
   // Default USD
-  const amount = isAnnual ? plan.annualMonthlyUsd : plan.monthlyUsd;
+  const promoAmt = isAnnual ? plan.promo.annualMonthlyUsd : plan.promo.monthlyUsd;
+  const regularAmt = isAnnual ? plan.regular.annualMonthlyUsd : plan.regular.monthlyUsd;
+  const discount = Math.round(((regularAmt - promoAmt) / regularAmt) * 100);
+  const perMailbox = (promoAmt / mailboxCount).toFixed(2);
+
   return {
-    formatted: `${symbol}${amount.toFixed(2)}`,
-    amount,
+    formatted: `${symbol}${promoAmt.toFixed(2)}`,
+    amount: promoAmt,
+    regularFormatted: `${symbol}${regularAmt.toFixed(2)}`,
+    regularAmount: regularAmt,
+    discountPercent: discount,
+    perMailboxFormatted: `${symbol}${perMailbox}/mailbox`,
     symbol,
     currency,
   };

@@ -1155,15 +1155,15 @@ export function createOrderAndInvoice({
   };
 
   const defaultPricingUsd: Record<string, { monthly: number; annually: number }> = {
-    starter: { monthly: 5.00, annually: 43.20 }, // $4.50 * 12 * 0.8
-    growth: { monthly: 14.00, annually: 115.20 }, // $12.00 * 12 * 0.8
-    pro: { monthly: 35.00, annually: 278.40 }, // $29.00 * 12 * 0.8
+    starter: { monthly: 2.50, annually: 23.88 }, // $1.99 * 12
+    growth: { monthly: 6.00, annually: 59.88 },  // $4.99 * 12
+    pro: { monthly: 15.00, annually: 155.88 },   // $12.99 * 12
   };
 
   const defaultPricingNgn: Record<string, { monthly: number; annually: number }> = {
-    starter: { monthly: 7500, annually: 62400 },
-    growth: { monthly: 21000, annually: 172800 },
-    pro: { monthly: 52000, annually: 417600 },
+    starter: { monthly: 1900, annually: 18000 }, // ₦1,500 * 12
+    growth: { monthly: 5500, annually: 54000 },  // ₦4,500 * 12
+    pro: { monthly: 15000, annually: 150000 },   // ₦12,500 * 12
   };
 
   const pricingTable = isNgn ? defaultPricingNgn : defaultPricingUsd;
