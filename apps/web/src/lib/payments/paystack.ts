@@ -40,11 +40,11 @@ export async function initializePaystackTransaction(params: PaystackInitParams):
   const amountKobo = Math.round(params.amountNgn * 100);
   const reference = `ZPS_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
 
-  // If live Paystack key is not set, provide simulated sandbox checkout URL
-  if (!secretKey) {
+  // If live Paystack key is not set, or is a placeholder/mock, provide simulated sandbox checkout URL
+  if (!secretKey || secretKey.includes("mock") || secretKey.startsWith("sk_test_mock")) {
     return {
       success: true,
-      authorizationUrl: `/checkout/paystack-simulate?ref=${reference}&amount=${params.amountNgn}&plan=${params.planId}`,
+      authorizationUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/app?payment=success&orderId=${params.metadata?.orderId || reference}&gateway=paystack`,
       accessCode: `sim_access_${reference}`,
       reference,
       amountKobo,

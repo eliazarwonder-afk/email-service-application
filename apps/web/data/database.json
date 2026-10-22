@@ -135,6 +135,28 @@
       "emailVerified": true,
       "authProvider": "whmcs_sso",
       "createdAt": "2026-10-22T08:44:54.237Z"
+    },
+    {
+      "id": "usr_ecece833",
+      "name": "David Founder",
+      "email": "founder@newventures.co",
+      "passwordHash": "b07bfae00b3651579ef35dddb96b491f06b66e6e74b81c05f2bc06c4c55f02ff",
+      "role": "owner",
+      "orgId": "org_2e502d5d",
+      "emailVerified": true,
+      "authProvider": "email",
+      "createdAt": "2026-10-22T10:11:50.146Z"
+    },
+    {
+      "id": "usr_1ffdb3e8",
+      "name": "Growth Agency Ltd",
+      "email": "ceo@growthagency.ng",
+      "passwordHash": "e0334514652b9c4c9459f739280596973fbe7fa84b50a4f4c73182192adb9f3b",
+      "role": "owner",
+      "orgId": "org_e8a391f2",
+      "emailVerified": true,
+      "authProvider": "email",
+      "createdAt": "2026-10-22T10:11:50.245Z"
     }
   ],
   "orgs": [
@@ -169,6 +191,22 @@
       "plan": "growth",
       "whmcsClientId": "ZCL-CL-40000",
       "createdAt": "2026-10-19T15:27:32.497Z"
+    },
+    {
+      "id": "org_2e502d5d",
+      "name": "David Founder's Organization",
+      "ownerId": "usr_ecece833",
+      "plan": "free",
+      "whmcsClientId": "WHMCS-CL-47270",
+      "createdAt": "2026-10-22T10:11:50.143Z"
+    },
+    {
+      "id": "org_e8a391f2",
+      "name": "Growth Agency Ltd's Organization",
+      "ownerId": "usr_1ffdb3e8",
+      "plan": "growth",
+      "whmcsClientId": "WHMCS-CL-18211",
+      "createdAt": "2026-10-22T10:11:50.245Z"
     }
   ],
   "domains": [
@@ -275,6 +313,45 @@
       "dmarcStatus": "verified",
       "whmcsOrderId": "WHMCS-ORD-78236",
       "createdAt": "2026-10-19T15:27:32.497Z"
+    },
+    {
+      "id": "dom_ftmve9k",
+      "orgId": "org_acme_001",
+      "domainName": "growthagency.ng",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "4545",
+      "createdAt": "2026-10-22T10:10:54.878Z"
+    },
+    {
+      "id": "dom_a67d75c0",
+      "orgId": "org_2e502d5d",
+      "domainName": "newventures.co",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-51295",
+      "createdAt": "2026-10-22T10:11:50.150Z"
+    },
+    {
+      "id": "dom_c88b3011",
+      "orgId": "org_e8a391f2",
+      "domainName": "growthagency.ng",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-90952",
+      "createdAt": "2026-10-22T10:11:50.248Z"
     }
   ],
   "mailboxes": [
@@ -367,6 +444,36 @@
       "usedMb": 0,
       "status": "active",
       "createdAt": "2026-10-19T15:27:32.497Z"
+    },
+    {
+      "id": "mbx_ceeaabdd",
+      "orgId": "org_2e502d5d",
+      "emailAddress": "founder@newventures.co",
+      "role": "Organization Admin",
+      "quotaMb": 1000,
+      "usedMb": 24,
+      "status": "active",
+      "createdAt": "2026-10-22T10:11:50.150Z"
+    },
+    {
+      "id": "mbx_7b339136",
+      "orgId": "org_2e502d5d",
+      "emailAddress": "info@newventures.co",
+      "role": "General Support",
+      "quotaMb": 1000,
+      "usedMb": 5,
+      "status": "active",
+      "createdAt": "2026-10-22T10:11:50.150Z"
+    },
+    {
+      "id": "mbx_b68d352f",
+      "orgId": "org_e8a391f2",
+      "emailAddress": "ceo@growthagency.ng",
+      "role": "Organization Admin",
+      "quotaMb": 5000,
+      "usedMb": 24,
+      "status": "active",
+      "createdAt": "2026-10-22T10:11:50.248Z"
     }
   ],
   "messages": [
@@ -617,6 +724,26 @@
       "token": "ses_4d41bbae59a08a85c64a944a60423e29db81e602a4240a67",
       "userId": "usr_sales_002",
       "expiresAt": "2026-10-29T08:44:54.251Z"
+    },
+    {
+      "token": "ses_db4a5dcb9fe5c6cb3847864bdb3b22ea6d85c98357ab7bd6",
+      "userId": "usr_ecece833",
+      "expiresAt": "2026-10-29T10:11:50.146Z"
+    },
+    {
+      "token": "ses_52b4500a93d38d63d4d5f93e81f240ea805863d14626c2bc",
+      "userId": "usr_1ffdb3e8",
+      "expiresAt": "2026-10-29T10:11:50.245Z"
+    },
+    {
+      "token": "ses_1de7913949ad430692d6ac1a343c4e10c1bbf48c2cc0e794",
+      "userId": "usr_ecece833",
+      "expiresAt": "2026-10-29T10:15:57.007Z"
+    },
+    {
+      "token": "ses_ff4b9d026934e3df9aadf40b21e42873f439b476bcee000f",
+      "userId": "usr_1ffdb3e8",
+      "expiresAt": "2026-10-29T10:15:57.192Z"
     }
   ],
   "campaigns": [
@@ -1128,6 +1255,69 @@
   ],
   "orders": [
     {
+      "id": "ord_mvjdyc87",
+      "orderNumber": "WHMCS-ORD-2026-3970",
+      "orgId": "org_2e502d5d",
+      "userId": "usr_ecece833",
+      "clientEmail": "founder@newventures.co",
+      "clientName": "David Founder",
+      "planId": "free",
+      "planName": "ZegaMail Free Forever",
+      "billingCycle": "annually",
+      "amount": 0,
+      "currency": "USD",
+      "paymentMethod": "free_forever",
+      "paymentMethodName": "free_forever",
+      "status": "active",
+      "invoiceId": "WHMCS-INV-58191",
+      "whmcsOrderId": "3970",
+      "whmcsInvoiceId": "58191",
+      "createdAt": "2026-10-22T10:15:57.031Z",
+      "updatedAt": "2026-10-22T10:15:57.031Z"
+    },
+    {
+      "id": "ord_mvjdt1qm",
+      "orderNumber": "WHMCS-ORD-2026-5011",
+      "orgId": "org_2e502d5d",
+      "userId": "usr_ecece833",
+      "clientEmail": "founder@newventures.co",
+      "clientName": "David Founder",
+      "planId": "free",
+      "planName": "ZegaMail Free Forever",
+      "billingCycle": "annually",
+      "amount": 0,
+      "currency": "USD",
+      "paymentMethod": "free_forever",
+      "paymentMethodName": "free_forever",
+      "status": "active",
+      "invoiceId": "WHMCS-INV-11771",
+      "whmcsOrderId": "5011",
+      "whmcsInvoiceId": "11771",
+      "createdAt": "2026-10-22T10:11:50.158Z",
+      "updatedAt": "2026-10-22T10:11:50.158Z"
+    },
+    {
+      "id": "ord_mvjcy92z",
+      "orderNumber": "WHMCS-ORD-2026-6593",
+      "orgId": "org_6dfae194",
+      "userId": "usr_6862acd9",
+      "clientEmail": "redemptidsadsonnewton@gmail.com",
+      "clientName": "fwFf",
+      "planId": "starter",
+      "planName": "ZegaMail Starter Business",
+      "billingCycle": "annually",
+      "amount": 1500,
+      "currency": "NGN",
+      "paymentMethod": "paystack",
+      "paymentMethodName": "Paystack (Cards, Bank Transfer & USSD)",
+      "status": "pending",
+      "invoiceId": "WHMCS-INV-10381",
+      "whmcsOrderId": "6593",
+      "whmcsInvoiceId": "10381",
+      "createdAt": "2026-10-22T09:47:53.339Z",
+      "updatedAt": "2026-10-22T09:47:53.339Z"
+    },
+    {
       "id": "ord_mvfbob8v",
       "orderNumber": "WHMCS-ORD-2026-7981",
       "orgId": "org_acme_001",
@@ -1299,6 +1489,47 @@
     }
   ],
   "invoices": [
+    {
+      "id": "WHMCS-INV-58191",
+      "orderId": "ord_mvjdyc87",
+      "orgId": "org_2e502d5d",
+      "userId": "usr_ecece833",
+      "amount": 0,
+      "currency": "USD",
+      "status": "paid",
+      "dueDate": "2026-10-29",
+      "datePaid": "2026-10-22T10:15:57.031Z",
+      "paymentMethod": "free_forever",
+      "description": "ZegaMail Free Forever (Annual billing)",
+      "createdAt": "2026-10-22T10:15:57.031Z"
+    },
+    {
+      "id": "WHMCS-INV-11771",
+      "orderId": "ord_mvjdt1qm",
+      "orgId": "org_2e502d5d",
+      "userId": "usr_ecece833",
+      "amount": 0,
+      "currency": "USD",
+      "status": "paid",
+      "dueDate": "2026-10-29",
+      "datePaid": "2026-10-22T10:11:50.158Z",
+      "paymentMethod": "free_forever",
+      "description": "ZegaMail Free Forever (Annual billing)",
+      "createdAt": "2026-10-22T10:11:50.158Z"
+    },
+    {
+      "id": "WHMCS-INV-10381",
+      "orderId": "ord_mvjcy92z",
+      "orgId": "org_6dfae194",
+      "userId": "usr_6862acd9",
+      "amount": 1500,
+      "currency": "NGN",
+      "status": "unpaid",
+      "dueDate": "2026-10-29",
+      "paymentMethod": "Paystack (Cards, Bank Transfer & USSD)",
+      "description": "ZegaMail Starter Business (Annual billing)",
+      "createdAt": "2026-10-22T09:47:53.339Z"
+    },
     {
       "id": "WHMCS-INV-37464",
       "orderId": "ord_mvfbob8v",

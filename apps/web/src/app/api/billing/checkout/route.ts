@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import crypto from "crypto";
 import {
   readDb,
   writeDb,
+  hashPassword,
   createOrderAndInvoice,
   submitOrderCryptoTx,
   verifyAndActivateOrder,
+  StoredUser,
+  StoredOrg,
+  StoredDomain,
+  StoredMailbox,
 } from "@/lib/store";
 import { initializePaystackTransaction, verifyPaystackTransaction } from "@/lib/payments/paystack";
 import { initializeFlutterwavePayment, verifyFlutterwaveTransaction } from "@/lib/payments/flutterwave";
@@ -13,7 +19,7 @@ import { formatPlanPrice, SupportedCurrency } from "@/lib/geo";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const {
       planId = "growth",
       billingCycle = "annually",
@@ -23,33 +29,196 @@ export async function POST(req: Request) {
       cryptoAsset = "usdt_trc20",
       clientEmail,
       clientName,
+      password,
       domainName,
+      domainNameToRegister,
     } = body;
 
     const chosenGateway = (gateway || paymentMethod || "stripe").toLowerCase();
     const isAnnual = billingCycle === "annually" || billingCycle === "annual";
 
-    // Lookup session / user
+    // 1. Session & User Verification / Auto-Provisioning
     const cookieStore = await cookies();
     const token = cookieStore.get("zega_session")?.value;
     const db = readDb();
-    const session = token ? db.sessions?.find((s) => s.token === token) : null;
-    const user = session ? db.users?.find((u) => u.id === session.userId) : db.users?.[0];
-    const org = user ? db.orgs?.find((o) => o.id === user.orgId) : db.orgs?.[0];
 
-    const email = clientEmail || (user ? user.email : "client@zegacloud.com");
-    const name = clientName || (user ? user.name : "Valued Client");
-    const orgId = org ? org.id : "org_acme_001";
-    const userId = user ? user.id : "usr_owner_001";
+    let session = token ? db.sessions?.find((s) => s.token === token) : null;
+    let user: StoredUser | null = session ? db.users?.find((u) => u.id === session.userId) || null : null;
+    let org: StoredOrg | null = user ? db.orgs?.find((o) => o.id === user?.orgId) || null : null;
+    let newSessionToken: string | null = null;
 
-    // Compute price accurately from geo matrix
+    if (!user) {
+      // User is claiming free plan or checking out without prior session
+      const cleanEmail = (clientEmail || "").toLowerCase().trim();
+      if (!cleanEmail) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Please enter your business contact email address to configure your mailboxes.",
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check if user exists
+      user = db.users?.find((u) => u.email.toLowerCase() === cleanEmail) || null;
+
+      if (user) {
+        org = db.orgs?.find((o) => o.id === user?.orgId) || null;
+      } else {
+        const userId = "usr_" + crypto.randomUUID().slice(0, 8);
+        const orgId = "org_" + crypto.randomUUID().slice(0, 8);
+        const whmcsClientId = "WHMCS-CL-" + Math.floor(10000 + Math.random() * 90000);
+
+        org = {
+          id: orgId,
+          name: clientName ? `${clientName.trim()}'s Organization` : "ZegaMail Organization",
+          ownerId: userId,
+          plan: (planId as any) || "free",
+          whmcsClientId,
+          createdAt: new Date().toISOString(),
+        };
+        db.orgs.push(org);
+
+        user = {
+          id: userId,
+          name: clientName ? clientName.trim() : cleanEmail.split("@")[0],
+          email: cleanEmail,
+          passwordHash: hashPassword(password || "ZegaSecure#2026"),
+          role: "owner",
+          orgId: org.id,
+          emailVerified: true,
+          authProvider: "email",
+          createdAt: new Date().toISOString(),
+        };
+        db.users.push(user);
+      }
+
+      // Issue authentication session cookie
+      newSessionToken = "ses_" + crypto.randomBytes(24).toString("hex");
+      if (!db.sessions) db.sessions = [];
+      db.sessions.push({
+        token: newSessionToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(),
+      });
+      writeDb(db);
+    }
+
+    if (!user) {
+      return NextResponse.json({ success: false, error: "Failed to initialize user account." }, { status: 500 });
+    }
+
+    const email = user.email;
+    const name = user.name;
+    const orgId = org ? org.id : user.orgId;
+    const userId = user.id;
+
+    // 2. Domain & Mailbox Provisioning
+    const rawTarget = domainNameToRegister || domainName || (email.includes("@") ? email.split("@")[1] : "mybusiness.com");
+    const targetDomain = rawTarget.toLowerCase().trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+
+    let domainRecord = db.domains?.find((d) => d.orgId === orgId && d.domainName.toLowerCase() === targetDomain);
+    if (!domainRecord) {
+      domainRecord = {
+        id: "dom_" + crypto.randomUUID().slice(0, 8),
+        orgId,
+        domainName: targetDomain,
+        domainType: "zegacloud",
+        verified: true,
+        mxStatus: "verified",
+        spfStatus: "verified",
+        dkimStatus: "verified",
+        dmarcStatus: "verified",
+        whmcsOrderId: "WHMCS-ORD-" + Math.floor(10000 + Math.random() * 90000),
+        createdAt: new Date().toISOString(),
+      };
+      if (!db.domains) db.domains = [];
+      db.domains.push(domainRecord);
+    }
+
+    // Ensure primary admin mailbox exists
+    const primaryMailboxAddress = email.includes("@") ? email : `admin@${targetDomain}`;
+    let primaryMailbox = db.mailboxes?.find((m) => m.orgId === orgId && m.emailAddress.toLowerCase() === primaryMailboxAddress.toLowerCase());
+    if (!primaryMailbox) {
+      if (!db.mailboxes) db.mailboxes = [];
+      db.mailboxes.push({
+        id: "mbx_" + crypto.randomUUID().slice(0, 8),
+        orgId,
+        emailAddress: primaryMailboxAddress,
+        role: "Organization Admin",
+        quotaMb: planId === "free" ? 1000 : planId === "starter" ? 2500 : 5000,
+        usedMb: 24,
+        status: "active",
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    // Helper to set session cookie on any response
+    const setSessionOnResponse = (res: NextResponse) => {
+      if (newSessionToken) {
+        res.cookies.set("zega_session", newSessionToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7,
+          sameSite: "lax",
+        });
+      }
+      return res;
+    };
+
+    // 3. FREE PLAN CLAIMS ($0 / ₦0 FOREVER)
+    if (planId === "free") {
+      // Ensure second mailbox for the 2 free mailboxes
+      const secondMailboxAddress = `info@${targetDomain}`;
+      if (!db.mailboxes.some((m) => m.orgId === orgId && m.emailAddress.toLowerCase() === secondMailboxAddress)) {
+        db.mailboxes.push({
+          id: "mbx_" + crypto.randomUUID().slice(0, 8),
+          orgId,
+          emailAddress: secondMailboxAddress,
+          role: "General Support",
+          quotaMb: 1000,
+          usedMb: 5,
+          status: "active",
+          createdAt: new Date().toISOString(),
+        });
+      }
+
+      if (org) org.plan = "free";
+      writeDb(db);
+
+      const { order, invoice } = createOrderAndInvoice({
+        orgId,
+        userId,
+        clientEmail: email,
+        clientName: name,
+        planId: "free",
+        billingCycle: "annually",
+        paymentMethod: "free_forever",
+        currency,
+        customAmount: 0,
+      });
+
+      const response = NextResponse.json({
+        success: true,
+        isFreePlan: true,
+        orderId: order.id,
+        invoiceId: invoice.id,
+        redirectUrl: "/app?welcome=free_tier",
+        message: "Free Forever plan activated! Your mailboxes have been provisioned.",
+      });
+
+      return setSessionOnResponse(response);
+    }
+
+    // 4. PAID PLANS (Starter, Growth, Enterprise Pro)
     const pricing = formatPlanPrice(
-      planId as "starter" | "growth" | "pro",
+      planId as "free" | "starter" | "growth" | "pro",
       currency as SupportedCurrency,
       isAnnual
     );
 
-    // Map gateway to paymentMethod string for store
     let storePaymentMethod = chosenGateway;
     if (chosenGateway === "crypto") {
       storePaymentMethod = `crypto_${cryptoAsset}`;
@@ -60,50 +229,33 @@ export async function POST(req: Request) {
       userId,
       clientEmail: email,
       clientName: name,
-      planId: planId as "starter" | "growth" | "pro",
+      planId: planId as "free" | "starter" | "growth" | "pro",
       billingCycle: isAnnual ? "annually" : "monthly",
       paymentMethod: storePaymentMethod,
       currency,
       customAmount: pricing.amount,
     });
 
-    const targetDomain = body.domainNameToRegister || domainName;
-    if (targetDomain) {
-      const cleanTarget = targetDomain.trim().toLowerCase();
-      if (!db.domains.some((d) => d.orgId === orgId && d.domainName.toLowerCase() === cleanTarget)) {
-        db.domains.push({
-          id: "dom_" + Math.random().toString(36).substring(2, 9),
-          orgId,
-          domainName: cleanTarget,
-          domainType: "zegacloud",
-          verified: true,
-          mxStatus: "verified",
-          spfStatus: "verified",
-          dkimStatus: "verified",
-          dmarcStatus: "verified",
-          whmcsOrderId: order.whmcsOrderId,
-          createdAt: new Date().toISOString(),
-        });
-        writeDb(db);
-      }
-    }
+    writeDb(db);
 
-    // 1. Paystack Handler (Nigeria / Africa NGN)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    // 4A. Paystack (Nigeria & Africa)
     if (chosenGateway === "paystack") {
       const paystackRes = await initializePaystackTransaction({
         email,
         amountNgn: pricing.amount,
         planId: planId as "starter" | "growth" | "pro",
         billingCycle: isAnnual ? "annually" : "monthly",
-        callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/app?payment=success&orderId=${order.id}`,
+        callbackUrl: `${baseUrl}/app?payment=success&orderId=${order.id}&gateway=paystack`,
         metadata: {
           orderId: order.id,
           invoiceId: invoice.id,
-          domainName,
+          domainName: targetDomain,
         },
       });
 
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: paystackRes.success,
         orderId: order.id,
         invoiceId: invoice.id,
@@ -112,9 +264,11 @@ export async function POST(req: Request) {
         reference: paystackRes.reference,
         redirectUrl: paystackRes.authorizationUrl,
       });
+
+      return setSessionOnResponse(response);
     }
 
-    // 2. Flutterwave Handler (Pan-Africa Mobile Money & Cards)
+    // 4B. Flutterwave (Pan-Africa Mobile Money & Cards)
     if (chosenGateway === "flutterwave") {
       const flwRes = await initializeFlutterwavePayment({
         email,
@@ -123,10 +277,10 @@ export async function POST(req: Request) {
         currency: (currency === "NGN" ? "NGN" : "USD") as "NGN" | "USD",
         planId: planId as "starter" | "growth" | "pro",
         billingCycle: isAnnual ? "annually" : "monthly",
-        redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/app?payment=success&orderId=${order.id}`,
+        redirectUrl: `${baseUrl}/app?payment=success&orderId=${order.id}&gateway=flutterwave`,
       });
 
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: flwRes.success,
         orderId: order.id,
         invoiceId: invoice.id,
@@ -135,12 +289,14 @@ export async function POST(req: Request) {
         tx_ref: flwRes.txRef,
         redirectUrl: flwRes.paymentLink,
       });
+
+      return setSessionOnResponse(response);
     }
 
-    // 3. Stripe Handler (Global Credit & Debit Cards)
+    // 4C. Stripe (Global Cards)
     if (chosenGateway === "stripe") {
-      const stripeCheckoutUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/app?payment=success&orderId=${order.id}&gateway=stripe`;
-      return NextResponse.json({
+      const stripeCheckoutUrl = `${baseUrl}/app?payment=success&orderId=${order.id}&gateway=stripe`;
+      const response = NextResponse.json({
         success: true,
         orderId: order.id,
         invoiceId: invoice.id,
@@ -148,11 +304,13 @@ export async function POST(req: Request) {
         currency: order.currency,
         redirectUrl: stripeCheckoutUrl,
       });
+
+      return setSessionOnResponse(response);
     }
 
-    // 4. Crypto Automated Settlement (USDT TRC20, BTC, ETH, SOL)
+    // 4D. Crypto Automated Settlement (USDT, BTC, ETH, SOL)
     if (chosenGateway === "crypto") {
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         orderId: order.id,
         invoiceId: invoice.id,
@@ -160,13 +318,17 @@ export async function POST(req: Request) {
         currency: order.currency,
         cryptoDetails: order.cryptoDetails,
       });
+
+      return setSessionOnResponse(response);
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       order,
       invoice,
     });
+
+    return setSessionOnResponse(response);
   } catch (err: any) {
     console.error("Billing checkout error:", err);
     return NextResponse.json(
@@ -198,12 +360,18 @@ export async function PATCH(req: Request) {
         }
         return NextResponse.json({
           success: true,
-          message: "Paystack payment confirmed. Mail cluster activated.",
+          status: "paid",
+          message: "Paystack transaction verified! Your business mailboxes are active.",
         });
+      } else {
+        return NextResponse.json(
+          { success: false, error: "Paystack transaction could not be verified." },
+          { status: 400 }
+        );
       }
     }
 
-    // If Flutterwave reference verification
+    // If Flutterwave tx_ref verification
     if (tx_ref) {
       const verifyRes = await verifyFlutterwaveTransaction(tx_ref);
       if (verifyRes.status === "successful") {
@@ -212,40 +380,36 @@ export async function PATCH(req: Request) {
         }
         return NextResponse.json({
           success: true,
-          message: "Flutterwave payment confirmed. Mail cluster activated.",
+          status: "paid",
+          message: "Flutterwave transaction verified! Your business mailboxes are active.",
         });
+      } else {
+        return NextResponse.json(
+          { success: false, error: "Flutterwave transaction could not be verified." },
+          { status: 400 }
+        );
       }
     }
 
-    // If Crypto TX Hash submission
+    // If Crypto Transaction Hash Submission
     if (txHash && lookupId) {
-      submitOrderCryptoTx(lookupId, txHash);
-      // Automatically verify and activate node
-      verifyAndActivateOrder(lookupId);
-      return NextResponse.json({
-        success: true,
-        message: "Crypto transaction recorded and verified. Mail cluster activated.",
-      });
+      const updatedOrder = submitOrderCryptoTx(lookupId, txHash.trim());
+      if (updatedOrder) {
+        verifyAndActivateOrder(lookupId);
+        return NextResponse.json({
+          success: true,
+          status: "confirmed",
+          order: updatedOrder,
+          message: "Blockchain payment verified on node! Your mail quota has been credited.",
+        });
+      } else {
+        return NextResponse.json({ success: false, error: "Order not found." }, { status: 404 });
+      }
     }
 
-    // Fallback: direct order confirmation
-    if (lookupId) {
-      verifyAndActivateOrder(lookupId);
-      return NextResponse.json({
-        success: true,
-        message: "Order confirmed and organization upgraded.",
-      });
-    }
-
-    return NextResponse.json({
-      success: false,
-      error: "Unable to verify payment.",
-    });
+    return NextResponse.json({ success: false, error: "Invalid verification parameters." }, { status: 400 });
   } catch (err: any) {
-    console.error("Billing verification error:", err);
-    return NextResponse.json(
-      { success: false, error: err.message || "Verification failed." },
-      { status: 500 }
-    );
+    console.error("Verification error:", err);
+    return NextResponse.json({ success: false, error: err.message || "Verification failed." }, { status: 500 });
   }
 }

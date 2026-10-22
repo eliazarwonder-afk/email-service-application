@@ -34,6 +34,25 @@ export const EXCHANGE_RATES: Record<SupportedCurrency, number> = {
  * Calibrated specifically for the Nigerian market & global launch affordability.
  */
 export const PLAN_PRICING = {
+  free: {
+    name: "Free Forever",
+    mailboxes: "2 Free Mailboxes",
+    mailboxCount: 2,
+    storage: "2 GB NVMe Pool",
+    domains: "1 Custom Domain",
+    promo: {
+      monthlyUsd: 0,
+      annualMonthlyUsd: 0,
+      monthlyNgn: 0,
+      annualMonthlyNgn: 0,
+    },
+    regular: {
+      monthlyUsd: 0,
+      annualMonthlyUsd: 0,
+      monthlyNgn: 0,
+      annualMonthlyNgn: 0,
+    },
+  },
   starter: {
     name: "Starter Business",
     mailboxes: "Up to 10 Mailboxes",
@@ -104,7 +123,7 @@ export const PLAN_PRICING = {
  * Formats a price nicely based on the selected currency, incorporating promotional pricing.
  */
 export function formatPlanPrice(
-  planId: "starter" | "growth" | "pro",
+  planId: "free" | "starter" | "growth" | "pro",
   currency: SupportedCurrency,
   isAnnual: boolean = true
 ): {
@@ -117,9 +136,22 @@ export function formatPlanPrice(
   symbol: string;
   currency: SupportedCurrency;
 } {
-  const plan = PLAN_PRICING[planId];
+  const plan = PLAN_PRICING[planId] || PLAN_PRICING.starter;
   const symbol = CURRENCY_SYMBOLS[currency] || "$";
   const mailboxCount = plan.mailboxCount || 10;
+
+  if (planId === "free") {
+    return {
+      formatted: `${symbol}0`,
+      amount: 0,
+      regularFormatted: `${symbol}0`,
+      regularAmount: 0,
+      discountPercent: 0,
+      perMailboxFormatted: `${symbol}0/mailbox`,
+      symbol,
+      currency,
+    };
+  }
 
   if (currency === "NGN") {
     const promoAmt = isAnnual ? plan.promo.annualMonthlyNgn : plan.promo.monthlyNgn;

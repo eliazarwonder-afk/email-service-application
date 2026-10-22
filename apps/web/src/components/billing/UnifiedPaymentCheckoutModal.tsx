@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   X,
   Check,
@@ -17,7 +18,11 @@ import {
   Sparkles,
   Smartphone,
   Globe,
-  Coins
+  Coins,
+  Lock,
+  User,
+  Mail,
+  Building2,
 } from "lucide-react";
 import { useCurrency } from "@/components/CurrencyProvider";
 import { PLAN_PRICING, formatPlanPrice, SupportedCurrency } from "@/lib/geo";
@@ -25,8 +30,8 @@ import { PLAN_PRICING, formatPlanPrice, SupportedCurrency } from "@/lib/geo";
 interface UnifiedPaymentCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultPlan?: "starter" | "growth" | "pro";
-  initialPlan?: "starter" | "growth" | "pro";
+  defaultPlan?: "free" | "starter" | "growth" | "pro";
+  initialPlan?: "free" | "starter" | "growth" | "pro";
   domainNameToRegister?: string;
   clientEmail?: string;
   clientName?: string;
@@ -43,10 +48,19 @@ export function UnifiedPaymentCheckoutModal({
   clientName,
   onPaymentSuccess,
 }: UnifiedPaymentCheckoutModalProps) {
+  const router = useRouter();
   const { currency, setCurrency, isAfrica, isNigeria } = useCurrency();
-  const [selectedPlan, setSelectedPlan] = useState<"starter" | "growth" | "pro">(initialPlan || defaultPlan);
+  const [selectedPlan, setSelectedPlan] = useState<"free" | "starter" | "growth" | "pro">(initialPlan || defaultPlan);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("annually");
-  
+
+  // User input fields (for unauthenticated checkout or free claim)
+  const [inputName, setInputName] = useState(clientName || "");
+  const [inputEmail, setInputEmail] = useState(clientEmail || "");
+  const [inputPassword, setInputPassword] = useState("");
+  const [inputDomain, setInputDomain] = useState(domainNameToRegister || "");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
   // Payment Gateway Tab: paystack | flutterwave | stripe | crypto
   const [gateway, setGateway] = useState<"paystack" | "flutterwave" | "stripe" | "crypto">(
     isNigeria ? "paystack" : isAfrica ? "flutterwave" : "stripe"
@@ -59,11 +73,40 @@ export function UnifiedPaymentCheckoutModal({
   const [txHashInput, setTxHashInput] = useState("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [txSubmitting, setTxSubmitting] = useState(false);
-  const [txConfirmed, setTxConfirmed] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Check auth session on mount
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        setIsLoadingAuth(true);
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        if (data.authenticated && data.user) {
+          setIsAuthenticated(true);
+          if (!inputEmail) setInputEmail(data.user.email);
+          if (!inputName) setInputName(data.user.name);
+          if (!inputDomain && data.domain?.domainName) setInputDomain(data.domain.domainName);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    }
+
+    if (isOpen) {
+      if (initialPlan) setSelectedPlan(initialPlan);
+      if (domainNameToRegister) setInputDomain(domainNameToRegister);
+      checkSession();
+    }
+  }, [isOpen, initialPlan, domainNameToRegister]);
 
   if (!isOpen) return null;
 
+  const isFreePlan = selectedPlan === "free";
   const currentPricing = formatPlanPrice(selectedPlan, currency, billingCycle === "annually");
   const isAnnual = billingCycle === "annually";
 
@@ -71,22 +114,18 @@ export function UnifiedPaymentCheckoutModal({
     usdt_trc20: {
       network: "TRON (TRC-20)",
       address: "TZeGaC1oudMailUSDT2026PaymentNodeAddrX9",
-      memoRequired: false,
     },
     btc: {
       network: "Bitcoin Native SegWit (Bech32)",
       address: "bc1qzegacloudmailnode2026btcpaycluster9",
-      memoRequired: false,
     },
     eth: {
       network: "Ethereum (ERC-20)",
       address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-      memoRequired: false,
     },
     sol: {
       network: "Solana (SPL)",
       address: "ZegaMailClusterPaySolanaNode111111111111",
-      memoRequired: false,
     },
   };
 
@@ -96,10 +135,17 @@ export function UnifiedPaymentCheckoutModal({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  // Submit Order Initiation
-  const handleInitiatePayment = async () => {
-    setIsSubmitting(true);
+  // Submit Order Initiation / Free Plan Activation
+  const handleInitiateOrder = async () => {
     setErrorMessage("");
+
+    // Validate email if user is not authenticated
+    if (!isAuthenticated && !inputEmail.trim()) {
+      setErrorMessage("Please enter your work/contact email address to configure your mailbox.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const res = await fetch("/api/billing/checkout", {
@@ -108,11 +154,13 @@ export function UnifiedPaymentCheckoutModal({
         body: JSON.stringify({
           planId: selectedPlan,
           billingCycle,
-          gateway,
+          gateway: isFreePlan ? "free_tier" : gateway,
           currency,
-          clientEmail,
-          clientName,
-          domainNameToRegister,
+          clientEmail: inputEmail.trim(),
+          clientName: inputName.trim() || inputEmail.split("@")[0],
+          password: inputPassword.trim() || undefined,
+          domainName: inputDomain.trim() || undefined,
+          domainNameToRegister: inputDomain.trim() || domainNameToRegister || undefined,
           cryptoAsset: gateway === "crypto" ? cryptoAsset : undefined,
         }),
       });
@@ -120,13 +168,18 @@ export function UnifiedPaymentCheckoutModal({
       const data = await res.json();
       if (data.success) {
         setOrderData(data);
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
+
+        // If Free Plan or direct redirect returned
+        if (data.isFreePlan || data.redirectUrl) {
+          if (onPaymentSuccess) onPaymentSuccess(selectedPlan);
+          window.location.href = data.redirectUrl || "/app?welcome=activated";
           return;
         }
+
+        // Paid crypto checkout moves to payment screen
         setStep("pay");
       } else {
-        setErrorMessage(data.error || "Unable to initialize order.");
+        setErrorMessage(data.error || "Unable to initialize order. Please check your details.");
       }
     } catch (err: any) {
       setErrorMessage(err.message || "Network error. Please try again.");
@@ -158,9 +211,11 @@ export function UnifiedPaymentCheckoutModal({
 
       const data = await res.json();
       if (data.success) {
-        setTxConfirmed(true);
         setStep("confirmed");
         if (onPaymentSuccess) onPaymentSuccess(selectedPlan);
+        setTimeout(() => {
+          window.location.href = "/app?payment=crypto_confirmed";
+        }, 1200);
       } else {
         setErrorMessage(data.error || "Verification in progress. We will activate your node once confirmed.");
       }
@@ -182,10 +237,12 @@ export function UnifiedPaymentCheckoutModal({
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                {domainNameToRegister
+                {isFreePlan
+                  ? "Claim 2 Free Mailboxes (Forever Free)"
+                  : domainNameToRegister
                   ? `Register ${domainNameToRegister} & Hosting`
                   : step === "select"
-                  ? "Upgrade Your Business Email Plan"
+                  ? "Configure Your Business Email"
                   : step === "pay"
                   ? "Complete Payment"
                   : "Subscription Activated!"}
@@ -214,315 +271,422 @@ export function UnifiedPaymentCheckoutModal({
             </div>
           )}
 
-          {/* STEP 1: PLAN & GATEWAY SELECTION */}
+          {/* STEP 1: CONFIGURATION & SELECTION */}
           {step === "select" && (
             <div className="space-y-6">
-              {/* Billing Cycle & Currency Switcher */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
-                {/* Billing Cycle */}
-                <div className="inline-flex rounded-xl p-1 bg-white dark:bg-slate-800 shadow-xs border border-slate-200 dark:border-slate-700">
+              {/* PLAN SELECTOR TABS */}
+              <div className="grid grid-cols-4 gap-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold">
+                {(["free", "starter", "growth", "pro"] as const).map((p) => (
                   <button
+                    key={p}
                     type="button"
-                    onClick={() => setBillingCycle("monthly")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      billingCycle === "monthly"
-                        ? "bg-blue-600 text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400"
+                    onClick={() => setSelectedPlan(p)}
+                    className={`py-2 rounded-lg capitalize transition-all ${
+                      selectedPlan === p
+                        ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs font-bold"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                     }`}
                   >
-                    Monthly
+                    {p === "free" ? "Free Forever" : p}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setBillingCycle("annually")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                      billingCycle === "annually"
-                        ? "bg-blue-600 text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400"
-                    }`}
-                  >
-                    <span>Annual Billing</span>
-                    <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-1 rounded font-bold">
-                      -20%
-                    </span>
-                  </button>
-                </div>
+                ))}
+              </div>
 
-                {/* Currency Switcher */}
-                <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-slate-500 font-medium text-[11px]">Currency:</span>
-                  <div className="inline-flex rounded-xl p-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                    {(["USD", "NGN", "EUR", "GBP"] as SupportedCurrency[]).map((c) => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => setCurrency(c)}
-                        className={`px-2 py-1 rounded-lg text-[11px] font-mono font-semibold transition-all ${
-                          currency === c
-                            ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900"
-                            : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                        }`}
-                      >
-                        {c}
-                      </button>
-                    ))}
+              {/* ACCOUNT & DOMAIN SETUP (If user is not logged in) */}
+              {!isAuthenticated && (
+                <div className="space-y-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5 text-blue-600" />
+                      <span>Account & Webmail Credentials</span>
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono">Instant Session Access</span>
                   </div>
-                </div>
-              </div>
 
-              {/* 3 Tier Plan Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {(["starter", "growth", "pro"] as const).map((planId) => {
-                  const info = PLAN_PRICING[planId];
-                  const price = formatPlanPrice(planId, currency, isAnnual);
-                  const isSelected = selectedPlan === planId;
-
-                  return (
-                    <div
-                      key={planId}
-                      onClick={() => setSelectedPlan(planId)}
-                      className={`p-4 rounded-2xl border cursor-pointer transition-all ${
-                        isSelected
-                          ? "border-blue-600 bg-blue-50/40 dark:bg-blue-950/30 ring-2 ring-blue-500/20 shadow-sm"
-                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/60"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                          {info.name.split(" ")[0]}
-                        </span>
-                        {planId === "growth" && (
-                          <span className="text-[9px] font-mono uppercase bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">
-                            Popular
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="mb-3">
-                        <div className="flex items-baseline gap-1.5 font-mono">
-                          <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                            {price.formatted}
-                          </span>
-                          <span className="text-xs line-through text-slate-400">
-                            {price.regularFormatted}
-                          </span>
-                          <span className="text-xs text-slate-400 font-sans">/mo</span>
-                        </div>
-                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
-                          Save {price.discountPercent}% Promo
-                        </div>
-                      </div>
-
-                      <ul className="space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-3">
-                        <li className="flex items-center gap-1.5">
-                          <Check className="h-3 w-3 text-emerald-600" />
-                          <span>{info.mailboxes}</span>
-                        </li>
-                        <li className="flex items-center gap-1.5">
-                          <Check className="h-3 w-3 text-emerald-600" />
-                          <span>{info.storage}</span>
-                        </li>
-                      </ul>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Full Name / Business Name
+                      </label>
+                      <input
+                        type="text"
+                        value={inputName}
+                        onChange={(e) => setInputName(e.target.value)}
+                        placeholder="e.g. Alex Carter"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500"
+                      />
                     </div>
-                  );
-                })}
-              </div>
 
-              {/* PAYMENT GATEWAY TABS */}
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-slate-900 dark:text-white">
-                  Select Payment Gateway
-                </label>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Work / Contact Email <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={inputEmail}
+                        onChange={(e) => setInputEmail(e.target.value)}
+                        placeholder="you@company.com"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 font-mono"
+                      />
+                    </div>
+                  </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {/* Paystack (Nigeria & Africa) */}
-                  <button
-                    type="button"
-                    onClick={() => setGateway("paystack")}
-                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between ${
-                      gateway === "paystack"
-                        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
-                        : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                    }`}
-                  >
-                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <span>🇳🇬 Paystack</span>
-                    </span>
-                    <span className="text-[10px] text-slate-500 mt-1">
-                      Bank Transfer, Cards &amp; USSD
-                    </span>
-                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Master Password <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        value={inputPassword}
+                        onChange={(e) => setInputPassword(e.target.value)}
+                        placeholder="Create webmail password"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 font-mono"
+                      />
+                    </div>
 
-                  {/* Flutterwave (Africa) */}
-                  <button
-                    type="button"
-                    onClick={() => setGateway("flutterwave")}
-                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between ${
-                      gateway === "flutterwave"
-                        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
-                        : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                    }`}
-                  >
-                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <span>🌍 Flutterwave</span>
-                    </span>
-                    <span className="text-[10px] text-slate-500 mt-1">
-                      Mobile Money &amp; Cards
-                    </span>
-                  </button>
-
-                  {/* Stripe (Global Cards) */}
-                  <button
-                    type="button"
-                    onClick={() => setGateway("stripe")}
-                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between ${
-                      gateway === "stripe"
-                        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
-                        : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                    }`}
-                  >
-                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <CreditCard className="h-3.5 w-3.5 text-blue-600" />
-                      <span>Stripe</span>
-                    </span>
-                    <span className="text-[10px] text-slate-500 mt-1">
-                      Visa, Mastercard &amp; Apple Pay
-                    </span>
-                  </button>
-
-                  {/* Crypto (On-Chain) */}
-                  <button
-                    type="button"
-                    onClick={() => setGateway("crypto")}
-                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between ${
-                      gateway === "crypto"
-                        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
-                        : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                    }`}
-                  >
-                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <Coins className="h-3.5 w-3.5 text-emerald-600" />
-                      <span>Crypto</span>
-                    </span>
-                    <span className="text-[10px] text-slate-500 mt-1">
-                      USDT, BTC, ETH, SOL
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Crypto Asset Selector (Only shown if crypto is selected) */}
-              {gateway === "crypto" && (
-                <div className="space-y-2 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Choose Cryptocurrency:
-                  </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {(["usdt_trc20", "btc", "eth", "sol"] as const).map((coin) => (
-                      <button
-                        key={coin}
-                        type="button"
-                        onClick={() => setCryptoAsset(coin)}
-                        className={`p-2 rounded-xl text-xs font-mono font-semibold uppercase text-center border ${
-                          cryptoAsset === coin
-                            ? "bg-emerald-600 text-white border-emerald-600"
-                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
-                        }`}
-                      >
-                        {coin.replace("_", " ")}
-                      </button>
-                    ))}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Business Domain
+                      </label>
+                      <input
+                        type="text"
+                        value={inputDomain}
+                        onChange={(e) => setInputDomain(e.target.value)}
+                        placeholder="e.g. acmestudio.com"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 font-mono"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Summary and Next Button */}
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-slate-400">Total Billed Today:</p>
-                  <p className="text-xl font-bold text-slate-900 dark:text-white">
-                    {currency === "NGN"
-                      ? `₦${(currentPricing.amount * (isAnnual ? 12 : 1)).toLocaleString()}`
-                      : `${currentPricing.symbol}${(currentPricing.amount * (isAnnual ? 12 : 1)).toFixed(2)}`}
-                  </p>
-                </div>
+              {/* FREE PLAN SPECIFIC VIEW */}
+              {isFreePlan ? (
+                <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/30 p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-2.5 py-0.5 rounded-full">
+                        Lifetime Free Tier
+                      </span>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white mt-1">
+                        Domain-Linked Free Business Email
+                      </h3>
+                    </div>
+                    <span className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                      {currency === "NGN" ? "₦0" : "$0"}
+                    </span>
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={handleInitiatePayment}
-                  disabled={isSubmitting}
-                  className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold shadow-md flex items-center gap-2 transition-all active:scale-[0.98]"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 ${isSubmitting ? "animate-spin" : "hidden"}`} />
-                  <span>{isSubmitting ? "Connecting Gateway..." : "Proceed to Checkout"}</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Activate 2 full NVMe-hosted mailboxes on your custom domain with verified delivery ticks, SPF, and 2048-bit DKIM keys. Zero charges, no credit card required.
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-emerald-600" /> 2 Free Mailboxes
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-emerald-600" /> 2 GB NVMe Storage
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-emerald-600" /> Verified Delivery Ticks
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-emerald-600" /> SSL IMAP / Webmail
+                    </span>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={handleInitiateOrder}
+                      disabled={isSubmitting}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs py-3 shadow-md transition-all"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                          <span>Provisioning Free Mailboxes…</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Claim 2 Free Mailboxes & Launch Webmail</span>
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* PAID PLANS VIEW (Starter, Growth, Pro) */
+                <div className="space-y-6">
+                  {/* Billing Cycle Switcher */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                    <div className="inline-flex rounded-xl p-1 bg-white dark:bg-slate-800 shadow-xs border border-slate-200 dark:border-slate-700">
+                      <button
+                        type="button"
+                        onClick={() => setBillingCycle("monthly")}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          billingCycle === "monthly"
+                            ? "bg-blue-600 text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400"
+                        }`}
+                      >
+                        Monthly
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBillingCycle("annually")}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                          billingCycle === "annually"
+                            ? "bg-blue-600 text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400"
+                        }`}
+                      >
+                        <span>Annual Billing</span>
+                        <span className="rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold px-1 py-0.5">
+                          Save 20%
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Currency Selector */}
+                    <div className="flex items-center gap-1 p-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      {(["USD", "NGN", "EUR", "GBP"] as SupportedCurrency[]).map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setCurrency(c)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                            currency === c
+                              ? "bg-blue-600 text-white"
+                              : "text-slate-600 dark:text-slate-400"
+                          }`}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* PAYMENT GATEWAY TABS */}
+                  <div className="space-y-2.5">
+                    <label className="block text-xs font-bold text-slate-900 dark:text-white">
+                      Select Payment Gateway
+                    </label>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setGateway("paystack")}
+                        className={`p-3 rounded-2xl border text-left transition-all ${
+                          gateway === "paystack"
+                            ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
+                            : "border-slate-200 dark:border-slate-800"
+                        }`}
+                      >
+                        <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                          🇳🇬 Paystack
+                        </span>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          Bank, Cards & USSD
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setGateway("flutterwave")}
+                        className={`p-3 rounded-2xl border text-left transition-all ${
+                          gateway === "flutterwave"
+                            ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
+                            : "border-slate-200 dark:border-slate-800"
+                        }`}
+                      >
+                        <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                          🌍 Flutterwave
+                        </span>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          Pan-Africa Mobile
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setGateway("stripe")}
+                        className={`p-3 rounded-2xl border text-left transition-all ${
+                          gateway === "stripe"
+                            ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
+                            : "border-slate-200 dark:border-slate-800"
+                        }`}
+                      >
+                        <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                          <CreditCard className="h-3.5 w-3.5 text-blue-600" />
+                          <span>Stripe</span>
+                        </span>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          Visa, Mastercard
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setGateway("crypto")}
+                        className={`p-3 rounded-2xl border text-left transition-all ${
+                          gateway === "crypto"
+                            ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-500"
+                            : "border-slate-200 dark:border-slate-800"
+                        }`}
+                      >
+                        <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                          <Coins className="h-3.5 w-3.5 text-emerald-600" />
+                          <span>Crypto</span>
+                        </span>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          USDT, BTC, SOL
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Crypto Asset Selector */}
+                  {gateway === "crypto" && (
+                    <div className="space-y-2 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800">
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Choose Cryptocurrency:
+                      </span>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {(["usdt_trc20", "btc", "eth", "sol"] as const).map((coin) => (
+                          <button
+                            key={coin}
+                            type="button"
+                            onClick={() => setCryptoAsset(coin)}
+                            className={`p-2 rounded-xl text-xs font-mono font-semibold uppercase text-center border ${
+                              cryptoAsset === coin
+                                ? "bg-emerald-600 text-white border-emerald-600"
+                                : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                            }`}
+                          >
+                            {coin.replace("_", " ")}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Summary and Next Button */}
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-slate-400">Total Billed Today:</p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">
+                        {currency === "NGN"
+                          ? `₦${(currentPricing.amount * (isAnnual ? 12 : 1)).toLocaleString()}`
+                          : `${currentPricing.symbol}${(currentPricing.amount * (isAnnual ? 12 : 1)).toFixed(2)}`}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleInitiateOrder}
+                      disabled={isSubmitting}
+                      className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs px-6 py-3 shadow-md transition-all"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                          <span>Initiating Checkout…</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Proceed to Payment</span>
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* STEP 2: CRYPTO DEPOSIT INSTRUCTIONS */}
-          {step === "pay" && gateway === "crypto" && (
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-5 space-y-4">
+          {/* STEP 2: CRYPTO PAYMENT VERIFICATION SCREEN */}
+          {step === "pay" && orderData && (
+            <div className="space-y-5">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white">
-                    Deposit Destination ({cryptoDepositAddresses[cryptoAsset].network})
-                  </span>
-                  <span className="text-[10px] font-mono bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded font-bold">
-                    Awaiting Blockchain Confirmation
+                  <div className="flex items-center gap-2">
+                    <Coins className="h-5 w-5 text-emerald-600" />
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                        Send Crypto to ZegaCloud Settlement Node
+                      </h3>
+                      <p className="text-xs text-slate-500 font-mono">
+                        Network: {cryptoDepositAddresses[cryptoAsset]?.network}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="font-mono text-sm font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+                    {orderData.cryptoDetails?.cryptoAmount || "$12.00"}{" "}
+                    {cryptoAsset.toUpperCase().split("_")[0]}
                   </span>
                 </div>
 
-                <div>
-                  <p className="text-[11px] text-slate-400 font-mono mb-1">Send exact deposit to:</p>
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                    <span className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate mr-2">
-                      {cryptoDepositAddresses[cryptoAsset].address}
-                    </span>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                    Deposit Wallet Address:
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      readOnly
+                      value={orderData.cryptoDetails?.walletAddress || cryptoDepositAddresses[cryptoAsset]?.address}
+                      className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 select-all"
+                    />
                     <button
                       type="button"
-                      onClick={() => handleCopy(cryptoDepositAddresses[cryptoAsset].address, "addr")}
-                      className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 shrink-0"
+                      onClick={() =>
+                        handleCopy(
+                          orderData.cryptoDetails?.walletAddress || cryptoDepositAddresses[cryptoAsset]?.address,
+                          "address"
+                        )
+                      }
+                      className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 hover:bg-blue-100 transition-colors"
                     >
-                      <Copy className="h-3.5 w-3.5" />
-                      <span>{copiedField === "addr" ? "Copied" : "Copy"}</span>
+                      {copiedField === "address" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Enter Transaction Hash / TXID
+                <div className="space-y-1.5 pt-2">
+                  <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                    Paste Your Transaction Hash / TXID:
                   </label>
                   <input
                     type="text"
-                    required
-                    placeholder="e.g. 0x8a92... or TRC20 TXID"
                     value={txHashInput}
                     onChange={(e) => setTxHashInput(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2.5 text-xs text-slate-900 dark:text-white font-mono outline-none"
+                    placeholder="e.g. 0x8f2d... or e6a8f1..."
+                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                   />
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStep("select")}
-                  className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                >
-                  &larr; Back
-                </button>
 
                 <button
                   type="button"
                   onClick={handleConfirmCryptoPayment}
                   disabled={txSubmitting}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-2"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs py-3 shadow-md transition-all"
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 ${txSubmitting ? "animate-spin" : "hidden"}`} />
-                  <span>{txSubmitting ? "Verifying On-Chain..." : "Confirm Payment"}</span>
+                  {txSubmitting ? (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                      <span>Verifying On-Chain…</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit TX Hash & Activate Webmail</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -531,24 +695,15 @@ export function UnifiedPaymentCheckoutModal({
           {/* STEP 3: CONFIRMED */}
           {step === "confirmed" && (
             <div className="py-8 text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-sm">
-                <Check className="h-8 w-8" />
+              <div className="h-14 w-14 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+                <CheckCircle2 className="h-8 w-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                Payment Successfully Verified!
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Payment Confirmed & Account Activated!
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
-                Your WHMCS order (#{orderData?.orderId || "ZORD-892"}) has been activated. Mailbox quotas and high-speed NVMe limits are now updated.
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Your business email quota has been allocated on ZegaCloud WHMCS. Redirecting to your mailbox…
               </p>
-              <div className="pt-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm"
-                >
-                  Return to Workspace
-                </button>
-              </div>
             </div>
           )}
         </div>

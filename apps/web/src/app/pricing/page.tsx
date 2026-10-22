@@ -35,17 +35,28 @@ export default function PricingPage() {
   const { currency, setCurrency, symbol, isAfrica, isNigeria } = useCurrency();
   const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [checkoutPlan, setCheckoutPlan] = useState<"starter" | "growth" | "pro">("growth");
+  const [checkoutPlan, setCheckoutPlan] = useState<"free" | "starter" | "growth" | "pro">("growth");
 
   // Calculated Pricing Tiers based on selected currency and billing cycle
   const starterPrice = formatPlanPrice("starter", currency, billingCycle === "annual");
   const growthPrice = formatPlanPrice("growth", currency, billingCycle === "annual");
   const proPrice = formatPlanPrice("pro", currency, billingCycle === "annual");
 
-  const openCheckout = (plan: "starter" | "growth" | "pro") => {
+  const openCheckout = (plan: "free" | "starter" | "growth" | "pro") => {
     setCheckoutPlan(plan);
     setIsCheckoutModalOpen(true);
   };
+
+  // Automatically trigger modal if query parameter plan is specified
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const planParam = params.get("plan");
+      if (planParam && ["free", "starter", "growth", "pro"].includes(planParam)) {
+        openCheckout(planParam as any);
+      }
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6] transition-colors selection:bg-blue-500/20">
@@ -203,7 +214,7 @@ export default function PricingPage() {
 
             <button
               type="button"
-              onClick={() => openCheckout("starter")}
+              onClick={() => openCheckout("free")}
               className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               Claim Free Mailboxes

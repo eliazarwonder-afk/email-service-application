@@ -27,10 +27,10 @@ export async function initializeFlutterwavePayment(params: FlutterwaveInitParams
   const secretKey = process.env.FLW_SECRET_KEY;
   const txRef = params.txRef || `ZFLW_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
 
-  if (!secretKey) {
+  if (!secretKey || secretKey.includes("mock") || secretKey.startsWith("FLWSECK_TEST-mock")) {
     return {
       success: true,
-      paymentLink: `/checkout/flutterwave-simulate?txRef=${txRef}&amount=${params.amount}&currency=${params.currency}`,
+      paymentLink: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/app?payment=success&orderId=${txRef}&gateway=flutterwave`,
       txRef,
       message: "Sandbox Flutterwave payment link initialized.",
     };

@@ -38,7 +38,7 @@ export default function SignupGatewayPage() {
   // SSO & Modal State
   const [isSsoLoading, setIsSsoLoading] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [selectedPlanForModal, setSelectedPlanForModal] = useState<"starter" | "growth" | "pro">("growth");
+  const [selectedPlanForModal, setSelectedPlanForModal] = useState<"free" | "starter" | "growth" | "pro">("growth");
   const [targetDomainForModal, setTargetDomainForModal] = useState<string>("");
 
   const handleDomainSearch = async (e: React.FormEvent) => {
@@ -86,7 +86,7 @@ export default function SignupGatewayPage() {
     }
   };
 
-  const openCheckoutWithDomain = (plan: "starter" | "growth" | "pro", domainName?: string) => {
+  const openCheckoutWithDomain = (plan: "free" | "starter" | "growth" | "pro", domainName?: string) => {
     setSelectedPlanForModal(plan);
     if (domainName) {
       setTargetDomainForModal(domainName);

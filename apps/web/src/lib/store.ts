@@ -200,7 +200,7 @@ export interface StoredOrder {
   userId: string;
   clientEmail: string;
   clientName: string;
-  planId: "starter" | "growth" | "pro";
+  planId: "free" | "starter" | "growth" | "pro";
   planName: string;
   billingCycle: "monthly" | "annually";
   amount: number;
@@ -1145,7 +1145,7 @@ export function createOrderAndInvoice({
   userId: string;
   clientEmail: string;
   clientName: string;
-  planId: "starter" | "growth" | "pro";
+  planId: "free" | "starter" | "growth" | "pro";
   billingCycle: "monthly" | "annually";
   paymentMethod: string;
   currency?: string;
@@ -1157,18 +1157,21 @@ export function createOrderAndInvoice({
 
   const isNgn = currency === "NGN";
   const planNames: Record<string, string> = {
+    free: "ZegaMail Free Forever",
     starter: "ZegaMail Starter Business",
     growth: "ZegaMail Business Growth",
     pro: "ZegaMail Enterprise Pro",
   };
 
   const defaultPricingUsd: Record<string, { monthly: number; annually: number }> = {
+    free: { monthly: 0, annually: 0 },
     starter: { monthly: 2.50, annually: 23.88 }, // $1.99 * 12
     growth: { monthly: 6.00, annually: 59.88 },  // $4.99 * 12
     pro: { monthly: 15.00, annually: 155.88 },   // $12.99 * 12
   };
 
   const defaultPricingNgn: Record<string, { monthly: number; annually: number }> = {
+    free: { monthly: 0, annually: 0 },
     starter: { monthly: 1900, annually: 18000 }, // ₦1,500 * 12
     growth: { monthly: 5500, annually: 54000 },  // ₦4,500 * 12
     pro: { monthly: 15000, annually: 150000 },   // ₦12,500 * 12
@@ -1248,7 +1251,7 @@ export function createOrderAndInvoice({
     sol: "Solana (SOL)",
   };
 
-  const isCardPrePaid = paymentMethod === "stripe_card";
+  const isCardPrePaid = paymentMethod === "stripe_card" || planId === "free";
 
   const newOrder: StoredOrder = {
     id: orderId,
