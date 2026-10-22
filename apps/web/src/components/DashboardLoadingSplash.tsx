@@ -96,8 +96,8 @@ export function DashboardLoadingSplash({
         {/* Pulsing Shield Logo with Orbital Ring */}
         <div className="relative mb-6">
           <div className="absolute -inset-4 rounded-full bg-blue-500/20 blur-xl animate-pulse" />
-          <div className="relative h-20 w-20 rounded-2xl bg-[#0f1422] border border-blue-500/30 flex items-center justify-center shadow-2xl shadow-blue-500/20">
-            <ZegaLogo className="h-10 w-10 text-white" />
+          <div className="relative h-20 w-20 rounded-2xl bg-[#0f1422] border border-blue-500/30 flex items-center justify-center shadow-2xl shadow-blue-500/20 p-3">
+            <ZegaLogo variant="icon" imgClassName="h-10 w-auto" />
           </div>
 
           {/* Rotating Orbital Ping */}

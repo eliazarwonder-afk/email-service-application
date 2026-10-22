@@ -113,7 +113,7 @@ export function HeroDashboardPreview() {
   return (
     <div className="mt-12 max-w-5xl mx-auto rounded-2xl p-2 bg-slate-200/60 dark:bg-slate-800/40 border border-slate-300/80 dark:border-slate-700/60 shadow-2xl backdrop-blur-sm transition-all">
       <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 overflow-hidden shadow-sm flex flex-col">
-        {/* Top App Bar - Clean Gmail / Zoho styling */}
+        {/* Top App Bar - Clean Modern Webmail Styling */}
         <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
@@ -233,7 +233,7 @@ export function HeroDashboardPreview() {
             </div>
           </div>
 
-          {/* Email Row List (Gmail / Zoho Masterclass) */}
+          {/* Email Row List */}
           <div className="w-full md:w-80 lg:w-96 border-r border-slate-200 dark:border-slate-800 overflow-y-auto flex flex-col">
             <div className="p-2 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40 flex items-center justify-between text-xs text-slate-500">
               <span className="font-semibold text-slate-700 dark:text-slate-300 pl-1">Primary Messages</span>

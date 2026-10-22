@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useCurrency } from "@/components/CurrencyProvider";
 import { PLAN_PRICING, formatPlanPrice, SupportedCurrency } from "@/lib/geo";
+import { ZegaLogo } from "@/components/ZegaLogo";
 
 interface UnifiedPaymentCheckoutModalProps {
   isOpen: boolean;
@@ -232,9 +233,7 @@ export function UnifiedPaymentCheckoutModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/50 dark:bg-slate-900/40">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
+            <ZegaLogo variant="icon" imgClassName="h-8.5 w-auto" />
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 {isFreePlan

@@ -97,7 +97,7 @@ export function DashboardSidebar({
             : "-translate-x-full md:translate-x-0 md:w-0 md:border-r-0 md:opacity-0 md:overflow-hidden pointer-events-none"
         }`}
       >
-        {/* Top Section: Prominent Gmail/Zoho Compose Button */}
+        {/* Top Section: Prominent Compose Button */}
         <div className="p-4 space-y-4 overflow-y-auto flex-1">
           <button
             type="button"

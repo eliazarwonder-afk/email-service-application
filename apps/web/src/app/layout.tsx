@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   title: "Zega Mail — Professional Business Email & Client Outreach | A product of ZegaCloud",
   description:
     "Ad-free, secure business email with verified delivery status ticks (Sent ✓ and Delivered ✓✓), AI proposal generator, cold outreach campaigns, and flat-rate pricing. A product of ZegaCloud.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/branding/logo-icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

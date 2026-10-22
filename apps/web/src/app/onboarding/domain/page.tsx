@@ -23,7 +23,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
-import { ZegaLogo } from "@/components/ZegaLogo";
 import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { useCurrency } from "@/components/CurrencyProvider";
 

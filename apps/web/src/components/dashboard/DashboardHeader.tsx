@@ -100,16 +100,20 @@ export function DashboardHeader({
         <Link
           href="/"
           className="flex items-center gap-2.5 group transition-transform active:scale-[0.98]"
-          title="Return to Zega Mail Home"
+          title="Return to ZegaMail Home"
         >
-          <ZegaLogo variant="icon" />
-          <div className="hidden sm:flex flex-col">
-            <span className="font-bold text-slate-900 dark:text-white text-base tracking-tight leading-none group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              Zega<span className="text-blue-600 dark:text-blue-400">Mail</span>
-            </span>
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono tracking-wider uppercase leading-none mt-0.5">
+          {/* Full logo on desktop and tablet */}
+          <div className="hidden sm:flex items-center gap-2">
+            <ZegaLogo variant="full" imgClassName="h-7 sm:h-8" />
+            <span className="hidden lg:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase tracking-wider bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
               Workspace
             </span>
+          </div>
+
+          {/* Compact Icon logo on mobile */}
+          <div className="sm:hidden flex items-center gap-1.5">
+            <ZegaLogo variant="icon" imgClassName="h-7" />
+            <span className="text-xs font-bold text-slate-900 dark:text-white">Mail</span>
           </div>
         </Link>
       </div>

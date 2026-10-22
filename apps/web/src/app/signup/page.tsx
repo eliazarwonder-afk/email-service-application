@@ -100,7 +100,9 @@ export default function SignupGatewayPage() {
 
       <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full space-y-12">
         {/* HEADER SECTION */}
-        <div className="text-center space-y-4 max-w-2xl mx-auto">
+        <div className="text-center space-y-4 max-w-2xl mx-auto flex flex-col items-center">
+          <ZegaLogo variant="full" className="mx-auto mb-1" />
+
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 px-3.5 py-1 text-xs text-blue-800 dark:text-blue-300 font-medium">
             <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <span>ZegaCloud WHMCS Master Provisioning Gateway</span>

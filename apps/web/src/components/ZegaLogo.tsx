@@ -1,51 +1,56 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { useTheme } from "./ThemeProvider";
 
 interface ZegaLogoProps {
   variant?: "full" | "icon";
   className?: string;
-  height?: number;
+  imgClassName?: string;
+  alt?: string;
 }
 
-export function ZegaLogo({ variant = "full", className = "", height = 36 }: ZegaLogoProps) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
+export function ZegaLogo({
+  variant = "full",
+  className = "",
+  imgClassName = "",
+  alt = "ZegaMail Business Email",
+}: ZegaLogoProps) {
   if (variant === "icon") {
     return (
-      <div className={`relative flex items-center justify-center ${className}`}>
+      <div className={`relative inline-flex items-center justify-center shrink-0 ${className}`}>
         {/* Light theme icon */}
         <img
           src="/branding/zegamail-icon-light-transparent.png"
-          alt="Zega Mail"
-          className={`h-9 w-auto object-contain dark:hidden transition-transform`}
+          alt={alt}
+          className={`h-8 sm:h-9 w-auto object-contain dark:hidden transition-transform select-none ${imgClassName}`}
+          loading="eager"
         />
         {/* Dark theme icon */}
         <img
           src="/branding/zegamail-icon-dark-transparent.png"
-          alt="Zega Mail"
-          className={`h-9 w-auto object-contain hidden dark:block transition-transform`}
+          alt={alt}
+          className={`h-8 sm:h-9 w-auto object-contain hidden dark:block transition-transform select-none ${imgClassName}`}
+          loading="eager"
         />
       </div>
     );
   }
 
   return (
-    <div className={`relative flex items-center ${className}`}>
+    <div className={`relative inline-flex items-center shrink-0 ${className}`}>
       {/* Light Theme Full Logo */}
       <img
         src="/branding/zegamail-light-transparent.png"
-        alt="Zega Mail — A Product of ZegaCloud"
-        className="h-10 sm:h-11 w-auto object-contain dark:hidden"
+        alt={alt}
+        className={`h-8 sm:h-9.5 md:h-10 w-auto object-contain dark:hidden select-none ${imgClassName}`}
+        loading="eager"
       />
       {/* Dark Theme Full Logo */}
       <img
         src="/branding/zegamail-dark-transparent.png"
-        alt="Zega Mail — A Product of ZegaCloud"
-        className="h-10 sm:h-11 w-auto object-contain hidden dark:block"
+        alt={alt}
+        className={`h-8 sm:h-9.5 md:h-10 w-auto object-contain hidden dark:block select-none ${imgClassName}`}
+        loading="eager"
       />
     </div>
   );

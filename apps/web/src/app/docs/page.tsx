@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { ZegaLogo } from "@/components/ZegaLogo";
 import {
   Code,
   Terminal,
@@ -182,13 +183,11 @@ export default function ApiDocumentationPage() {
       {/* Top Header */}
       <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
-              <Zap className="w-5 h-5 fill-current" />
-            </div>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <ZegaLogo variant="icon" imgClassName="h-8 w-auto" />
             <div className="leading-tight">
               <span className="font-bold text-lg text-white">ZegaMail</span>
-              <span className="text-xs text-cyan-400 font-mono block">DEVELOPER PLATFORM</span>
+              <span className="text-[10px] text-cyan-400 font-mono block tracking-wider uppercase">DEVELOPER PLATFORM</span>
             </div>
           </Link>
           <span className="hidden md:inline-flex items-center gap-1.5 ml-4 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-950 text-cyan-300 border border-cyan-800/60">
