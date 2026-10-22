@@ -325,36 +325,38 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Real OAuth Providers (Google, GitHub, WHMCS SSO) */}
+            {/* Real OAuth & ZegaCloud SSO Providers */}
             <div className="space-y-2">
               <button
                 type="button"
-                onClick={() => handleOAuthClick("google")}
-                className="w-full inline-flex items-center justify-center gap-2.5 rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#161a25] px-4 py-2.5 text-xs font-medium text-[#121212] dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-sm"
-              >
-                <img src="/branding/google-icon.svg" alt="Google" className="h-4 w-4" />
-                <span>Sign in with Google</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleOAuthClick("github")}
-                className="w-full inline-flex items-center justify-center gap-2.5 rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#161a25] px-4 py-2.5 text-xs font-medium text-[#121212] dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-sm"
-              >
-                <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                </svg>
-                <span>Sign in with GitHub</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={handleWhmcsSSO}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/40 px-4 py-2.5 text-xs font-semibold text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/50 px-4 py-2.5 text-xs font-semibold text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors shadow-sm"
               >
                 <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 <span>ZegaCloud One-Click Client SSO</span>
               </button>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleOAuthClick("google")}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#161a25] px-3 py-2 text-xs font-medium text-[#121212] dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-sm"
+                >
+                  <img src="/branding/google-icon.svg" alt="Google" className="h-3.5 w-3.5" />
+                  <span>Google</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleOAuthClick("github")}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#161a25] px-3 py-2 text-xs font-medium text-[#121212] dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-sm"
+                >
+                  <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                  <span>GitHub</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -362,9 +364,9 @@ export default function LoginPage() {
             Don’t have a business email account?{" "}
             <Link
               href="/signup"
-              className="font-semibold text-[#121212] dark:text-white hover:underline underline-offset-2"
+              className="font-semibold text-blue-600 dark:text-blue-400 hover:underline underline-offset-2"
             >
-              Start free with your domain →
+              Order on ZegaCloud WHMCS →
             </Link>
           </div>
         </div>

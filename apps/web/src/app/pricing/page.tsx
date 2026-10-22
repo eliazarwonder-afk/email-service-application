@@ -201,12 +201,13 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <Link
-              href="/signup?plan=free"
+            <button
+              type="button"
+              onClick={() => openCheckout("starter")}
               className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               Claim Free Mailboxes
-            </Link>
+            </button>
           </div>
 
           {/* CARD 2: Starter Plan */}

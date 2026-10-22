@@ -100,7 +100,7 @@ export async function POST(
 
       const token = `${payloadB64}.${signature}`;
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-      const ssoUrl = `${baseUrl}/app?sso_token=${token}`;
+      const ssoUrl = `${baseUrl}/api/auth/sso?token=${token}`;
 
       return NextResponse.json({
         success: true,

@@ -106,10 +106,10 @@ export default function HomePage() {
             {/* Clear Primary & Secondary CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
-                href="/signup"
+                href="/pricing"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.98]"
               >
-                <span>Start Free with Your Domain</span>
+                <span>Get Started with Your Domain</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
@@ -382,7 +382,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/signup?plan=starter"
+                href="/pricing?plan=starter"
                 className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 Choose Starter
@@ -437,7 +437,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/signup?plan=growth"
+                href="/pricing?plan=growth"
                 className="mt-8 w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold text-xs shadow-md transition-colors"
               >
                 Start Growth Trial
@@ -487,7 +487,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/signup?plan=pro"
+                href="/pricing?plan=pro"
                 className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 Choose Enterprise Pro
@@ -567,7 +567,7 @@ export default function HomePage() {
               </p>
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
-                  href="/signup"
+                  href="/pricing"
                   className="w-full sm:w-auto px-7 py-3 rounded-xl bg-white text-blue-600 hover:bg-blue-50 font-bold text-sm shadow-md transition-colors"
                 >
                   Create Your Business Mailbox

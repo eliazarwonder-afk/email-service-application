@@ -125,6 +125,16 @@
       "authProvider": "github",
       "avatarUrl": "https://avatars.githubusercontent.com/u/9919?v=4",
       "createdAt": "2026-10-19T15:50:35.823Z"
+    },
+    {
+      "id": "usr_4e45d10a",
+      "name": "ceo",
+      "email": "ceo@acmedesign.co",
+      "role": "owner",
+      "orgId": "org_acme_001",
+      "emailVerified": true,
+      "authProvider": "whmcs_sso",
+      "createdAt": "2026-10-22T08:44:54.237Z"
     }
   ],
   "orgs": [
@@ -592,6 +602,21 @@
       "token": "ses_e7816b273a6aea7c4edbddbaa31ffdd37219d361fbba9490",
       "userId": "usr_d4c15703",
       "expiresAt": "2026-10-26T15:50:35.824Z"
+    },
+    {
+      "token": "ses_bfd63fdfbd8dd8f5e18d8bf75a3034229bdab5b263b77f1b",
+      "userId": "usr_sales_002",
+      "expiresAt": "2026-10-29T08:44:33.052Z"
+    },
+    {
+      "token": "ses_7c3f39c2e1681fd357629b9ad560da4b9e7bc35785e4addc",
+      "userId": "usr_4e45d10a",
+      "expiresAt": "2026-10-29T08:44:54.237Z"
+    },
+    {
+      "token": "ses_4d41bbae59a08a85c64a944a60423e29db81e602a4240a67",
+      "userId": "usr_sales_002",
+      "expiresAt": "2026-10-29T08:44:54.251Z"
     }
   ],
   "campaigns": [

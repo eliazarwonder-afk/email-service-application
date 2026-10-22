@@ -211,14 +211,19 @@ export default function WebmailAppPage() {
   const loadTemplates = async () => {};
 
   useEffect(() => {
-    loadDashboardBootstrap();
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
+      const ssoToken = params.get("sso_token") || params.get("token");
+      if (ssoToken) {
+        window.location.href = `/api/auth/sso?token=${encodeURIComponent(ssoToken)}`;
+        return;
+      }
       const tab = params.get("tab");
       if (tab && ["mail", "ai", "campaigns", "contacts", "domains", "settings"].includes(tab)) {
         setActiveTab(tab as any);
       }
     }
+    loadDashboardBootstrap();
   }, []);
 
   // Action Handlers
@@ -545,13 +550,14 @@ export default function WebmailAppPage() {
             >
               Support
             </button>
-            <Link
-              href="/signup"
+            <button
+              type="button"
+              onClick={() => setIsUpgradeModalOpen(true)}
               className="ml-2 inline-flex items-center gap-1 rounded-lg bg-blue-600 text-white px-2.5 py-0.5 font-semibold text-[11px] hover:bg-blue-700 shadow-xs"
             >
               <span>Get Real Account</span>
               <ArrowRight className="h-3 w-3" />
-            </Link>
+            </button>
           </div>
         </aside>
       )}

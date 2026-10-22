@@ -1,530 +1,429 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
-  Mail,
-  CheckCircle2,
-  ArrowRight,
   ShieldCheck,
   Globe,
+  ArrowRight,
   Sparkles,
-  AlertCircle,
+  Server,
+  Lock,
+  Mail,
+  Check,
+  Search,
+  ExternalLink,
   RefreshCw,
   Building2,
-  Phone,
-  Hash,
-  Lock,
-  User,
-  KeyRound,
+  Users,
+  AlertCircle,
+  HelpCircle,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { ZegaLogo } from "@/components/ZegaLogo";
+import { useCurrency } from "@/components/CurrencyProvider";
+import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 
-export default function SignupPage() {
+export default function SignupGatewayPage() {
   const router = useRouter();
+  const { currency, symbol, isNigeria } = useCurrency();
 
-  // Registration Form State
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [cacNumber, setCacNumber] = useState("");
-  const [showOptionalFields, setShowOptionalFields] = useState(false);
+  // Domain Pre-Check State
+  const [domainSearchQuery, setDomainSearchQuery] = useState("");
+  const [isSearchingDomain, setIsSearchingDomain] = useState(false);
+  const [domainResult, setDomainResult] = useState<any>(null);
+  const [searchError, setSearchError] = useState("");
 
-  // Verification Step State
-  const [step, setStep] = useState<"register" | "verify">("register");
-  const [verificationCode, setVerificationCode] = useState("");
-  const [previewCode, setPreviewCode] = useState<string | null>(null);
-  const [resendCooldown, setResendCooldown] = useState(0);
+  // SSO & Modal State
+  const [isSsoLoading, setIsSsoLoading] = useState(false);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [selectedPlanForModal, setSelectedPlanForModal] = useState<"starter" | "growth" | "pro">("growth");
+  const [targetDomainForModal, setTargetDomainForModal] = useState<string>("");
 
-  // Submission & Feedback State
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-
-  // Sandbox OAuth Modal State
-  const [sandboxProvider, setSandboxProvider] = useState<"google" | "github" | null>(null);
-  const [sandboxEmail, setSandboxEmail] = useState("");
-  const [sandboxName, setSandboxName] = useState("");
-
-  // Handle countdown for resend button
-  useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const timer = setInterval(() => setResendCooldown((prev) => prev - 1), 1000);
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
-
-  // Handle Initial Registration Submission
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleDomainSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
-    setIsSubmitting(true);
+    if (!domainSearchQuery.trim()) return;
+
+    setIsSearchingDomain(true);
+    setSearchError("");
+    setDomainResult(null);
 
     try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName,
-          email,
-          password,
-          companyName: companyName.trim() || undefined,
-          phoneNumber: phoneNumber.trim() || undefined,
-          cacNumber: cacNumber.trim() || undefined,
-        }),
-      });
-
+      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(domainSearchQuery.trim())}`);
       const data = await res.json();
 
-      if (!res.ok || !data.success) {
-        setErrorMessage(data.error || "Failed to create account. Please check your details.");
-        setIsSubmitting(false);
-        return;
+      if (data.success && data.primary) {
+        setDomainResult(data.primary);
+      } else {
+        setSearchError(data.error || "Unable to check domain availability.");
       }
-
-      setStep("verify");
-      setSuccessMessage(data.message || "Confirmation code dispatched to your email!");
-      if (data.previewCode) {
-        setPreviewCode(data.previewCode);
-      }
-      setResendCooldown(60);
     } catch (err: any) {
-      setErrorMessage("Could not connect to registration service. Please try again.");
+      setSearchError("Network error while searching domain on WHMCS.");
     } finally {
-      setIsSubmitting(false);
+      setIsSearchingDomain(false);
     }
   };
 
-  // Handle 6-Digit Email Verification
-  const handleVerifyCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!verificationCode.trim()) {
-      setErrorMessage("Please enter the 6-digit confirmation code.");
-      return;
-    }
-
-    setIsVerifying(true);
-    setErrorMessage("");
-
+  const handleWhmcsSSO = async () => {
+    setIsSsoLoading(true);
     try {
-      const res = await fetch("/api/auth/verify-email", {
+      const res = await fetch("/api/auth/whmcs-sso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          code: verificationCode.trim(),
-        }),
+        body: JSON.stringify({ email: "owner@zegacloud.com" }),
       });
-
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setErrorMessage(data.error || "Invalid code. Please recheck or click Resend.");
-        setIsVerifying(false);
-        return;
-      }
-
-      setSuccessMessage("Email confirmed! Redirecting to custom domain setup…");
-      setTimeout(() => {
-        router.push("/onboarding/domain");
-      }, 900);
-    } catch (err: any) {
-      setErrorMessage("Verification service connection error. Please try again.");
-      setIsVerifying(false);
-    }
-  };
-
-  // Handle Resend Verification Code
-  const handleResendCode = async () => {
-    if (resendCooldown > 0) return;
-    setErrorMessage("");
-
-    try {
-      const res = await fetch("/api/auth/resend-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setSuccessMessage("A fresh 6-digit confirmation code has been sent!");
-        if (data.previewCode) setPreviewCode(data.previewCode);
-        setResendCooldown(60);
+      if (data.success && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
       } else {
-        setErrorMessage(data.error || "Failed to resend code.");
+        router.push("/app");
       }
     } catch (err) {
-      setErrorMessage("Error communicating with mail server.");
+      router.push("/app");
+    } finally {
+      setIsSsoLoading(false);
     }
   };
 
-  // Handle OAuth initiation
-  const handleOAuthClick = (provider: "google" | "github") => {
-    // Navigate directly to OAuth route which checks credentials or opens sandbox
-    window.location.href = `/api/auth/${provider}`;
-  };
-
-  // Handle Sandbox OAuth Simulation
-  const handleSandboxSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sandboxEmail.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/auth/oauth-sandbox", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: sandboxProvider,
-          name: sandboxName.trim() || sandboxEmail.split("@")[0],
-          email: sandboxEmail.trim(),
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        router.push(data.redirectUrl || "/onboarding/domain");
-      } else {
-        setErrorMessage(data.error || "Sandbox login failed.");
-        setIsSubmitting(false);
-      }
-    } catch (err) {
-      setErrorMessage("Sandbox service error.");
-      setIsSubmitting(false);
+  const openCheckoutWithDomain = (plan: "starter" | "growth" | "pro", domainName?: string) => {
+    setSelectedPlanForModal(plan);
+    if (domainName) {
+      setTargetDomainForModal(domainName);
     }
+    setIsCheckoutModalOpen(true);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6] transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6] transition-colors selection:bg-blue-500/20">
       <Navbar />
 
-      <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md space-y-6">
-          {/* Header with ZegaMail Logo */}
-          <div className="text-center space-y-3 flex flex-col items-center">
-            <ZegaLogo variant="full" className="mx-auto" />
-            <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-              {step === "register"
-                ? "Create your business email account. No credit card required to start."
-                : `Enter the 6-digit confirmation code sent to ${email}`}
-            </p>
+      <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full space-y-12">
+        {/* HEADER SECTION */}
+        <div className="text-center space-y-4 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 px-3.5 py-1 text-xs text-blue-800 dark:text-blue-300 font-medium">
+            <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <span>ZegaCloud WHMCS Master Provisioning Gateway</span>
           </div>
 
-          {/* Stepper Indicator */}
-          <div className="flex items-center justify-center gap-2">
-            <span
-              className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
-                step === "register"
-                  ? "bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  : "bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300"
-              }`}
-            >
-              1. Account Creation
-            </span>
-            <span className="text-neutral-400">→</span>
-            <span
-              className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
-                step === "verify"
-                  ? "bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500"
-              }`}
-            >
-              2. Email Confirmation
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Get Your Business Email on ZegaCloud
+          </h1>
+
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            Like Titan Mail and Google Workspace with web hosting partners, ZegaMail business accounts, custom domains, and DNS security are provisioned through the <strong>ZegaCloud WHMCS Master Platform</strong>.
+          </p>
+        </div>
+
+        {/* DOMAIN AVAILABILITY CHECKER BAR */}
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span>Check Domain Availability on ZegaCloud</span>
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Check whether your business name is available or connect an existing registered domain.
+              </p>
+            </div>
+            <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-full self-start sm:self-auto">
+              WHMCS Domain API Ready
             </span>
           </div>
 
-          {/* Form Card */}
-          <div className="rounded-2xl border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-6 shadow-sm space-y-5">
-            {errorMessage && (
-              <div className="rounded-lg bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 p-2.5 text-xs text-red-800 dark:text-red-300 flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
-                <span>{errorMessage}</span>
-              </div>
-            )}
+          <form onSubmit={handleDomainSearch} className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={domainSearchQuery}
+                onChange={(e) => setDomainSearchQuery(e.target.value)}
+                placeholder="e.g. acmestudio.com or mybusiness.ng"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#161a25] pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 font-mono"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSearchingDomain || !domainSearchQuery.trim()}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold px-5 py-2.5 shadow-sm transition-all shrink-0"
+            >
+              {isSearchingDomain ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  <span>Checking WHMCS…</span>
+                </>
+              ) : (
+                <>
+                  <span>Search Domain</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </>
+              )}
+            </button>
+          </form>
 
-            {successMessage && (
-              <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 p-2.5 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{successMessage}</span>
-              </div>
-            )}
+          {/* Search Result Feedback */}
+          {searchError && (
+            <div className="rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 p-3 text-xs text-red-800 dark:text-red-300 flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+              <span>{searchError}</span>
+            </div>
+          )}
 
-            {/* STEP 1: REGISTRATION FORM */}
-            {step === "register" && (
-              <>
-                {/* Social One-Click Sign Up Buttons */}
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => handleOAuthClick("google")}
-                    className="w-full inline-flex items-center justify-center gap-2.5 rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#161a25] px-4 py-2.5 text-xs font-medium text-[#121212] dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-sm"
+          {domainResult && (
+            <div
+              className={`rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                domainResult.status === "available"
+                  ? "border-emerald-200 dark:border-emerald-900 bg-emerald-50/60 dark:bg-emerald-950/40"
+                  : "border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/40"
+              }`}
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-sm font-bold text-slate-900 dark:text-white">
+                    {domainResult.domain}
+                  </span>
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                      domainResult.status === "available"
+                        ? "bg-emerald-600 text-white"
+                        : "bg-amber-600 text-white"
+                    }`}
                   >
-                    <img src="/branding/google-icon.svg" alt="Google" className="h-4 w-4" />
-                    <span>Sign up with Google</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleOAuthClick("github")}
-                    className="w-full inline-flex items-center justify-center gap-2.5 rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#161a25] px-4 py-2.5 text-xs font-medium text-[#121212] dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-sm"
-                  >
-                    <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                    </svg>
-                    <span>Sign up with GitHub</span>
-                  </button>
+                    {domainResult.status === "available" ? "Available" : "Registered"}
+                  </span>
                 </div>
-
-                <div className="relative my-3">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[#eaeaea] dark:border-[#202636]" />
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-white dark:bg-[#12151e] px-2 text-[#706f6c] dark:text-[#9ca3af]">
-                      Or register with work email
-                    </span>
-                  </div>
-                </div>
-
-                <form onSubmit={handleRegister} className="space-y-3.5">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-[#121212] dark:text-white">
-                      Full Name
-                    </label>
-                    <div className="relative">
-                      <User className="h-4 w-4 absolute left-3 top-3 text-neutral-400" />
-                      <input
-                        type="text"
-                        required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="e.g. Tunde Adebayo"
-                        className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] pl-9 pr-3.5 py-2.5 text-xs text-[#121212] dark:text-white focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-[#121212] dark:text-white">
-                      Work Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail className="h-4 w-4 absolute left-3 top-3 text-neutral-400" />
-                      <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="tunde@mycompany.ng"
-                        className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] pl-9 pr-3.5 py-2.5 text-xs text-[#121212] dark:text-white focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-[#121212] dark:text-white">
-                      Create Password
-                    </label>
-                    <div className="relative">
-                      <Lock className="h-4 w-4 absolute left-3 top-3 text-neutral-400" />
-                      <input
-                        type="password"
-                        required
-                        minLength={6}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••••••"
-                        className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] pl-9 pr-3.5 py-2.5 text-xs text-[#121212] dark:text-white font-mono focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Optional Details Toggle */}
-                  <div className="pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setShowOptionalFields(!showOptionalFields)}
-                      className="text-[11px] text-blue-600 dark:text-blue-400 font-medium hover:underline flex items-center gap-1"
-                    >
-                      <span>{showOptionalFields ? "Hide business details" : "+ Add company name & phone (Optional)"}</span>
-                    </button>
-                  </div>
-
-                  {showOptionalFields && (
-                    <div className="space-y-2.5 pt-2 border-t border-[#eaeaea] dark:border-[#202636]">
-                      <div className="space-y-1">
-                        <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
-                          Company / Organization Name (Optional)
-                        </label>
-                        <div className="relative">
-                          <Building2 className="h-3.5 w-3.5 absolute left-3 top-2.5 text-neutral-400" />
-                          <input
-                            type="text"
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
-                            placeholder="e.g. Adebayo Tech Ventures Ltd"
-                            className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] pl-9 pr-3 py-2 text-xs text-[#121212] dark:text-white focus:bg-white dark:focus:bg-[#1a202d]"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
-                            Phone Number
-                          </label>
-                          <div className="relative">
-                            <Phone className="h-3.5 w-3.5 absolute left-3 top-2.5 text-neutral-400" />
-                            <input
-                              type="tel"
-                              value={phoneNumber}
-                              onChange={(e) => setPhoneNumber(e.target.value)}
-                              placeholder="+234 803 000 0000"
-                              className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] pl-9 pr-3 py-2 text-xs text-[#121212] dark:text-white focus:bg-white dark:focus:bg-[#1a202d]"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
-                            CAC / Reg No.
-                          </label>
-                          <div className="relative">
-                            <Hash className="h-3.5 w-3.5 absolute left-3 top-2.5 text-neutral-400" />
-                            <input
-                              type="text"
-                              value={cacNumber}
-                              onChange={(e) => setCacNumber(e.target.value)}
-                              placeholder="RC-1234567"
-                              className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] pl-9 pr-3 py-2 text-xs text-[#121212] dark:text-white focus:bg-white dark:focus:bg-[#1a202d]"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#121212] dark:bg-white px-4 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 disabled:opacity-50 transition-colors shadow-sm mt-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                        <span>Sending confirmation code…</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Create Account & Verify Email</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </>
-                    )}
-                  </button>
-                </form>
-              </>
-            )}
-
-            {/* STEP 2: EMAIL CONFIRMATION CODE */}
-            {step === "verify" && (
-              <form onSubmit={handleVerifyCode} className="space-y-4">
-                <div className="text-center space-y-1.5 pb-1">
-                  <div className="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto">
-                    <KeyRound className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-sm font-bold text-[#121212] dark:text-white">
-                    Confirm your email address
-                  </h3>
-                  <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                    We sent a 6-digit confirmation code to <span className="font-semibold text-[#121212] dark:text-white">{email}</span>
-                  </p>
-                </div>
-
-                {previewCode && (
-                  <div className="p-2.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-[11px] text-blue-900 dark:text-blue-300 flex items-center justify-between">
-                    <span>Dev Preview Code: <strong className="font-mono text-xs">{previewCode}</strong></span>
-                    <button
-                      type="button"
-                      onClick={() => setVerificationCode(previewCode)}
-                      className="text-[10px] underline hover:no-underline font-semibold"
-                    >
-                      Auto-fill
-                    </button>
-                  </div>
-                )}
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-center text-[#121212] dark:text-white">
-                    Enter 6-Digit Code
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value.replace(/[^0-9]/g, ""))}
-                    placeholder="123456"
-                    className="w-full text-center tracking-[0.5em] font-mono text-xl py-2.5 rounded-xl border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] text-[#121212] dark:text-white focus:bg-white dark:focus:bg-[#1a202d] focus-visible:ring-2 focus-visible:ring-blue-600"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isVerifying || verificationCode.length < 6}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#121212] dark:bg-white px-4 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 disabled:opacity-50 transition-colors shadow-sm"
-                >
-                  {isVerifying ? (
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  {domainResult.status === "available" ? (
                     <>
-                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                      <span>Verifying code…</span>
+                      Standard WHMCS registration:{" "}
+                      <strong className="text-slate-900 dark:text-white">
+                        {isNigeria
+                          ? `₦${domainResult.priceAnnualNgn?.toLocaleString() || "17,500"}`
+                          : `$${domainResult.priceAnnualUsd || "12.00"}`}
+                        /year
+                      </strong>{" "}
+                      with free 2048-bit DKIM & DNS zone pre-setup.
                     </>
                   ) : (
-                    <>
-                      <span>Confirm & Proceed to Domain Setup</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </>
+                    "This domain is already registered. You can still link your existing DNS to ZegaMail!"
                   )}
-                </button>
+                </p>
+              </div>
 
-                <div className="flex items-center justify-between text-xs pt-1">
+              <div className="shrink-0 flex items-center gap-2">
+                {domainResult.status === "available" ? (
                   <button
                     type="button"
-                    onClick={() => setStep("register")}
-                    className="text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white"
+                    onClick={() => openCheckoutWithDomain("growth", domainResult.domain)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-all"
                   >
-                    ← Edit email
+                    <span>Order on ZegaCloud</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </button>
-
+                ) : (
                   <button
                     type="button"
-                    disabled={resendCooldown > 0}
-                    onClick={handleResendCode}
-                    className="text-blue-600 dark:text-blue-400 font-medium hover:underline disabled:opacity-50"
+                    onClick={() => openCheckoutWithDomain("starter", domainResult.domain)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-sm transition-all"
                   >
-                    {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
+                    <span>Connect Domain to ZegaMail</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </button>
-                </div>
-              </form>
-            )}
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 3 GATEWAY PATHWAYS (TITAN / WHMCS MODEL) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* PATHWAY 1: New Business Email Plan */}
+          <div className="rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between shadow-lg relative">
+            <div className="space-y-4">
+              <div className="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                <Sparkles className="h-5 w-5" />
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  Recommended For Businesses
+                </span>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Order on ZegaCloud WHMCS
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Select your flat-rate email plan. Get up to 30 mailboxes, high-speed NVMe storage, and automated cPanel DNS routing from <strong>₦1,500/mo</strong> or <strong>$3.90/mo</strong> flat.
+                </p>
+              </div>
+
+              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                  <span>No per-user monthly penalties</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                  <span>Pay with Paystack, Stripe or Crypto</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                  <span>Instant WHMCS quota provisioning</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-6">
+              <Link
+                href="/pricing"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2.5 shadow-sm transition-all"
+              >
+                <span>View Plans & Checkout</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
 
-          <div className="text-center text-xs text-[#706f6c] dark:text-[#9ca3af]">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-semibold text-[#121212] dark:text-white hover:underline underline-offset-2"
-            >
-              Sign in to your webmail →
-            </Link>
+          {/* PATHWAY 2: ZegaCloud Client SSO */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="space-y-4">
+              <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  Existing ZegaCloud Client
+                </span>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  1-Click ZegaCloud SSO
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Already have hosting, domains, or an active account in the ZegaCloud Client Area? Access webmail directly with cryptographic HMAC-SHA256 Single Sign-On.
+                </p>
+              </div>
+
+              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span>No separate password required</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span>Synchronized with WHMCS services</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span>Instant admin organization access</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-6">
+              <button
+                type="button"
+                onClick={handleWhmcsSSO}
+                disabled={isSsoLoading}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-semibold text-xs py-2.5 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-all shadow-xs"
+              >
+                {isSsoLoading ? (
+                  <span>Authenticating SSO…</span>
+                ) : (
+                  <>
+                    <span>Sign In via ZegaCloud SSO</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* PATHWAY 3: Mailbox Login (Team Members) */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="space-y-4">
+              <div className="h-10 w-10 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+                <Users className="h-5 w-5" />
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                  Employees & Staff
+                </span>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Mailbox User Sign In
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  If your administrator or IT department has already assigned you a business email address (e.g. <code>you@company.com</code>), log in directly to your webmail mailbox.
+                </p>
+              </div>
+
+              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-purple-600 shrink-0" />
+                  <span>Access emails, contacts & AI Studio</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-purple-600 shrink-0" />
+                  <span>Works on mobile web and desktop</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-purple-600 shrink-0" />
+                  <span>Supports IMAP for Apple Mail & Outlook</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-6">
+              <Link
+                href="/login"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold text-xs py-2.5 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all shadow-xs"
+              >
+                <span>Sign In to Mailbox</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* HOW IT WORKS / FAQ ACCORDION SUMMARY */}
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 shadow-sm space-y-4">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <HelpCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <span>Why is registration handled via ZegaCloud WHMCS?</span>
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            <div className="space-y-1.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800">
+              <p className="font-semibold text-slate-900 dark:text-white">
+                1. Dedicated DNS & Reputation Protection
+              </p>
+              <p>
+                Unlike consumer webmail services where anyone can register disposable spam addresses, ZegaMail provisions dedicated 2048-bit DKIM keys, SPF records, and DMARC policies on our cPanel cluster for your verified company domain.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800">
+              <p className="font-semibold text-slate-900 dark:text-white">
+                2. Unified Billing & Centralized Team Seats
+              </p>
+              <p>
+                Business administrators manage their invoices, team quotas, renewals, and payment methods (Paystack, Stripe, Crypto) in one unified WHMCS client dashboard without juggling multiple disjointed logins.
+              </p>
+            </div>
           </div>
         </div>
       </main>
+
+      {/* Unified Payment Checkout Modal */}
+      <UnifiedPaymentCheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        initialPlan={selectedPlanForModal}
+        domainNameToRegister={targetDomainForModal || undefined}
+        onPaymentSuccess={() => {
+          setIsCheckoutModalOpen(false);
+          router.push("/app?onboarding=complete");
+        }}
+      />
     </div>
   );
 }

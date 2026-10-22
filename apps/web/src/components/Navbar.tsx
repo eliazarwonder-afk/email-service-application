@@ -75,10 +75,10 @@ export function Navbar() {
             Sign In
           </Link>
           <Link
-            href="/signup"
+            href="/pricing"
             className="group inline-flex items-center gap-2 rounded-full bg-[#121212] dark:bg-white pl-4 pr-1.5 py-1.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-sm active:scale-[0.98]"
           >
-            <span>Start Free</span>
+            <span>Get Started</span>
             <div className="h-6 w-6 rounded-full bg-white/20 dark:bg-black/10 flex items-center justify-center transition-transform group-hover:translate-x-0.5">
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </div>
@@ -148,11 +148,11 @@ export function Navbar() {
               Sign In
             </Link>
             <Link
-              href="/signup"
+              href="/pricing"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center rounded-lg bg-[#121212] dark:bg-white px-4 py-2 text-sm font-medium text-white dark:text-[#121212]"
             >
-              Start Free Today
+              Get Started
             </Link>
           </div>
         </div>
