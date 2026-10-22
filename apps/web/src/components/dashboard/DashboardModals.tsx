@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   X,
   Smartphone,
@@ -9,8 +9,17 @@ import {
   UserPlus,
   CheckCircle2,
   ExternalLink,
-  Laptop
+  Laptop,
+  AlertCircle,
+  Check,
 } from "lucide-react";
+import {
+  validateDomain,
+  validateFolderName,
+  validateFullName,
+  validateMailboxUsername,
+} from "@/lib/validation";
+import { FormField } from "@/components/ui/FormField";
 
 interface DashboardModalsProps {
   // Mobile / Client Setup Modal
@@ -83,6 +92,16 @@ export function DashboardModals({
   onCreateMember,
   currentDomainName = "acmedesign.co",
 }: DashboardModalsProps) {
+  // Modal internal validation states
+  const [domainInputTouched, setDomainInputTouched] = useState(false);
+  const [folderInputTouched, setFolderInputTouched] = useState(false);
+  const [memberNameTouched, setMemberNameTouched] = useState(false);
+  const [memberPrefixTouched, setMemberPrefixTouched] = useState(false);
+
+  const domainVal = whmcsSearchDomain.trim() ? validateDomain(whmcsSearchDomain) : { isValid: false, error: "Please enter a domain name." };
+  const folderVal = newFolderName.trim() ? validateFolderName(newFolderName) : { isValid: false, error: "Folder name is required." };
+  const memberNameVal = newMemberName.trim() ? validateFullName(newMemberName, "Full Name") : { isValid: false, error: "Full name is required." };
+  const memberPrefixVal = newMemberEmailPrefix.trim() ? validateMailboxUsername(newMemberEmailPrefix) : { isValid: false, error: "Mailbox prefix is required." };
   return (
     <>
       {/* 1. CONNECT PHONE & DESKTOP IMAP/SMTP MODAL */}
@@ -192,28 +211,46 @@ export function DashboardModals({
             )}
 
             <form onSubmit={onOrderWhmcsDomain} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Enter Domain Name
-                </label>
+              <FormField
+                id="whmcsSearchDomain"
+                label="Enter Domain Name"
+                required
+                error={domainInputTouched && !domainVal.isValid ? domainVal.error : null}
+                isValid={domainInputTouched && domainVal.isValid}
+                helperText={!domainInputTouched ? "Check real-time availability via WHMCS Anycast DNS" : undefined}
+              >
                 <div className="flex gap-2">
                   <input
+                    id="whmcsSearchDomain"
                     type="text"
                     required
                     placeholder="e.g. acmepreferred.com"
                     value={whmcsSearchDomain}
-                    onChange={(e) => setWhmcsSearchDomain(e.target.value.toLowerCase().trim())}
-                    className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    onChange={(e) => {
+                      setWhmcsSearchDomain(e.target.value.toLowerCase().trim());
+                      if (!domainInputTouched) setDomainInputTouched(true);
+                    }}
+                    onBlur={() => setDomainInputTouched(true)}
+                    className={`flex-1 rounded-xl border px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 font-mono transition-colors ${
+                      domainInputTouched && !domainVal.isValid
+                        ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                        : domainInputTouched && domainVal.isValid
+                        ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                        : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 focus:ring-blue-500"
+                    }`}
                   />
                   <button
                     type="button"
-                    onClick={() => onSearchWhmcsDomain(whmcsSearchDomain)}
+                    onClick={() => {
+                      setDomainInputTouched(true);
+                      if (domainVal.isValid) onSearchWhmcsDomain(whmcsSearchDomain);
+                    }}
                     className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold"
                   >
                     Check
                   </button>
                 </div>
-              </div>
+              </FormField>
 
               {whmcsDomainAvailable !== null && (
                 <div
@@ -271,19 +308,34 @@ export function DashboardModals({
             </div>
 
             <form onSubmit={onCreateFolder} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Folder Name
-                </label>
+              <FormField
+                id="newFolderName"
+                label="Folder Name"
+                required
+                error={folderInputTouched && !folderVal.isValid ? folderVal.error : null}
+                isValid={folderInputTouched && folderVal.isValid}
+                helperText={!folderInputTouched ? "Organize incoming client leads and receipts" : undefined}
+              >
                 <input
+                  id="newFolderName"
                   type="text"
                   required
                   placeholder="e.g. VIP Clients, Invoices, Partners"
                   value={newFolderName}
-                  onChange={(e) => setNewFolderName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => {
+                    setNewFolderName(e.target.value);
+                    if (!folderInputTouched) setFolderInputTouched(true);
+                  }}
+                  onBlur={() => setFolderInputTouched(true)}
+                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 transition-colors ${
+                    folderInputTouched && !folderVal.isValid
+                      ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                      : folderInputTouched && folderVal.isValid
+                      ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                      : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 focus:ring-blue-500"
+                  }`}
                 />
-              </div>
+              </FormField>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
@@ -361,38 +413,68 @@ export function DashboardModals({
             )}
 
             <form onSubmit={onCreateMember} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Full Name
-                </label>
+              <FormField
+                id="newMemberName"
+                label="Full Name"
+                required
+                error={memberNameTouched && !memberNameVal.isValid ? memberNameVal.error : null}
+                isValid={memberNameTouched && memberNameVal.isValid}
+                helperText={!memberNameTouched ? "e.g. Jordan Rivera" : undefined}
+              >
                 <input
+                  id="newMemberName"
                   type="text"
                   required
                   placeholder="e.g. Jordan Rivera"
                   value={newMemberName}
-                  onChange={(e) => setNewMemberName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => {
+                    setNewMemberName(e.target.value);
+                    if (!memberNameTouched) setMemberNameTouched(true);
+                  }}
+                  onBlur={() => setMemberNameTouched(true)}
+                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 transition-colors ${
+                    memberNameTouched && !memberNameVal.isValid
+                      ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                      : memberNameTouched && memberNameVal.isValid
+                      ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                      : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 focus:ring-blue-500"
+                  }`}
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Mailbox Prefix
-                </label>
-                <div className="flex items-center rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+              <FormField
+                id="newMemberEmailPrefix"
+                label="Mailbox Prefix"
+                required
+                error={memberPrefixTouched && !memberPrefixVal.isValid ? memberPrefixVal.error : null}
+                isValid={memberPrefixTouched && memberPrefixVal.isValid}
+                helperText={!memberPrefixTouched ? "Letters, numbers, dots, and hyphens only" : undefined}
+              >
+                <div className={`flex items-center rounded-xl border bg-slate-50 dark:bg-slate-900/60 overflow-hidden focus-within:ring-2 transition-colors ${
+                  memberPrefixTouched && !memberPrefixVal.isValid
+                    ? "border-rose-400 focus-within:ring-rose-500"
+                    : memberPrefixTouched && memberPrefixVal.isValid
+                    ? "border-emerald-500/70 focus-within:ring-emerald-500"
+                    : "border-slate-200 dark:border-slate-800 focus-within:ring-blue-500"
+                }`}>
                   <input
+                    id="newMemberEmailPrefix"
                     type="text"
                     required
                     placeholder="jordan"
                     value={newMemberEmailPrefix}
-                    onChange={(e) => setNewMemberEmailPrefix(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""))}
+                    onChange={(e) => {
+                      setNewMemberEmailPrefix(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""));
+                      if (!memberPrefixTouched) setMemberPrefixTouched(true);
+                    }}
+                    onBlur={() => setMemberPrefixTouched(true)}
                     className="flex-1 bg-transparent px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none"
                   />
                   <span className="px-3 text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 py-2 border-l border-slate-200 dark:border-slate-800 font-mono">
                     @{currentDomainName}
                   </span>
                 </div>
-              </div>
+              </FormField>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>

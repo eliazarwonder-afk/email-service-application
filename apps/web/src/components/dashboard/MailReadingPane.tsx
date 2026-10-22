@@ -22,6 +22,7 @@ import {
   Lock
 } from "lucide-react";
 import { EmailMessage } from "./MailMessageRow";
+import { validateEmailBody } from "@/lib/validation";
 
 interface MailReadingPaneProps {
   message?: EmailMessage;
@@ -79,7 +80,9 @@ export function MailReadingPane({
     : "EM";
 
   const handleSendInlineReply = () => {
-    if (!inlineReplyText.trim()) return;
+    const bodyCheck = validateEmailBody(inlineReplyText);
+    if (!bodyCheck.isValid) return;
+
     setIsSendingInline(true);
     setTimeout(() => {
       setIsSendingInline(false);
@@ -90,7 +93,7 @@ export function MailReadingPane({
         onReply(
           message.fromEmail.includes("@acmedesign.co") ? message.toEmail : message.fromEmail,
           `Re: ${message.subject}`,
-          inlineReplyText
+          bodyCheck.value
         );
       }, 1000);
     }, 600);
@@ -338,7 +341,7 @@ export function MailReadingPane({
           </button>
         </div>
 
-        {/* Inline Quick Reply Card (Gmail/Zoho style) */}
+        {/* Inline Quick Reply Card */}
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 p-4 space-y-3 mt-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">

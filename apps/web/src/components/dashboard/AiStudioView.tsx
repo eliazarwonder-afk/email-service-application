@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Sparkles, Wand2, Copy, Send, Check } from "lucide-react";
+import { sanitizeText } from "@/lib/validation";
 
 interface AiStudioViewProps {
   leadName: string;
@@ -73,7 +74,7 @@ export function AiStudioView({
             <input
               type="text"
               value={leadName}
-              onChange={(e) => setLeadName(e.target.value)}
+              onChange={(e) => setLeadName(sanitizeText(e.target.value, 60))}
               placeholder="e.g. David Miller"
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -86,7 +87,7 @@ export function AiStudioView({
             <input
               type="text"
               value={leadCompany}
-              onChange={(e) => setLeadCompany(e.target.value)}
+              onChange={(e) => setLeadCompany(sanitizeText(e.target.value, 60))}
               placeholder="e.g. HyperScale Tech"
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -121,7 +122,7 @@ export function AiStudioView({
             <textarea
               rows={4}
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={(e) => setPrompt(sanitizeText(e.target.value, 1500))}
               placeholder="Provide a quick value hook or offer..."
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-3 text-xs text-slate-900 dark:text-white resize-none outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed font-sans"
             />

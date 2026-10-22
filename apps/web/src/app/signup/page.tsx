@@ -24,6 +24,7 @@ import { Navbar } from "@/components/Navbar";
 import { ZegaLogo } from "@/components/ZegaLogo";
 import { useCurrency } from "@/components/CurrencyProvider";
 import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
+import { validateDomain } from "@/lib/validation";
 
 export default function SignupGatewayPage() {
   const router = useRouter();
@@ -45,12 +46,24 @@ export default function SignupGatewayPage() {
     e.preventDefault();
     if (!domainSearchQuery.trim()) return;
 
+    // Sanitize domain query
+    let query = domainSearchQuery.trim().toLowerCase().replace(/^[a-z]+:\/\//i, "").replace(/\/.*$/, "");
+    if (!query.includes(".")) {
+      query = query + ".com";
+    }
+
+    const domCheck = validateDomain(query);
+    if (!domCheck.isValid) {
+      setSearchError(domCheck.error || "Please enter a valid domain name (e.g. yourcompany.com).");
+      return;
+    }
+
     setIsSearchingDomain(true);
     setSearchError("");
     setDomainResult(null);
 
     try {
-      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(domainSearchQuery.trim())}`);
+      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(domCheck.value)}`);
       const data = await res.json();
 
       if (data.success && data.primary) {

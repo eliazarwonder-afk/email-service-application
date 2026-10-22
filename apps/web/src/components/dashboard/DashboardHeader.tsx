@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import { ZegaLogo } from "@/components/ZegaLogo";
+import { sanitizeSearchQuery } from "@/lib/validation";
 
 interface DashboardHeaderProps {
   activeTab: "mail" | "ai" | "campaigns" | "contacts" | "domains" | "settings";
@@ -127,7 +128,7 @@ export function DashboardHeader({
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(sanitizeSearchQuery(e.target.value, 80))}
             placeholder="Search mail, contacts, or documents..."
             className="w-full bg-slate-100 hover:bg-slate-200/70 focus:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 dark:focus:bg-slate-900 border border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 rounded-full pl-10 pr-10 py-2 transition-all outline-none"
           />

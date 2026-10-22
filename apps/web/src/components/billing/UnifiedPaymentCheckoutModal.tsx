@@ -27,6 +27,14 @@ import {
 import { useCurrency } from "@/components/CurrencyProvider";
 import { PLAN_PRICING, formatPlanPrice, SupportedCurrency } from "@/lib/geo";
 import { ZegaLogo } from "@/components/ZegaLogo";
+import {
+  validateEmail,
+  validatePassword,
+  validateDomain,
+  validateFullName,
+  validateTxHash,
+} from "@/lib/validation";
+import { FormField } from "@/components/ui/FormField";
 
 interface UnifiedPaymentCheckoutModalProps {
   isOpen: boolean;
@@ -59,8 +67,23 @@ export function UnifiedPaymentCheckoutModal({
   const [inputEmail, setInputEmail] = useState(clientEmail || "");
   const [inputPassword, setInputPassword] = useState("");
   const [inputDomain, setInputDomain] = useState(domainNameToRegister || "");
+  const [txHashInput, setTxHashInput] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
+  // Field touched states for validation feedback
+  const [touchedEmail, setTouchedEmail] = useState(false);
+  const [touchedPassword, setTouchedPassword] = useState(false);
+  const [touchedDomain, setTouchedDomain] = useState(false);
+  const [touchedName, setTouchedName] = useState(false);
+  const [touchedTxHash, setTouchedTxHash] = useState(false);
+
+  // Real-time validations
+  const emailVal = validateEmail(inputEmail, "Work Email");
+  const passVal = validatePassword(inputPassword, 8);
+  const domainVal = inputDomain.trim() ? validateDomain(inputDomain) : { isValid: true, value: "" };
+  const nameVal = inputName.trim() ? validateFullName(inputName, "Name") : { isValid: true, value: "" };
+  const txVal = validateTxHash(txHashInput);
 
   // Payment Gateway Tab: paystack | flutterwave | stripe | crypto
   const [gateway, setGateway] = useState<"paystack" | "flutterwave" | "stripe" | "crypto">(
@@ -71,7 +94,6 @@ export function UnifiedPaymentCheckoutModal({
   const [step, setStep] = useState<"select" | "pay" | "confirmed">("select");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderData, setOrderData] = useState<any>(null);
-  const [txHashInput, setTxHashInput] = useState("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [txSubmitting, setTxSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -140,15 +162,48 @@ export function UnifiedPaymentCheckoutModal({
   const handleInitiateOrder = async () => {
     setErrorMessage("");
 
-    // Validate email if user is not authenticated
-    if (!isAuthenticated && !inputEmail.trim()) {
-      setErrorMessage("Please enter your work/contact email address to configure your mailbox.");
-      return;
+    if (!isAuthenticated) {
+      setTouchedEmail(true);
+      setTouchedPassword(true);
+      if (inputDomain.trim()) setTouchedDomain(true);
+      if (inputName.trim()) setTouchedName(true);
+
+      const emailCheck = validateEmail(inputEmail, "Work Email");
+      if (!emailCheck.isValid) {
+        setErrorMessage(emailCheck.error || "Please enter a valid work email address.");
+        return;
+      }
+
+      const passCheck = validatePassword(inputPassword, 8);
+      if (!passCheck.isValid) {
+        setErrorMessage(passCheck.error || "Master password must be at least 8 characters long.");
+        return;
+      }
+
+      if (inputDomain.trim()) {
+        const domCheck = validateDomain(inputDomain);
+        if (!domCheck.isValid) {
+          setErrorMessage(domCheck.error || "Please enter a valid domain name (e.g. yourcompany.com).");
+          return;
+        }
+      }
+
+      if (inputName.trim()) {
+        const nameCheck = validateFullName(inputName, "Full Name");
+        if (!nameCheck.isValid) {
+          setErrorMessage(nameCheck.error || "Please enter a valid name.");
+          return;
+        }
+      }
     }
 
     setIsSubmitting(true);
 
     try {
+      const emailCheck = validateEmail(inputEmail);
+      const cleanEmail = emailCheck.isValid ? emailCheck.value : inputEmail.trim().toLowerCase();
+      const cleanDomain = inputDomain.trim() ? validateDomain(inputDomain).value : undefined;
+
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -157,11 +212,11 @@ export function UnifiedPaymentCheckoutModal({
           billingCycle,
           gateway: isFreePlan ? "free_tier" : gateway,
           currency,
-          clientEmail: inputEmail.trim(),
-          clientName: inputName.trim() || inputEmail.split("@")[0],
-          password: inputPassword.trim() || undefined,
-          domainName: inputDomain.trim() || undefined,
-          domainNameToRegister: inputDomain.trim() || domainNameToRegister || undefined,
+          clientEmail: cleanEmail,
+          clientName: inputName.trim() || cleanEmail.split("@")[0],
+          password: inputPassword || undefined,
+          domainName: cleanDomain,
+          domainNameToRegister: cleanDomain || domainNameToRegister || undefined,
           cryptoAsset: gateway === "crypto" ? cryptoAsset : undefined,
         }),
       });
@@ -191,8 +246,11 @@ export function UnifiedPaymentCheckoutModal({
 
   // Confirm Crypto Transaction
   const handleConfirmCryptoPayment = async () => {
-    if (!txHashInput.trim()) {
-      setErrorMessage("Please enter your transaction hash or TX ID.");
+    setTouchedTxHash(true);
+    const txCheck = validateTxHash(txHashInput);
+
+    if (!txCheck.isValid) {
+      setErrorMessage(txCheck.error || "Please enter a valid transaction hash or TXID.");
       return;
     }
 
@@ -206,7 +264,7 @@ export function UnifiedPaymentCheckoutModal({
         body: JSON.stringify({
           orderId: orderData?.orderId,
           invoiceId: orderData?.invoiceId,
-          txHash: txHashInput.trim(),
+          txHash: txCheck.value,
         }),
       });
 
@@ -303,60 +361,122 @@ export function UnifiedPaymentCheckoutModal({
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Full Name / Business Name
-                      </label>
+                    <FormField
+                      id="inputName"
+                      label="Full Name / Business Name"
+                      error={touchedName && !nameVal.isValid ? nameVal.error : null}
+                      isValid={touchedName && nameVal.isValid && !!inputName.trim()}
+                      helperText={!touchedName ? "e.g. Alex Carter" : undefined}
+                    >
                       <input
+                        id="inputName"
                         type="text"
                         value={inputName}
-                        onChange={(e) => setInputName(e.target.value)}
-                        placeholder="e.g. Alex Carter"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500"
+                        onChange={(e) => {
+                          setInputName(e.target.value);
+                          if (!touchedName) setTouchedName(true);
+                        }}
+                        onBlur={() => setTouchedName(true)}
+                        placeholder="Alex Carter"
+                        className={`w-full rounded-xl border px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 transition-colors ${
+                          touchedName && !nameVal.isValid
+                            ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                            : touchedName && nameVal.isValid && inputName.trim()
+                            ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] focus:ring-blue-500"
+                        }`}
                       />
-                    </div>
+                    </FormField>
 
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Work / Contact Email <span className="text-rose-500">*</span>
-                      </label>
+                    <FormField
+                      id="inputEmail"
+                      label="Work / Contact Email"
+                      required
+                      error={touchedEmail && !emailVal.isValid ? emailVal.error : null}
+                      isValid={touchedEmail && emailVal.isValid}
+                      helperText={!touchedEmail ? "Direct mailbox activation recipient" : undefined}
+                    >
                       <input
+                        id="inputEmail"
                         type="email"
                         required
                         value={inputEmail}
-                        onChange={(e) => setInputEmail(e.target.value)}
+                        onChange={(e) => {
+                          setInputEmail(e.target.value);
+                          if (!touchedEmail) setTouchedEmail(true);
+                        }}
+                        onBlur={() => setTouchedEmail(true)}
                         placeholder="you@company.com"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 font-mono"
+                        className={`w-full rounded-xl border px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 transition-colors font-mono ${
+                          touchedEmail && !emailVal.isValid
+                            ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                            : touchedEmail && emailVal.isValid
+                            ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] focus:ring-blue-500"
+                        }`}
                       />
-                    </div>
+                    </FormField>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Master Password <span className="text-rose-500">*</span>
-                      </label>
+                    <FormField
+                      id="inputPassword"
+                      label="Master Password"
+                      required
+                      error={touchedPassword && !passVal.isValid ? passVal.error : null}
+                      isValid={touchedPassword && passVal.isValid}
+                      helperText={
+                        touchedPassword && passVal.isValid
+                          ? `Password strength: ${passVal.strength.toUpperCase()}`
+                          : "At least 8 characters"
+                      }
+                    >
                       <input
+                        id="inputPassword"
                         type="password"
                         value={inputPassword}
-                        onChange={(e) => setInputPassword(e.target.value)}
-                        placeholder="Create webmail password"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 font-mono"
+                        onChange={(e) => {
+                          setInputPassword(e.target.value);
+                          if (!touchedPassword) setTouchedPassword(true);
+                        }}
+                        onBlur={() => setTouchedPassword(true)}
+                        placeholder="••••••••••••"
+                        className={`w-full rounded-xl border px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 transition-colors font-mono ${
+                          touchedPassword && !passVal.isValid
+                            ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                            : touchedPassword && passVal.isValid
+                            ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] focus:ring-blue-500"
+                        }`}
                       />
-                    </div>
+                    </FormField>
 
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                        Business Domain
-                      </label>
+                    <FormField
+                      id="inputDomain"
+                      label="Business Domain"
+                      error={touchedDomain && !domainVal.isValid ? domainVal.error : null}
+                      isValid={touchedDomain && domainVal.isValid && !!inputDomain.trim()}
+                      helperText={!touchedDomain ? "e.g. acmestudio.com" : undefined}
+                    >
                       <input
+                        id="inputDomain"
                         type="text"
                         value={inputDomain}
-                        onChange={(e) => setInputDomain(e.target.value)}
-                        placeholder="e.g. acmestudio.com"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 font-mono"
+                        onChange={(e) => {
+                          setInputDomain(e.target.value);
+                          if (!touchedDomain) setTouchedDomain(true);
+                        }}
+                        onBlur={() => setTouchedDomain(true)}
+                        placeholder="acmestudio.com"
+                        className={`w-full rounded-xl border px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 transition-colors font-mono ${
+                          touchedDomain && !domainVal.isValid
+                            ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                            : touchedDomain && domainVal.isValid && inputDomain.trim()
+                            ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] focus:ring-blue-500"
+                        }`}
                       />
-                    </div>
+                    </FormField>
                   </div>
                 </div>
               )}
@@ -656,17 +776,34 @@ export function UnifiedPaymentCheckoutModal({
                   </div>
                 </div>
 
-                <div className="space-y-1.5 pt-2">
-                  <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                    Paste Your Transaction Hash / TXID:
-                  </label>
-                  <input
-                    type="text"
-                    value={txHashInput}
-                    onChange={(e) => setTxHashInput(e.target.value)}
-                    placeholder="e.g. 0x8f2d... or e6a8f1..."
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus-visible:ring-2 focus-visible:ring-blue-500"
-                  />
+                <div className="pt-2">
+                  <FormField
+                    id="txHashInput"
+                    label="Paste Your Transaction Hash / TXID"
+                    required
+                    error={touchedTxHash && !txVal.isValid ? txVal.error : null}
+                    isValid={touchedTxHash && txVal.isValid}
+                    helperText={!touchedTxHash ? "Transaction ID from your wallet or exchange receipt" : undefined}
+                  >
+                    <input
+                      id="txHashInput"
+                      type="text"
+                      value={txHashInput}
+                      onChange={(e) => {
+                        setTxHashInput(e.target.value);
+                        if (!touchedTxHash) setTouchedTxHash(true);
+                      }}
+                      onBlur={() => setTouchedTxHash(true)}
+                      placeholder="e.g. 0x8f2d... or 5K7e9b..."
+                      className={`w-full rounded-xl border px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 outline-none focus:ring-2 transition-colors ${
+                        touchedTxHash && !txVal.isValid
+                          ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                          : touchedTxHash && txVal.isValid
+                          ? "border-emerald-500/70 bg-emerald-50/10 focus:ring-emerald-500"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#161a25] focus:ring-blue-500"
+                      }`}
+                    />
+                  </FormField>
                 </div>
 
                 <button

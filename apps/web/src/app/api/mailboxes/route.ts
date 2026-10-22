@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { readDb, writeDb, StoredMailbox } from "@/lib/store";
 import { createCpanelMailbox, getCpanelDnsRecords } from "@/lib/cpanel-uapi";
+import { validateMailboxUsername, validateDomain, validatePassword } from "@/lib/validation";
 
 export async function GET(req: Request) {
   try {
@@ -41,14 +42,24 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { emailPrefix, domain, password, quotaMb = 5000, role = "Custom Mailbox", isDemo = false } = body;
 
-    if (!emailPrefix || !domain) {
-      return NextResponse.json(
-        { success: false, error: "emailPrefix and domain are required." },
-        { status: 400 }
-      );
+    const prefixCheck = validateMailboxUsername(emailPrefix);
+    if (!prefixCheck.isValid) {
+      return NextResponse.json({ success: false, error: prefixCheck.error }, { status: 400 });
+    }
+
+    const domainCheck = validateDomain(domain);
+    if (!domainCheck.isValid) {
+      return NextResponse.json({ success: false, error: domainCheck.error }, { status: 400 });
+    }
+
+    if (password) {
+      const passCheck = validatePassword(password, 6);
+      if (!passCheck.isValid) {
+        return NextResponse.json({ success: false, error: passCheck.error }, { status: 400 });
+      }
     }
 
     const cookieStore = await cookies();

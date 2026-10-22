@@ -1,22 +1,32 @@
 import { NextResponse } from "next/server";
 import { readDb, writeDb, hashPassword } from "@/lib/store";
 import { checkRateLimit, timingSafeCompare } from "@/lib/security";
+import { validateEmail, validatePassword } from "@/lib/validation";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { email, password } = body;
 
-    if (!email || !password) {
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.isValid) {
       return NextResponse.json(
-        { success: false, error: "Please enter your email and password." },
+        { success: false, error: emailCheck.error || "Please enter a valid work email address." },
         { status: 400 }
       );
     }
 
-    const cleanEmail = email.toLowerCase().trim();
+    const passCheck = validatePassword(password, 6);
+    if (!passCheck.isValid) {
+      return NextResponse.json(
+        { success: false, error: passCheck.error || "Please enter your password." },
+        { status: 400 }
+      );
+    }
+
+    const cleanEmail = emailCheck.value;
 
     // Security: Rate limit login attempts to prevent brute-force attacks
     const rateCheck = checkRateLimit(`login_${ip}_${cleanEmail}`, 5, 60 * 1000);

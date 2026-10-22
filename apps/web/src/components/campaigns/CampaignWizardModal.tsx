@@ -22,6 +22,12 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { CampaignStep, StoredCampaign } from "@/lib/store";
+import {
+  validateEmail,
+  validateSubject,
+  validateEmailBody,
+  validateFullName,
+} from "@/lib/validation";
 
 interface CampaignWizardModalProps {
   isOpen: boolean;
@@ -196,8 +202,50 @@ Marcus,Thorne,marcus@vanguardmedia.com,Vanguard Media Group,Managing Director`
 
   const handleSubmit = async () => {
     try {
-      setIsSubmitting(true);
       setErrorMsg("");
+
+      const nameCheck = validateFullName(name, "Campaign Name");
+      if (!nameCheck.isValid) {
+        setErrorMsg(nameCheck.error || "Please enter a valid campaign name.");
+        return;
+      }
+
+      const fromNameCheck = validateFullName(fromName, "Sender Name");
+      if (!fromNameCheck.isValid) {
+        setErrorMsg(fromNameCheck.error || "Please enter a valid sender name.");
+        return;
+      }
+
+      const fromEmailCheck = validateEmail(fromEmail, "Sender Email");
+      if (!fromEmailCheck.isValid) {
+        setErrorMsg(fromEmailCheck.error || "Please enter a valid sender email.");
+        return;
+      }
+
+      if (replyTo.trim()) {
+        const replyCheck = validateEmail(replyTo, "Reply-To Email");
+        if (!replyCheck.isValid) {
+          setErrorMsg(replyCheck.error || "Please enter a valid Reply-To email.");
+          return;
+        }
+      }
+
+      // Validate sequence steps
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        const sCheck = validateSubject(step.subject || "");
+        if (!sCheck.isValid) {
+          setErrorMsg(`Step ${i + 1}: Subject line is required.`);
+          return;
+        }
+        const bCheck = validateEmailBody(step.body || "");
+        if (!bCheck.isValid) {
+          setErrorMsg(`Step ${i + 1}: Message body is required.`);
+          return;
+        }
+      }
+
+      setIsSubmitting(true);
 
       const payload = {
         name,

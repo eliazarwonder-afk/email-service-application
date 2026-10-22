@@ -25,6 +25,7 @@ import {
 import { StoredCampaign } from "@/lib/store";
 import { CampaignWizardModal } from "./CampaignWizardModal";
 import { CampaignDetailModal } from "./CampaignDetailModal";
+import { sanitizeSearchQuery } from "@/lib/validation";
 
 interface CampaignsWorkspaceProps {
   mailboxes: Array<{ emailAddress: string; role?: string }>;
@@ -214,8 +215,9 @@ export function CampaignsWorkspace({ mailboxes, orgPlan = "GROWTH" }: CampaignsW
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(sanitizeSearchQuery(e.target.value))}
             placeholder="Search campaigns, senders…"
+            maxLength={100}
             className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-[#161a25] pl-8 pr-3 py-1.5 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

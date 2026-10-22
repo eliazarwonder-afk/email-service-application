@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { ZegaLogo } from "@/components/ZegaLogo";
+import { validateEmail, validatePassword } from "@/lib/validation";
+import { FormField } from "@/components/ui/FormField";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,6 +29,19 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+
+  // Field validation states
+  const [touchedEmail, setTouchedEmail] = useState(false);
+  const [touchedPassword, setTouchedPassword] = useState(false);
+
+  const emailValidation = validateEmail(email);
+  const passwordValidation = validatePassword(password, 6);
+
+  const isEmailValid = touchedEmail && emailValidation.isValid;
+  const emailError = touchedEmail && !emailValidation.isValid ? emailValidation.error : null;
+
+  const isPasswordValid = touchedPassword && passwordValidation.isValid;
+  const passwordError = touchedPassword && !passwordValidation.isValid ? passwordValidation.error : null;
 
   // Detect query params for errors
   useEffect(() => {
@@ -76,6 +91,22 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTouchedEmail(true);
+    setTouchedPassword(true);
+
+    const emailCheck = validateEmail(email);
+    const passCheck = validatePassword(password, 6);
+
+    if (!emailCheck.isValid) {
+      setErrorMessage(emailCheck.error || "Please enter a valid work email address.");
+      return;
+    }
+
+    if (!passCheck.isValid) {
+      setErrorMessage(passCheck.error || "Please enter your password.");
+      return;
+    }
+
     setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
@@ -84,7 +115,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: emailCheck.value, password: passCheck.value }),
       });
 
       const data = await res.json();
@@ -196,52 +227,62 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="email"
-                  className="block text-xs font-semibold text-[#121212] dark:text-white"
-                >
-                  Work Email Address
-                </label>
+              <FormField
+                id="email"
+                label="Work Email Address"
+                required
+                error={emailError}
+                isValid={isEmailValid}
+                helperText={!emailError ? "Use your company domain (e.g. you@acmepreferred.com)" : undefined}
+              >
                 <input
                   id="email"
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (!touchedEmail) setTouchedEmail(true);
+                  }}
+                  onBlur={() => setTouchedEmail(true)}
                   placeholder="you@company.com"
-                  className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] px-3.5 py-2.5 text-xs text-[#121212] dark:text-white placeholder-neutral-400 focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 transition-colors"
+                  className={`w-full rounded-xl border px-3.5 py-2.5 text-xs text-[#121212] dark:text-white placeholder-neutral-400 focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 transition-colors ${
+                    emailError
+                      ? "border-rose-400 bg-rose-50/20 focus-visible:ring-rose-500"
+                      : isEmailValid
+                      ? "border-emerald-500/70 bg-emerald-50/10 focus-visible:ring-emerald-500"
+                      : "border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] focus-visible:ring-neutral-900"
+                  }`}
                 />
-              </div>
+              </FormField>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-xs font-semibold text-[#121212] dark:text-white"
-                  >
-                    Password
-                  </label>
-                  <a
-                    href="#forgot"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert("Password reset instructions sent to your email address via admin SMTP.");
-                    }}
-                    className="text-[11px] text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white transition-colors"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
+              <FormField
+                id="password"
+                label="Password"
+                required
+                error={passwordError}
+                isValid={isPasswordValid}
+                helperText={!passwordError ? "Must be at least 6 characters" : undefined}
+              >
                 <div className="relative">
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (!touchedPassword) setTouchedPassword(true);
+                    }}
+                    onBlur={() => setTouchedPassword(true)}
                     placeholder="••••••••••••"
-                    className="w-full rounded-lg border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] px-3.5 py-2.5 text-xs text-[#121212] dark:text-white placeholder-neutral-400 focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 transition-colors font-mono"
+                    className={`w-full rounded-xl border px-3.5 py-2.5 text-xs text-[#121212] dark:text-white placeholder-neutral-400 focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 transition-colors font-mono pr-10 ${
+                      passwordError
+                        ? "border-rose-400 bg-rose-50/20 focus-visible:ring-rose-500"
+                        : isPasswordValid
+                        ? "border-emerald-500/70 bg-emerald-50/10 focus-visible:ring-emerald-500"
+                        : "border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] focus-visible:ring-neutral-900"
+                    }`}
                   />
                   <button
                     type="button"
@@ -252,7 +293,7 @@ export default function LoginPage() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-              </div>
+              </FormField>
 
               <button
                 type="submit"

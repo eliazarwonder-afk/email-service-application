@@ -27,6 +27,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
+import { validateEmail, validateSubject, sanitizeText } from "@/lib/validation";
 
 interface PreviewEmail {
   id: string;
@@ -100,9 +101,24 @@ export function HeroDashboardPreview() {
   const [composeSubject, setComposeSubject] = useState("Re: Approved: Q4 Cloud Migration");
   const [composeBody, setComposeBody] = useState("Hi Sarah,\n\nThank you for the confirmation. We have queued the DNS cutover for 2:00 PM EST.\n\nBest regards,\nAlex");
   const [sendFeedback, setSendFeedback] = useState<string | null>(null);
+  const [sendFeedbackError, setSendFeedbackError] = useState(false);
 
   const handleSendSimulated = (e: React.FormEvent) => {
     e.preventDefault();
+    const emailCheck = validateEmail(composeTo);
+    if (!emailCheck.isValid) {
+      setSendFeedback(emailCheck.error || "Invalid recipient email address");
+      setSendFeedbackError(true);
+      return;
+    }
+    const subjectCheck = validateSubject(composeSubject);
+    if (!subjectCheck.isValid) {
+      setSendFeedback(subjectCheck.error || "Invalid subject");
+      setSendFeedbackError(true);
+      return;
+    }
+
+    setSendFeedbackError(false);
     setSendFeedback("Dispatched via Encrypted TLS 1.3 • 250 OK");
     setTimeout(() => {
       setIsComposeOpen(false);
@@ -377,8 +393,13 @@ export function HeroDashboardPreview() {
               </div>
 
               {sendFeedback && (
-                <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 p-1.5 rounded">
-                  {sendFeedback}
+                <div className={`text-[11px] font-semibold p-1.5 rounded flex items-center gap-1.5 ${
+                  sendFeedbackError
+                    ? "text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900"
+                    : "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900"
+                }`}>
+                  {sendFeedbackError ? <AlertCircle className="w-3 h-3 shrink-0" /> : <CheckCircle2 className="w-3 h-3 shrink-0" />}
+                  <span>{sendFeedback}</span>
                 </div>
               )}
 

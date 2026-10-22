@@ -180,7 +180,7 @@
       "id": "org_5e75a942",
       "name": "PixelPath Digital Agency",
       "ownerId": "usr_af51b31c",
-      "plan": "growth",
+      "plan": "free",
       "whmcsClientId": "ZCL-CL-97975",
       "createdAt": "2026-10-14T14:53:26.451Z"
     },
@@ -352,6 +352,32 @@
       "dmarcStatus": "verified",
       "whmcsOrderId": "WHMCS-ORD-90952",
       "createdAt": "2026-10-22T10:11:50.248Z"
+    },
+    {
+      "id": "dom_d3c6415c",
+      "orgId": "org_5e75a942",
+      "domainName": "dsadasdasdsa",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-55377",
+      "createdAt": "2026-10-22T10:58:51.725Z"
+    },
+    {
+      "id": "dom_834ce6b4",
+      "orgId": "org_5e75a942",
+      "domainName": "jknkjndd",
+      "domainType": "zegacloud",
+      "verified": true,
+      "mxStatus": "verified",
+      "spfStatus": "verified",
+      "dkimStatus": "verified",
+      "dmarcStatus": "verified",
+      "whmcsOrderId": "WHMCS-ORD-83147",
+      "createdAt": "2026-10-22T11:09:15.071Z"
     }
   ],
   "mailboxes": [
@@ -474,6 +500,36 @@
       "usedMb": 24,
       "status": "active",
       "createdAt": "2026-10-22T10:11:50.248Z"
+    },
+    {
+      "id": "mbx_85a8f3e9",
+      "orgId": "org_5e75a942",
+      "emailAddress": "redemptionnewton@gmail.com",
+      "role": "Organization Admin",
+      "quotaMb": 1000,
+      "usedMb": 24,
+      "status": "active",
+      "createdAt": "2026-10-22T10:58:51.725Z"
+    },
+    {
+      "id": "mbx_bb43b7fc",
+      "orgId": "org_5e75a942",
+      "emailAddress": "info@dsadasdasdsa",
+      "role": "General Support",
+      "quotaMb": 1000,
+      "usedMb": 5,
+      "status": "active",
+      "createdAt": "2026-10-22T10:58:51.726Z"
+    },
+    {
+      "id": "mbx_eca629c7",
+      "orgId": "org_5e75a942",
+      "emailAddress": "info@jknkjndd",
+      "role": "General Support",
+      "quotaMb": 1000,
+      "usedMb": 5,
+      "status": "active",
+      "createdAt": "2026-10-22T11:09:15.071Z"
     }
   ],
   "messages": [
@@ -615,7 +671,7 @@
       "preview": "Your business email environment is live with verified DNS and delivery confirmation ticks…",
       "body": "Hello Redemption Ehaoleudu,\n\nWelcome to Zega Mail! Your organization \"PixelPath Digital Agency\" has been registered and linked to your domain: fagsehrsj.com.\n\nYour Setup Details:\n• Primary Mailbox: redemptionnewton@fagsehrsj.com\n• Client Account ID: ZCL-CL-97975\n• Plan: GROWTH\n• DNS Status: MX, SPF, DKIM & DMARC Enforced\n\nYou can now send business proposals with delivery confirmation ticks, use the Zega AI writer, and connect your phone via SSL IMAP/SMTP.\n\nWarm regards,\nZegaCloud Support Team",
       "date": "Just now",
-      "folder": "inbox",
+      "folder": "archive",
       "isRead": false,
       "createdAt": "2026-10-14T14:53:26.451Z"
     },
@@ -744,6 +800,11 @@
       "token": "ses_ff4b9d026934e3df9aadf40b21e42873f439b476bcee000f",
       "userId": "usr_1ffdb3e8",
       "expiresAt": "2026-10-29T10:15:57.192Z"
+    },
+    {
+      "token": "ses_2d0e13ac618d225e77ce7c6cb0e6f4e16585e4e728a4c4cf",
+      "userId": "usr_af51b31c",
+      "expiresAt": "2026-10-29T11:09:14.707Z"
     }
   ],
   "campaigns": [
@@ -1255,6 +1316,48 @@
   ],
   "orders": [
     {
+      "id": "ord_mvjfuvxy",
+      "orderNumber": "WHMCS-ORD-2026-7860",
+      "orgId": "org_5e75a942",
+      "userId": "usr_af51b31c",
+      "clientEmail": "redemptionnewton@gmail.com",
+      "clientName": "Redemption Ehaoleudu",
+      "planId": "free",
+      "planName": "ZegaMail Free Forever",
+      "billingCycle": "annually",
+      "amount": 0,
+      "currency": "USD",
+      "paymentMethod": "free_forever",
+      "paymentMethodName": "free_forever",
+      "status": "active",
+      "invoiceId": "WHMCS-INV-38474",
+      "whmcsOrderId": "7860",
+      "whmcsInvoiceId": "38474",
+      "createdAt": "2026-10-22T11:09:15.190Z",
+      "updatedAt": "2026-10-22T11:09:15.190Z"
+    },
+    {
+      "id": "ord_mvjfhivr",
+      "orderNumber": "WHMCS-ORD-2026-8354",
+      "orgId": "org_5e75a942",
+      "userId": "usr_af51b31c",
+      "clientEmail": "redemptionnewton@gmail.com",
+      "clientName": "Redemption Ehaoleudu",
+      "planId": "free",
+      "planName": "ZegaMail Free Forever",
+      "billingCycle": "annually",
+      "amount": 0,
+      "currency": "USD",
+      "paymentMethod": "free_forever",
+      "paymentMethodName": "free_forever",
+      "status": "active",
+      "invoiceId": "WHMCS-INV-94209",
+      "whmcsOrderId": "8354",
+      "whmcsInvoiceId": "94209",
+      "createdAt": "2026-10-22T10:58:51.735Z",
+      "updatedAt": "2026-10-22T10:58:51.735Z"
+    },
+    {
       "id": "ord_mvjdyc87",
       "orderNumber": "WHMCS-ORD-2026-3970",
       "orgId": "org_2e502d5d",
@@ -1489,6 +1592,34 @@
     }
   ],
   "invoices": [
+    {
+      "id": "WHMCS-INV-38474",
+      "orderId": "ord_mvjfuvxy",
+      "orgId": "org_5e75a942",
+      "userId": "usr_af51b31c",
+      "amount": 0,
+      "currency": "USD",
+      "status": "paid",
+      "dueDate": "2026-10-29",
+      "datePaid": "2026-10-22T11:09:15.190Z",
+      "paymentMethod": "free_forever",
+      "description": "ZegaMail Free Forever (Annual billing)",
+      "createdAt": "2026-10-22T11:09:15.190Z"
+    },
+    {
+      "id": "WHMCS-INV-94209",
+      "orderId": "ord_mvjfhivr",
+      "orgId": "org_5e75a942",
+      "userId": "usr_af51b31c",
+      "amount": 0,
+      "currency": "USD",
+      "status": "paid",
+      "dueDate": "2026-10-29",
+      "datePaid": "2026-10-22T10:58:51.735Z",
+      "paymentMethod": "free_forever",
+      "description": "ZegaMail Free Forever (Annual billing)",
+      "createdAt": "2026-10-22T10:58:51.735Z"
+    },
     {
       "id": "WHMCS-INV-58191",
       "orderId": "ord_mvjdyc87",

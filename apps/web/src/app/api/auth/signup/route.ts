@@ -1,28 +1,46 @@
 import { NextResponse } from "next/server";
 import { readDb, writeDb, hashPassword, StoredUser } from "@/lib/store";
 import { sendVerificationEmail } from "@/lib/email-service";
+import {
+  validateEmail,
+  validatePassword,
+  validateFullName,
+  validatePhone,
+  validateCacNumber,
+} from "@/lib/validation";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { fullName, email, password, companyName, phoneNumber, cacNumber } = body;
 
-    if (!email || !password || !fullName) {
-      return NextResponse.json(
-        { success: false, error: "Please provide your full name, work email address, and password." },
-        { status: 400 }
-      );
+    const nameCheck = validateFullName(fullName, "Full Name");
+    if (!nameCheck.isValid) {
+      return NextResponse.json({ success: false, error: nameCheck.error }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { success: false, error: "Password must be at least 6 characters long." },
-        { status: 400 }
-      );
+    const emailCheck = validateEmail(email, "Work Email");
+    if (!emailCheck.isValid) {
+      return NextResponse.json({ success: false, error: emailCheck.error }, { status: 400 });
     }
 
-    const cleanEmail = email.toLowerCase().trim();
+    const passCheck = validatePassword(password, 6);
+    if (!passCheck.isValid) {
+      return NextResponse.json({ success: false, error: passCheck.error }, { status: 400 });
+    }
+
+    const phoneCheck = validatePhone(phoneNumber);
+    if (!phoneCheck.isValid) {
+      return NextResponse.json({ success: false, error: phoneCheck.error }, { status: 400 });
+    }
+
+    const cacCheck = validateCacNumber(cacNumber);
+    if (!cacCheck.isValid) {
+      return NextResponse.json({ success: false, error: cacCheck.error }, { status: 400 });
+    }
+
+    const cleanEmail = emailCheck.value;
     const db = readDb();
 
     // Check if user already exists

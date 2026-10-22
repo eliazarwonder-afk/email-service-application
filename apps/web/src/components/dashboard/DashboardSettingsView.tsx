@@ -20,6 +20,7 @@ import {
   Calendar,
   AtSign
 } from "lucide-react";
+import { sanitizeText } from "@/lib/validation";
 
 interface DashboardSettingsViewProps {
   settingsPerspective: "admin" | "member";
@@ -455,8 +456,9 @@ export function DashboardSettingsView({
                 <label className="font-semibold text-slate-700 dark:text-slate-300">Display Name</label>
                 <input
                   type="text"
+                  maxLength={70}
                   value={userProfileName}
-                  onChange={(e) => setUserProfileName(e.target.value)}
+                  onChange={(e) => setUserProfileName(sanitizeText(e.target.value, 70))}
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs text-slate-900 dark:text-white"
                 />
               </div>
@@ -465,8 +467,9 @@ export function DashboardSettingsView({
                 <label className="font-semibold text-slate-700 dark:text-slate-300">Job Title</label>
                 <input
                   type="text"
+                  maxLength={70}
                   value={userJobTitle}
-                  onChange={(e) => setUserJobTitle(e.target.value)}
+                  onChange={(e) => setUserJobTitle(sanitizeText(e.target.value, 70))}
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs text-slate-900 dark:text-white"
                 />
               </div>
@@ -492,8 +495,9 @@ export function DashboardSettingsView({
 
             <textarea
               rows={4}
+              maxLength={1000}
               value={userSignature}
-              onChange={(e) => setUserSignature(e.target.value)}
+              onChange={(e) => setUserSignature(sanitizeText(e.target.value, 1000))}
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-3 text-xs text-slate-900 dark:text-white resize-none font-mono"
             />
 
@@ -565,7 +569,8 @@ export function DashboardSettingsView({
                   <input
                     type="text"
                     value={vacationSubject}
-                    onChange={(e) => setVacationSubject(e.target.value)}
+                    onChange={(e) => setVacationSubject(sanitizeText(e.target.value, 150))}
+                    placeholder="Out of Office: Automated Response"
                     className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-2 text-xs"
                   />
                 </div>
@@ -575,7 +580,8 @@ export function DashboardSettingsView({
                   <textarea
                     rows={3}
                     value={vacationMessage}
-                    onChange={(e) => setVacationMessage(e.target.value)}
+                    onChange={(e) => setVacationMessage(sanitizeText(e.target.value, 2000))}
+                    placeholder="I am currently away from my inbox..."
                     className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-2 text-xs resize-none"
                   />
                 </div>

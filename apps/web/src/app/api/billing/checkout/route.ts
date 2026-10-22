@@ -16,6 +16,12 @@ import {
 import { initializePaystackTransaction, verifyPaystackTransaction } from "@/lib/payments/paystack";
 import { initializeFlutterwavePayment, verifyFlutterwaveTransaction } from "@/lib/payments/flutterwave";
 import { formatPlanPrice, SupportedCurrency } from "@/lib/geo";
+import {
+  validateEmail,
+  validatePassword,
+  validateDomain,
+  validateTxHash,
+} from "@/lib/validation";
 
 export async function POST(req: Request) {
   try {
@@ -49,16 +55,32 @@ export async function POST(req: Request) {
 
     if (!user) {
       // User is claiming free plan or checking out without prior session
-      const cleanEmail = (clientEmail || "").toLowerCase().trim();
-      if (!cleanEmail) {
+      const emailCheck = validateEmail(clientEmail, "Contact Email");
+      if (!emailCheck.isValid) {
         return NextResponse.json(
           {
             success: false,
-            error: "Please enter your business contact email address to configure your mailboxes.",
+            error: emailCheck.error || "Please enter a valid business contact email address to configure your mailboxes.",
           },
           { status: 400 }
         );
       }
+
+      if (password) {
+        const passCheck = validatePassword(password, 6);
+        if (!passCheck.isValid) {
+          return NextResponse.json({ success: false, error: passCheck.error }, { status: 400 });
+        }
+      }
+
+      if (domainName) {
+        const domCheck = validateDomain(domainName);
+        if (!domCheck.isValid) {
+          return NextResponse.json({ success: false, error: domCheck.error }, { status: 400 });
+        }
+      }
+
+      const cleanEmail = emailCheck.value;
 
       // Check if user exists
       user = db.users?.find((u) => u.email.toLowerCase() === cleanEmail) || null;
@@ -393,7 +415,12 @@ export async function PATCH(req: Request) {
 
     // If Crypto Transaction Hash Submission
     if (txHash && lookupId) {
-      const updatedOrder = submitOrderCryptoTx(lookupId, txHash.trim());
+      const txCheck = validateTxHash(txHash);
+      if (!txCheck.isValid) {
+        return NextResponse.json({ success: false, error: txCheck.error }, { status: 400 });
+      }
+
+      const updatedOrder = submitOrderCryptoTx(lookupId, txCheck.value);
       if (updatedOrder) {
         verifyAndActivateOrder(lookupId);
         return NextResponse.json({

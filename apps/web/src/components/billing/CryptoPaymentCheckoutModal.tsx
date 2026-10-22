@@ -16,6 +16,7 @@ import {
   Clock,
   Sparkles
 } from "lucide-react";
+import { validateTxHash } from "@/lib/validation";
 
 interface CryptoPaymentCheckoutModalProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ export function CryptoPaymentCheckoutModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderData, setOrderData] = useState<any>(null);
   const [txHashInput, setTxHashInput] = useState("");
+  const [txHashTouched, setTxHashTouched] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [txSubmitting, setTxSubmitting] = useState(false);
   const [txConfirmed, setTxConfirmed] = useState(false);
@@ -117,7 +119,13 @@ export function CryptoPaymentCheckoutModal({
 
   const handleSubmitTxHash = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!txHashInput.trim() || !orderData?.id) return;
+    setTxHashTouched(true);
+    const txValidation = validateTxHash(txHashInput);
+    if (!txValidation.isValid) {
+      setErrorMessage(txValidation.error || "Please enter a valid transaction hash (TXID).");
+      return;
+    }
+    if (!orderData?.id) return;
     setTxSubmitting(true);
     setErrorMessage("");
     try {
@@ -126,7 +134,7 @@ export function CryptoPaymentCheckoutModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId: orderData.id,
-          txHash: txHashInput.trim(),
+          txHash: txValidation.value,
         }),
       });
       const data = await res.json();
@@ -443,21 +451,39 @@ export function CryptoPaymentCheckoutModal({
                   After sending funds, paste your Transaction Hash (TXID):
                 </label>
                 <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="e.g. e49f82bc7190ad3f7748ca52011b02ea9174dfb292..."
-                    value={txHashInput}
-                    onChange={(e) => setTxHashInput(e.target.value)}
-                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#141824] font-mono"
-                  />
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      placeholder="e.g. e49f82bc7190ad3f7748ca52011b02ea9174dfb292..."
+                      value={txHashInput}
+                      onChange={(e) => {
+                        setTxHashInput(e.target.value);
+                        if (!txHashTouched) setTxHashTouched(true);
+                      }}
+                      onBlur={() => setTxHashTouched(true)}
+                      className={`w-full px-3 py-2 text-xs rounded-xl border bg-white dark:bg-[#141824] font-mono transition-colors focus:outline-none ${
+                        txHashTouched && !validateTxHash(txHashInput).isValid
+                          ? "border-rose-400 focus:ring-1 focus:ring-rose-400 text-rose-900 dark:text-rose-200"
+                          : txHashTouched && validateTxHash(txHashInput).isValid
+                          ? "border-emerald-500 focus:ring-1 focus:ring-emerald-400"
+                          : "border-neutral-300 dark:border-neutral-700 focus:ring-1 focus:ring-blue-500"
+                      }`}
+                    />
+                  </div>
                   <button
                     type="submit"
-                    disabled={txSubmitting || !txHashInput.trim()}
-                    className="px-4 py-2 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-xl text-xs font-semibold hover:opacity-90 disabled:opacity-50"
+                    disabled={txSubmitting || (txHashTouched && !validateTxHash(txHashInput).isValid) || !txHashInput.trim()}
+                    className="px-4 py-2 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-xl text-xs font-semibold hover:opacity-90 disabled:opacity-50 transition-all shrink-0"
                   >
                     {txSubmitting ? "Submitting…" : "Submit TX"}
                   </button>
                 </div>
+                {txHashTouched && !validateTxHash(txHashInput).isValid && (
+                  <p className="text-[11px] text-rose-500 flex items-center gap-1 mt-1 font-medium">
+                    <AlertCircle className="h-3 w-3 shrink-0" />
+                    <span>{validateTxHash(txHashInput).error}</span>
+                  </p>
+                )}
                 {txConfirmed && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 mt-1">
                     <CheckCircle2 className="h-3.5 w-3.5" />

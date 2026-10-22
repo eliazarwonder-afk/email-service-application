@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readDb, getDomains, addDomain, verifyDomain } from "@/lib/store";
 import { cookies } from "next/headers";
+import { validateDomain } from "@/lib/validation";
 
 export async function GET() {
   try {
@@ -68,12 +69,13 @@ export async function POST(req: Request) {
     }
 
     if (action === "register" || action === "connect") {
-      if (!domainName || !domainName.trim()) {
-        return NextResponse.json({ success: false, error: "Domain name is required." }, { status: 400 });
+      const domCheck = validateDomain(domainName);
+      if (!domCheck.isValid) {
+        return NextResponse.json({ success: false, error: domCheck.error }, { status: 400 });
       }
 
       const type = action === "register" ? "zegacloud" : domainType;
-      const domain = addDomain(orgId, domainName, type);
+      const domain = addDomain(orgId, domCheck.value, type);
 
       const dnsRecords = {
         mx: { type: "MX", host: "@", value: "mail.zegamail.com", priority: 10 },

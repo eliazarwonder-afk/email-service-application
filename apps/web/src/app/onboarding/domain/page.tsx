@@ -25,6 +25,13 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { useCurrency } from "@/components/CurrencyProvider";
+import {
+  validateDomain,
+  validateFullName,
+  validatePhone,
+  validateCacNumber,
+} from "@/lib/validation";
+import { FormField } from "@/components/ui/FormField";
 
 interface DomainSearchResult {
   domain: string;
@@ -70,6 +77,14 @@ export default function DomainOnboardingPage() {
   const [sandboxPrefix, setSandboxPrefix] = useState("");
   const [isProvisioningSandbox, setIsProvisioningSandbox] = useState(false);
 
+  // Field validation error states
+  const [searchDomainError, setSearchDomainError] = useState("");
+  const [existingDomainError, setExistingDomainError] = useState("");
+  const [sandboxPrefixError, setSandboxPrefixError] = useState("");
+  const [companyNameError, setCompanyNameError] = useState("");
+  const [phoneNumberError, setPhoneNumberError] = useState("");
+  const [cacNumberError, setCacNumberError] = useState("");
+
   // Checkout Modal State
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedPlanForDomain, setSelectedPlanForDomain] = useState<"starter" | "growth" | "pro">("starter");
@@ -106,14 +121,24 @@ export default function DomainOnboardingPage() {
   // Handle Domain Search (WHMCS Integration)
   const handleDomainSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    setSearchDomainError("");
     if (!searchQuery.trim()) return;
+
+    let q = searchQuery.trim().toLowerCase().replace(/^[a-z]+:\/\//i, "").replace(/\/.*$/, "");
+    if (!q.includes(".")) q = q + ".com";
+
+    const domCheck = validateDomain(q);
+    if (!domCheck.isValid) {
+      setSearchDomainError(domCheck.error || "Please enter a valid domain name.");
+      return;
+    }
 
     setIsSearching(true);
     setSearchPrimary(null);
     setSelectedDomainToRegister(null);
 
     try {
-      const res = await fetch(`/api/domains/search?domain=${encodeURIComponent(searchQuery.trim())}`);
+      const res = await fetch(`/api/domains/search?domain=${encodeURIComponent(domCheck.value)}`);
       const data = await res.json();
 
       if (data.success && data.primary) {
@@ -122,9 +147,11 @@ export default function DomainOnboardingPage() {
         if (data.primary.status === "available") {
           setSelectedDomainToRegister(data.primary);
         }
+      } else {
+        setSearchDomainError(data.error || "Domain lookup failed.");
       }
     } catch (err) {
-      console.error("Domain search error:", err);
+      setSearchDomainError("Network error while querying domain.");
     } finally {
       setIsSearching(false);
     }
@@ -133,9 +160,16 @@ export default function DomainOnboardingPage() {
   // Handle Existing Domain DNS Generation
   const handleGenerateDns = (e: React.FormEvent) => {
     e.preventDefault();
+    setExistingDomainError("");
     if (!existingDomainInput.trim()) return;
 
-    const domain = existingDomainInput.trim().toLowerCase();
+    const domCheck = validateDomain(existingDomainInput);
+    if (!domCheck.isValid) {
+      setExistingDomainError(domCheck.error || "Please enter a valid existing business domain.");
+      return;
+    }
+
+    const domain = domCheck.value;
     const records = [
       { type: "MX", host: "@", value: `mail.${domain}`, priority: 10, status: "pending" },
       { type: "TXT", host: "@", value: "v=spf1 include:spf.zegacloud.com ~all", status: "pending" },
@@ -174,8 +208,16 @@ export default function DomainOnboardingPage() {
 
   // Handle Sandbox Instant Provisioning
   const handleProvisionSandbox = async () => {
+    setSandboxPrefixError("");
+    const cleanPrefix = (sandboxPrefix.trim().toLowerCase() || "demo").replace(/[^a-z0-9_-]/g, "");
+
+    if (cleanPrefix.length < 2 || cleanPrefix.length > 30) {
+      setSandboxPrefixError("Subdomain prefix must be between 2 and 30 characters.");
+      return;
+    }
+
     setIsProvisioningSandbox(true);
-    const domain = (sandboxPrefix.trim().toLowerCase() || "demo") + ".zegamail.net";
+    const domain = cleanPrefix + ".zegamail.net";
     try {
       const res = await fetch("/api/domains", {
         method: "POST",
@@ -409,34 +451,50 @@ export default function DomainOnboardingPage() {
               </p>
             </div>
 
-            <form onSubmit={handleDomainSearch} className="flex gap-2">
-              <div className="relative flex-1">
-                <Globe className="h-4 w-4 absolute left-3 top-3 text-neutral-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="e.g. acmeglobal.com or mycompany.ng"
-                  className="w-full rounded-xl border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] pl-9 pr-4 py-2.5 text-xs text-[#121212] dark:text-white font-mono focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-                />
+            <form onSubmit={handleDomainSearch} className="space-y-2">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Globe className="h-4 w-4 absolute left-3 top-3 text-neutral-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (searchDomainError) setSearchDomainError("");
+                    }}
+                    placeholder="e.g. acmeglobal.com or mycompany.ng"
+                    className={`w-full rounded-xl border pl-9 pr-4 py-2.5 text-xs text-[#121212] dark:text-white font-mono focus:bg-white dark:focus:bg-[#1a202d] focus-visible:outline-none focus-visible:ring-2 ${
+                      searchDomainError
+                        ? "border-rose-400 bg-rose-50/20 focus-visible:ring-rose-500"
+                        : "border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] focus-visible:ring-blue-600"
+                    }`}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#121212] dark:bg-white px-5 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors disabled:opacity-50"
+                >
+                  {isSearching ? (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                      <span>Checking WHMCS…</span>
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-3.5 w-3.5" />
+                      <span>Search Domain</span>
+                    </>
+                  )}
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={isSearching}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#121212] dark:bg-white px-5 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors disabled:opacity-50"
-              >
-                {isSearching ? (
-                  <>
-                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                    <span>Checking WHMCS…</span>
-                  </>
-                ) : (
-                  <>
-                    <Search className="h-3.5 w-3.5" />
-                    <span>Search Domain</span>
-                  </>
-                )}
-              </button>
+
+              {searchDomainError && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  <span>{searchDomainError}</span>
+                </p>
+              )}
             </form>
 
             {/* Primary Search Result */}
@@ -562,22 +620,38 @@ export default function DomainOnboardingPage() {
               </p>
             </div>
 
-            <form onSubmit={handleGenerateDns} className="flex gap-2">
-              <input
-                type="text"
-                value={existingDomainInput}
-                onChange={(e) => setExistingDomainInput(e.target.value)}
-                placeholder="e.g. acmebrand.com"
-                required
-                className="flex-1 rounded-xl border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] px-4 py-2.5 text-xs text-[#121212] dark:text-white font-mono focus:bg-white dark:focus:bg-[#1a202d]"
-              />
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#121212] dark:bg-white px-5 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
-              >
-                <span>Generate DNS Records</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
+            <form onSubmit={handleGenerateDns} className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={existingDomainInput}
+                  onChange={(e) => {
+                    setExistingDomainInput(e.target.value);
+                    if (existingDomainError) setExistingDomainError("");
+                  }}
+                  placeholder="e.g. acmebrand.com"
+                  required
+                  className={`flex-1 rounded-xl border px-4 py-2.5 text-xs text-[#121212] dark:text-white font-mono focus:bg-white dark:focus:bg-[#1a202d] outline-none focus:ring-2 transition-colors ${
+                    existingDomainError
+                      ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                      : "border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] focus:ring-blue-600"
+                  }`}
+                />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#121212] dark:bg-white px-5 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors shrink-0"
+                >
+                  <span>Generate DNS Records</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {existingDomainError && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  <span>{existingDomainError}</span>
+                </p>
+              )}
             </form>
 
             {existingDnsRecords && (
@@ -678,14 +752,27 @@ export default function DomainOnboardingPage() {
                 <input
                   type="text"
                   value={sandboxPrefix}
-                  onChange={(e) => setSandboxPrefix(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ""))}
+                  onChange={(e) => {
+                    setSandboxPrefix(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""));
+                    if (sandboxPrefixError) setSandboxPrefixError("");
+                  }}
                   placeholder="mybrand"
-                  className="w-full rounded-l-xl border border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] px-4 py-2.5 text-xs text-[#121212] dark:text-white font-mono focus:bg-white dark:focus:bg-[#1a202d]"
+                  className={`w-full rounded-l-xl border px-4 py-2.5 text-xs text-[#121212] dark:text-white font-mono focus:bg-white dark:focus:bg-[#1a202d] outline-none focus:ring-2 transition-colors ${
+                    sandboxPrefixError
+                      ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                      : "border-[#eaeaea] dark:border-[#202636] bg-[#faf9f6] dark:bg-[#161a25] focus:ring-blue-600"
+                  }`}
                 />
                 <span className="inline-flex items-center px-4 border border-l-0 border-[#eaeaea] dark:border-[#202636] bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-mono rounded-r-xl">
                   .zegamail.net
                 </span>
               </div>
+              {sandboxPrefixError && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  <span>{sandboxPrefixError}</span>
+                </p>
+              )}
             </div>
 
             <button

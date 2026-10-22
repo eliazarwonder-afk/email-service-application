@@ -13,8 +13,10 @@ import {
   Check,
   Bold,
   Italic,
-  Link as LinkIcon
+  Link as LinkIcon,
+  AlertCircle,
 } from "lucide-react";
+import { validateEmail, validateSubject, validateEmailBody } from "@/lib/validation";
 
 interface FloatingComposerProps {
   isOpen: boolean;
@@ -55,6 +57,54 @@ export function FloatingComposer({
   const [showCcBcc, setShowCcBcc] = useState(false);
   const [ccEmail, setCcEmail] = useState("");
   const [bccEmail, setBccEmail] = useState("");
+
+  // Validation States
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const handleValidatedSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
+
+    const emailCheck = validateEmail(toEmail, "Recipient Email");
+    if (!emailCheck.isValid) {
+      setValidationError(emailCheck.error || "Please enter a valid recipient email.");
+      return;
+    }
+
+    const subjectCheck = validateSubject(subject);
+    if (!subjectCheck.isValid) {
+      setValidationError(subjectCheck.error || "Subject line is required.");
+      return;
+    }
+
+    const bodyCheck = validateEmailBody(body);
+    if (!bodyCheck.isValid) {
+      setValidationError(bodyCheck.error || "Message body cannot be empty.");
+      return;
+    }
+
+    if (showCcBcc && ccEmail.trim()) {
+      const ccCheck = validateEmail(ccEmail, "Cc Email");
+      if (!ccCheck.isValid) {
+        setValidationError(ccCheck.error || "Please enter a valid Cc email.");
+        return;
+      }
+    }
+
+    if (showCcBcc && bccEmail.trim()) {
+      const bccCheck = validateEmail(bccEmail, "Bcc Email");
+      if (!bccCheck.isValid) {
+        setValidationError(bccCheck.error || "Please enter a valid Bcc email.");
+        return;
+      }
+    }
+
+    // Call upstream handler with clean values
+    setToEmail(emailCheck.value);
+    setSubject(subjectCheck.value);
+    setBody(bodyCheck.value);
+    onSend(e);
+  };
 
   if (!isOpen) return null;
 
@@ -120,7 +170,13 @@ export function FloatingComposer({
               </p>
             </div>
           ) : (
-            <form onSubmit={onSend} className="flex-1 flex flex-col overflow-hidden">
+            <form onSubmit={handleValidatedSend} className="flex-1 flex flex-col overflow-hidden">
+              {validationError && (
+                <div className="px-4 py-2 bg-rose-50 dark:bg-rose-950/60 border-b border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                  <span>{validationError}</span>
+                </div>
+              )}
               {/* To: Input */}
               <div className="flex items-center px-4 py-2 border-b border-slate-100 dark:border-slate-800/80 text-xs">
                 <label className="text-slate-400 w-12 font-medium shrink-0">To</label>

@@ -18,6 +18,7 @@ import {
   Layers,
 } from "lucide-react";
 import { StoredDomain } from "@/lib/store";
+import { validateDomain } from "@/lib/validation";
 
 interface DomainsWorkspaceProps {
   initialDomains?: StoredDomain[];
@@ -41,6 +42,10 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
   const [connectDomainName, setConnectDomainName] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectedDomain, setConnectedDomain] = useState<StoredDomain | null>(null);
+
+  // Validation Errors
+  const [searchDomainError, setSearchDomainError] = useState("");
+  const [connectDomainError, setConnectDomainError] = useState("");
 
   // Copied DNS record state
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -66,7 +71,17 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
 
   const handleSearchDomains = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSearchDomainError("");
     if (!searchQuery.trim()) return;
+
+    let q = searchQuery.trim().toLowerCase().replace(/^[a-z]+:\/\//i, "").replace(/\/.*$/, "");
+    if (!q.includes(".")) q = q + ".com";
+
+    const domCheck = validateDomain(q);
+    if (!domCheck.isValid) {
+      setSearchDomainError(domCheck.error || "Please enter a valid domain to search.");
+      return;
+    }
 
     try {
       setIsSearching(true);
@@ -74,14 +89,14 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
       const res = await fetch("/api/domains", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "search", domainName: searchQuery.trim() }),
+        body: JSON.stringify({ action: "search", domainName: domCheck.value }),
       });
       const data = await res.json();
       if (data.success) {
         setSearchResults(data.results || []);
       }
     } catch (err) {
-      console.error("Search error", err);
+      setSearchDomainError("Network error while searching domain.");
     } finally {
       setIsSearching(false);
     }
@@ -110,7 +125,14 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
 
   const handleConnectDomain = async (e: React.FormEvent) => {
     e.preventDefault();
+    setConnectDomainError("");
     if (!connectDomainName.trim()) return;
+
+    const domCheck = validateDomain(connectDomainName);
+    if (!domCheck.isValid) {
+      setConnectDomainError(domCheck.error || "Please enter a valid custom domain (e.g. acme.com).");
+      return;
+    }
 
     try {
       setIsConnecting(true);
@@ -119,7 +141,7 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "connect",
-          domainName: connectDomainName.trim(),
+          domainName: domCheck.value,
           domainType: "existing",
         }),
       });
@@ -356,24 +378,40 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
             </p>
           </div>
 
-          <form onSubmit={handleSearchDomains} className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-3 h-4 w-4 text-neutral-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Enter domain name (e.g. acmecreativestudio)"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-[#161a25] text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
-              />
+          <form onSubmit={handleSearchDomains} className="space-y-2">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-3 h-4 w-4 text-neutral-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (searchDomainError) setSearchDomainError("");
+                  }}
+                  placeholder="Enter domain name (e.g. acmecreativestudio)"
+                  className={`w-full pl-10 pr-4 py-2.5 rounded-xl border bg-neutral-50/50 dark:bg-[#161a25] text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-2 font-medium transition-colors ${
+                    searchDomainError
+                      ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                      : "border-neutral-200 dark:border-neutral-800 focus:ring-blue-500"
+                  }`}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSearching || !searchQuery.trim()}
+                className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all disabled:opacity-50"
+              >
+                {isSearching ? "Searching…" : "Check Availability"}
+              </button>
             </div>
-            <button
-              type="submit"
-              disabled={isSearching || !searchQuery.trim()}
-              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all disabled:opacity-50"
-            >
-              {isSearching ? "Searching…" : "Check Availability"}
-            </button>
+
+            {searchDomainError && (
+              <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                <AlertCircle className="h-3.5 w-3.5" />
+                <span>{searchDomainError}</span>
+              </p>
+            )}
           </form>
 
           {searchResults.length > 0 && (
@@ -424,21 +462,37 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
             </p>
           </div>
 
-          <form onSubmit={handleConnectDomain} className="flex gap-2">
-            <input
-              type="text"
-              value={connectDomainName}
-              onChange={(e) => setConnectDomainName(e.target.value)}
-              placeholder="e.g. mycompany.com"
-              className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-[#161a25] text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
-            />
-            <button
-              type="submit"
-              disabled={isConnecting || !connectDomainName.trim()}
-              className="px-6 py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold transition-all disabled:opacity-50"
-            >
-              {isConnecting ? "Adding…" : "Add Domain & View DNS"}
-            </button>
+          <form onSubmit={handleConnectDomain} className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={connectDomainName}
+                onChange={(e) => {
+                  setConnectDomainName(e.target.value);
+                  if (connectDomainError) setConnectDomainError("");
+                }}
+                placeholder="e.g. mycompany.com"
+                className={`flex-1 px-4 py-2.5 rounded-xl border bg-neutral-50/50 dark:bg-[#161a25] text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-2 font-medium transition-colors ${
+                  connectDomainError
+                    ? "border-rose-400 bg-rose-50/20 focus:ring-rose-500"
+                    : "border-neutral-200 dark:border-neutral-800 focus:ring-blue-500"
+                }`}
+              />
+              <button
+                type="submit"
+                disabled={isConnecting || !connectDomainName.trim()}
+                className="px-6 py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold transition-all disabled:opacity-50 shrink-0"
+              >
+                {isConnecting ? "Adding…" : "Add Domain & View DNS"}
+              </button>
+            </div>
+
+            {connectDomainError && (
+              <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                <AlertCircle className="h-3.5 w-3.5" />
+                <span>{connectDomainError}</span>
+              </p>
+            )}
           </form>
 
           {/* DNS Records Instruction Card */}

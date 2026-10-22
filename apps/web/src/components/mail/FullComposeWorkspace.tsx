@@ -32,6 +32,7 @@ import {
   Minimize2,
 } from "lucide-react";
 import { StoredTemplate } from "@/lib/store";
+import { validateEmail, validateSubject, validateEmailBody } from "@/lib/validation";
 
 interface FullComposeWorkspaceProps {
   isOpen: boolean;
@@ -150,9 +151,40 @@ export function FullComposeWorkspace({
   };
 
   const handleSend = async () => {
-    if (!toEmail.trim() || !subject.trim() || !body.trim()) {
-      setErrorMessage("Please fill in recipient email, subject, and message content.");
+    setErrorMessage("");
+
+    const emailCheck = validateEmail(toEmail, "Recipient Email");
+    if (!emailCheck.isValid) {
+      setErrorMessage(emailCheck.error || "Please enter a valid recipient email address.");
       return;
+    }
+
+    const subjectCheck = validateSubject(subject);
+    if (!subjectCheck.isValid) {
+      setErrorMessage(subjectCheck.error || "Please enter a valid subject line.");
+      return;
+    }
+
+    const bodyCheck = validateEmailBody(body);
+    if (!bodyCheck.isValid) {
+      setErrorMessage(bodyCheck.error || "Message body cannot be empty.");
+      return;
+    }
+
+    if (showCcBcc && ccEmail.trim()) {
+      const ccCheck = validateEmail(ccEmail, "Cc Email");
+      if (!ccCheck.isValid) {
+        setErrorMessage(ccCheck.error || "Please enter a valid Cc email address.");
+        return;
+      }
+    }
+
+    if (showCcBcc && bccEmail.trim()) {
+      const bccCheck = validateEmail(bccEmail, "Bcc Email");
+      if (!bccCheck.isValid) {
+        setErrorMessage(bccCheck.error || "Please enter a valid Bcc email address.");
+        return;
+      }
     }
 
     try {
@@ -163,9 +195,9 @@ export function FullComposeWorkspace({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          toEmail: toEmail.trim(),
-          subject: subject.trim(),
-          body: body,
+          toEmail: emailCheck.value,
+          subject: subjectCheck.value,
+          body: bodyCheck.value,
           enableTracking: enableTracking,
           attachments: attachments,
           isHtml: editorMode === "html",

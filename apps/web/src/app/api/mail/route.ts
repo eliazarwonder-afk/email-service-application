@@ -3,6 +3,7 @@ import { readDb, writeDb, StoredMessage } from "@/lib/store";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 import { sendViaCPanelExim } from "@/lib/cpanel-mail-bridge";
+import { validateEmail, validateSubject, validateEmailBody } from "@/lib/validation";
 
 export async function GET() {
   try {
@@ -30,11 +31,22 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { toEmail, subject, body: content, enableTracking, attachments = [], isHtml = false } = body;
 
-    if (!toEmail || !subject || !content) {
-      return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
+    const emailCheck = validateEmail(toEmail, "Recipient Email");
+    if (!emailCheck.isValid) {
+      return NextResponse.json({ success: false, error: emailCheck.error }, { status: 400 });
+    }
+
+    const subjectCheck = validateSubject(subject);
+    if (!subjectCheck.isValid) {
+      return NextResponse.json({ success: false, error: subjectCheck.error }, { status: 400 });
+    }
+
+    const bodyCheck = validateEmailBody(content);
+    if (!bodyCheck.isValid) {
+      return NextResponse.json({ success: false, error: bodyCheck.error }, { status: 400 });
     }
 
     const db = readDb();
