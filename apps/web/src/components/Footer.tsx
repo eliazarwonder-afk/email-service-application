@@ -138,7 +138,7 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
               </li>
               <li>
                 <Link href="/pricing" className="hover:text-[#121212] dark:hover:text-white transition-colors">
-                  vs Zoho Mail
+                  vs ProtonMail
                 </Link>
               </li>
               <li>

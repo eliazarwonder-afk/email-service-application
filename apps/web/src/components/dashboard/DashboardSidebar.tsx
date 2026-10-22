@@ -91,8 +91,10 @@ export function DashboardSidebar({
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-slate-50/80 dark:bg-[#0c1017] border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-transform duration-200 ease-in-out select-none shrink-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        className={`fixed md:relative inset-y-0 left-0 z-40 bg-slate-50/80 dark:bg-[#0c1017] border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-all duration-200 ease-in-out select-none shrink-0 ${
+          isSidebarOpen
+            ? "translate-x-0 w-64 opacity-100"
+            : "-translate-x-full md:translate-x-0 md:w-0 md:border-r-0 md:opacity-0 md:overflow-hidden pointer-events-none"
         }`}
       >
         {/* Top Section: Prominent Gmail/Zoho Compose Button */}

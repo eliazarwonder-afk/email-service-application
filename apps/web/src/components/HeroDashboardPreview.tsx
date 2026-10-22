@@ -103,7 +103,7 @@ export function HeroDashboardPreview() {
 
   const handleSendSimulated = (e: React.FormEvent) => {
     e.preventDefault();
-    setSendFeedback("Dispatched via cPanel Exim TLS 1.3 • 250 OK");
+    setSendFeedback("Dispatched via Encrypted TLS 1.3 • 250 OK");
     setTimeout(() => {
       setIsComposeOpen(false);
       setSendFeedback(null);
@@ -124,7 +124,7 @@ export function HeroDashboardPreview() {
             <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>sales@acmedesign.co</span>
-              <span className="text-slate-400 font-normal">• cPanel Mail Cluster</span>
+              <span className="text-slate-400 font-normal">• NVMe Cloud Mail Node</span>
             </div>
           </div>
 
@@ -330,7 +330,7 @@ export function HeroDashboardPreview() {
               >
                 Reply
               </button>
-              <span className="text-[11px] text-slate-400 font-mono">Direct cPanel Exim Transport</span>
+              <span className="text-[11px] text-slate-400 font-mono">Encrypted TLS 1.3 Transport</span>
             </div>
           </div>
         </div>

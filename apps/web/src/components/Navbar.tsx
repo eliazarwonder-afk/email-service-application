@@ -123,7 +123,7 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-medium text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white"
           >
-            Compare vs Google & Zoho
+            Compare vs Google
           </Link>
           <Link
             href="/pricing"

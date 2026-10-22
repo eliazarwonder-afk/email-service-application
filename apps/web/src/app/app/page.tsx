@@ -34,7 +34,7 @@ export default function WebmailAppPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<"all" | "unread" | "starred">("all");
   const [selectedMessageIds, setSelectedMessageIds] = useState<Set<string | number>>(new Set());
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileMailView, setMobileMailView] = useState<"list" | "message">("list");
 
   // Modals & Composer State
@@ -212,6 +212,9 @@ export default function WebmailAppPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      }
       const params = new URLSearchParams(window.location.search);
       const ssoToken = params.get("sso_token") || params.get("token");
       if (ssoToken) {
