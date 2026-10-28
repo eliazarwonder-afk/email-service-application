@@ -72,7 +72,7 @@ export default function SignupGatewayPage() {
         setSearchError(data.error || "Unable to check domain availability.");
       }
     } catch (err: any) {
-      setSearchError("Network error while searching domain on WHMCS.");
+      setSearchError("Network error while searching domain availability.");
     } finally {
       setIsSearchingDomain(false);
     }
@@ -118,7 +118,7 @@ export default function SignupGatewayPage() {
 
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 px-3.5 py-1 text-xs text-blue-800 dark:text-blue-300 font-medium">
             <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span>ZegaCloud WHMCS Master Provisioning Gateway</span>
+            <span>ZegaCloud Secure Provisioning Gateway</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
@@ -126,7 +126,7 @@ export default function SignupGatewayPage() {
           </h1>
 
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            Like Titan Mail and Google Workspace with web hosting partners, ZegaMail business accounts, custom domains, and DNS security are provisioned through the <strong>ZegaCloud WHMCS Master Platform</strong>.
+            Like Titan Mail and Google Workspace with web hosting partners, ZegaMail business accounts, custom domains, and DNS security are provisioned through the <strong>ZegaCloud Platform</strong>.
           </p>
         </div>
 
@@ -143,7 +143,7 @@ export default function SignupGatewayPage() {
               </p>
             </div>
             <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-full self-start sm:self-auto">
-              WHMCS Domain API Ready
+              Live DNS Cluster Ready
             </span>
           </div>
 
@@ -166,7 +166,7 @@ export default function SignupGatewayPage() {
               {isSearchingDomain ? (
                 <>
                   <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  <span>Checking WHMCS…</span>
+                  <span>Checking availability…</span>
                 </>
               ) : (
                 <>
@@ -211,7 +211,7 @@ export default function SignupGatewayPage() {
                 <p className="text-xs text-slate-600 dark:text-slate-400">
                   {domainResult.status === "available" ? (
                     <>
-                      Standard WHMCS registration:{" "}
+                      Standard registration:{" "}
                       <strong className="text-slate-900 dark:text-white">
                         {isNigeria
                           ? `₦${domainResult.priceAnnualNgn?.toLocaleString() || "17,500"}`
@@ -265,10 +265,10 @@ export default function SignupGatewayPage() {
                   Recommended For Businesses
                 </span>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  Order on ZegaCloud WHMCS
+                  Order on ZegaCloud
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Select your flat-rate email plan. Get up to 30 mailboxes, high-speed NVMe storage, and automated cPanel DNS routing from <strong>₦1,500/mo</strong> or <strong>$3.90/mo</strong> flat.
+                  Select your flat-rate email plan. Get up to 30 mailboxes, high-speed NVMe storage, and automated DNS routing from <strong>₦1,500/mo</strong> or <strong>$3.90/mo</strong> flat.
                 </p>
               </div>
 
@@ -283,7 +283,7 @@ export default function SignupGatewayPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-                  <span>Instant WHMCS quota provisioning</span>
+                  <span>Instant quota provisioning</span>
                 </li>
               </ul>
             </div>
@@ -325,7 +325,7 @@ export default function SignupGatewayPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                  <span>Synchronized with WHMCS services</span>
+                  <span>Synchronized with active services</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
@@ -404,7 +404,7 @@ export default function SignupGatewayPage() {
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <HelpCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span>Why is registration handled via ZegaCloud WHMCS?</span>
+            <span>Why is registration handled via ZegaCloud?</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             <div className="space-y-1.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800">
@@ -412,7 +412,7 @@ export default function SignupGatewayPage() {
                 1. Dedicated DNS & Reputation Protection
               </p>
               <p>
-                Unlike consumer webmail services where anyone can register disposable spam addresses, ZegaMail provisions dedicated 2048-bit DKIM keys, SPF records, and DMARC policies on our cPanel cluster for your verified company domain.
+                Unlike consumer webmail services where anyone can register disposable spam addresses, ZegaMail provisions dedicated 2048-bit DKIM keys, SPF records, and DMARC policies on our Anycast cloud cluster for your verified company domain.
               </p>
             </div>
 
@@ -421,7 +421,7 @@ export default function SignupGatewayPage() {
                 2. Unified Billing & Centralized Team Seats
               </p>
               <p>
-                Business administrators manage their invoices, team quotas, renewals, and payment methods (Paystack, Stripe, Crypto) in one unified WHMCS client dashboard without juggling multiple disjointed logins.
+                Business administrators manage their invoices, team quotas, renewals, and payment methods (Paystack, Stripe, Crypto) in one unified ZegaCloud dashboard without juggling multiple disjointed logins.
               </p>
             </div>
           </div>

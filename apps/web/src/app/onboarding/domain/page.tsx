@@ -385,7 +385,7 @@ export default function DomainOnboardingPage() {
               Register New via ZegaCloud
             </h3>
             <p className="text-[11px] text-[#706f6c] dark:text-[#9ca3af] mt-1">
-              WHMCS automated search & instant DNS provisioning with 1-click checkout.
+              Automated domain search & instant DNS provisioning with 1-click checkout.
             </p>
           </button>
 
@@ -444,7 +444,7 @@ export default function DomainOnboardingPage() {
             <div className="space-y-1">
               <h2 className="text-sm font-bold text-[#121212] dark:text-white flex items-center gap-2">
                 <Search className="h-4 w-4 text-blue-600" />
-                <span>Search Domain Availability via WHMCS API</span>
+                <span>Search Domain Availability</span>
               </h2>
               <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
                 Check real-time availability across global and Nigerian TLDs (.com, .ng, .com.ng, .org).
@@ -478,7 +478,7 @@ export default function DomainOnboardingPage() {
                   {isSearching ? (
                     <>
                       <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                      <span>Checking WHMCS…</span>
+                      <span>Checking availability…</span>
                     </>
                   ) : (
                     <>

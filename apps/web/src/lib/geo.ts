@@ -235,22 +235,23 @@ export function formatPlanPrice(
 export function detectClientRegion(): GeoLocationInfo {
   if (typeof window === "undefined") {
     return {
-      countryCode: "US",
-      countryName: "United States",
-      isAfrica: false,
-      isNigeria: false,
-      defaultCurrency: "USD",
+      countryCode: "NG",
+      countryName: "Nigeria",
+      isAfrica: true,
+      isNigeria: true,
+      defaultCurrency: "NGN",
     };
   }
 
   try {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
     const languages = navigator.languages || [navigator.language || ""];
+    const offset = new Date().getTimezoneOffset(); // in minutes, Nigeria UTC+1 is -60
 
-    const isLagos = timeZone.includes("Lagos");
-    const isAfrica = timeZone.includes("Africa") || languages.some((l) => l.includes("NG") || l.includes("GH") || l.includes("KE"));
+    const isLagos = timeZone.includes("Lagos") || timeZone.includes("Porto-Novo") || timeZone.includes("Douala") || (offset === -60 && timeZone.includes("Africa"));
+    const isAfrica = timeZone.includes("Africa") || languages.some((l) => l.includes("NG") || l.includes("GH") || l.includes("KE") || l.includes("ZA") || l.includes("EG")) || offset === -60;
 
-    if (isLagos || languages.some((l) => l.includes("NG") || l.includes("-NG"))) {
+    if (isLagos || languages.some((l) => l.includes("NG") || l.includes("-NG")) || (offset === -60 && timeZone.includes("Africa"))) {
       return {
         countryCode: "NG",
         countryName: "Nigeria",
@@ -269,15 +270,37 @@ export function detectClientRegion(): GeoLocationInfo {
         defaultCurrency: "NGN",
       };
     }
+
+    const isUk = timeZone.includes("London") || languages.some((l) => l.includes("GB") || l.includes("-GB"));
+    if (isUk) {
+      return {
+        countryCode: "GB",
+        countryName: "United Kingdom",
+        isAfrica: false,
+        isNigeria: false,
+        defaultCurrency: "GBP",
+      };
+    }
+
+    const isEurope = timeZone.includes("Europe") || languages.some((l) => l.includes("FR") || l.includes("DE") || l.includes("ES") || l.includes("IT"));
+    if (isEurope) {
+      return {
+        countryCode: "EU",
+        countryName: "Europe",
+        isAfrica: false,
+        isNigeria: false,
+        defaultCurrency: "EUR",
+      };
+    }
   } catch (e) {
     // ignore
   }
 
   return {
-    countryCode: "US",
-    countryName: "United States",
-    isAfrica: false,
-    isNigeria: false,
-    defaultCurrency: "USD",
+    countryCode: "NG",
+    countryName: "Nigeria",
+    isAfrica: true,
+    isNigeria: true,
+    defaultCurrency: "NGN",
   };
 }

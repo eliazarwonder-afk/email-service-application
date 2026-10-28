@@ -388,7 +388,7 @@ export default function WebmailAppPage() {
       const data = await res.json();
       if (data.success) {
         setDomainOrderSuccess(
-          `Domain ${whmcsSearchDomain} successfully ordered and registered under your organization profile (${data.whmcsOrderId})!`
+          `Domain ${whmcsSearchDomain} successfully ordered and registered under your organization profile (${data.orderId || data.whmcsOrderId?.replace("WHMCS-", "ZCL-") || "ZCL-DOM-ACTIVE"})!`
         );
         setCurrentDomain(data.domain);
         setTimeout(() => {

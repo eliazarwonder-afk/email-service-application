@@ -562,7 +562,7 @@ export default function PricingPage() {
             {[
               {
                 q: "Can I bring my own domain name?",
-                a: "Yes. You can connect any domain from GoDaddy, Namecheap, Cloudflare, NameSilo, or WHMCS. We provide one-click DNS records (MX, SPF, 2048-bit DKIM, and DMARC) that set up in under 2 minutes.",
+                a: "Yes. You can connect any domain from GoDaddy, Namecheap, Cloudflare, NameSilo, or your preferred registrar. We provide one-click DNS records (MX, SPF, 2048-bit DKIM, and DMARC) that set up in under 2 minutes.",
               },
               {
                 q: "How does the flat-rate pricing work?",

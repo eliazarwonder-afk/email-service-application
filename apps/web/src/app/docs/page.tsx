@@ -26,7 +26,7 @@ interface ApiEndpoint {
   path: string;
   title: string;
   category: string;
-  auth: "Public" | "Session Cookie" | "Bearer / Cron Token" | "WHMCS Secret / HMAC";
+  auth: "Public" | "Session Cookie" | "Bearer / Cron Token" | "Portal Secret / HMAC";
   description: string;
   sampleBody?: string;
   sampleCurl: string;
@@ -62,10 +62,10 @@ const ENDPOINTS: ApiEndpoint[] = [
     id: "mail-send",
     method: "POST",
     path: "/api/mail",
-    title: "Dispatch Email via cPanel Exim Bridge",
+    title: "Dispatch Email via Enterprise Mail Bridge",
     category: "Mail Transport",
     auth: "Session Cookie",
-    description: "Dispatches live outbound mail via direct TLS 1.3 cPanel SMTP with RFC 3461 DSN delivery notification acknowledgement (250 OK).",
+    description: "Dispatches live outbound mail via direct TLS 1.3 SMTP with RFC 3461 DSN delivery notification acknowledgement (250 OK).",
     sampleBody: JSON.stringify(
       {
         to: "recipient@company.com",
@@ -97,7 +97,7 @@ const ENDPOINTS: ApiEndpoint[] = [
     title: "Create Subscription Order & Crypto Invoice",
     category: "Billing & Cryptocurrency",
     auth: "Session Cookie",
-    description: "Creates a WHMCS billing order for Starter, Growth, or Pro plans, generating high-precision receiving deposit addresses across TRON, BTC, ETH, and SOL.",
+    description: "Creates a billing order for Starter, Growth, or Pro plans, generating high-precision receiving deposit addresses across TRON, BTC, ETH, and SOL.",
     sampleBody: JSON.stringify(
       {
         planId: "growth",
@@ -117,7 +117,7 @@ const ENDPOINTS: ApiEndpoint[] = [
     title: "List Orders & Invoices",
     category: "Billing & Cryptocurrency",
     auth: "Session Cookie",
-    description: "Lists all WHMCS-registered orders, associated invoices, and cryptocurrency settlement statuses.",
+    description: "Lists all registered orders, associated invoices, and cryptocurrency settlement statuses.",
     sampleCurl: `curl -X GET https://mail.zegacloud.com/api/billing/orders \\\n  --cookie "zega_session=ses_YOUR_TOKEN"`,
     sampleFetch: `fetch('/api/billing/orders').then(r => r.json());`,
   },
@@ -136,10 +136,10 @@ const ENDPOINTS: ApiEndpoint[] = [
     id: "whmcs-order-verify",
     method: "POST",
     path: "/api/internal/v1/whmcs/order-verify",
-    title: "WHMCS Webhook: Activate Order & Service",
-    category: "WHMCS Integration",
-    auth: "WHMCS Secret / HMAC",
-    description: "Internal webhook called by the WHMCS server module or addon to immediately activate and provision an organization upon payment.",
+    title: "Billing Webhook: Activate Order & Service",
+    category: "Billing & Portal Integration",
+    auth: "Portal Secret / HMAC",
+    description: "Internal webhook called by the central client portal module or addon to immediately activate and provision an organization upon payment.",
     sampleBody: JSON.stringify({ orderId: "ord_init_002" }, null, 2),
     sampleCurl: `curl -X POST https://mail.zegacloud.com/api/internal/v1/whmcs/order-verify \\\n  -H "Content-Type: application/json" \\\n  -H "x-zegabytez-whmcs-secret: super_secret_whmcs_webhook_token" \\\n  -d '{"orderId":"ord_init_002"}'`,
     sampleFetch: `fetch('/api/internal/v1/whmcs/order-verify', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'x-zegabytez-whmcs-secret': 'super_secret_whmcs_webhook_token'\n  },\n  body: JSON.stringify({ orderId: 'ord_init_002' })\n});`,
@@ -268,7 +268,7 @@ export default function ApiDocumentationPage() {
                 <strong className="text-slate-300">Cron / RPC:</strong> <code className="text-cyan-300">Bearer &lt;token&gt;</code>
               </li>
               <li>
-                <strong className="text-slate-300">WHMCS Module:</strong> <code className="text-cyan-300">x-zegabytez-whmcs-secret</code>
+                <strong className="text-slate-300">Portal Module:</strong> <code className="text-cyan-300">x-zegabytez-portal-secret</code>
               </li>
             </ul>
           </div>

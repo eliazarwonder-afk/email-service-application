@@ -331,7 +331,7 @@ export default function LoginPage() {
                 className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/50 px-4 py-2.5 text-xs font-semibold text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors shadow-sm"
               >
                 <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Sign In with ZegaCloud (1-Click Client SSO)</span>
+                <span>Sign In with ZegaCloud Account</span>
               </button>
             </div>
           </div>

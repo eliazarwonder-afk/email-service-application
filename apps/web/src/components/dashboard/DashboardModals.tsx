@@ -217,7 +217,7 @@ export function DashboardModals({
                 required
                 error={domainInputTouched && !domainVal.isValid ? domainVal.error : null}
                 isValid={domainInputTouched && domainVal.isValid}
-                helperText={!domainInputTouched ? "Check real-time availability via WHMCS Anycast DNS" : undefined}
+                helperText={!domainInputTouched ? "Check real-time availability across Global Anycast DNS" : undefined}
               >
                 <div className="flex gap-2">
                   <input

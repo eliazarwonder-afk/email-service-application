@@ -12,22 +12,24 @@ interface CurrencyContextType {
 }
 
 const CurrencyContext = createContext<CurrencyContextType>({
-  currency: "USD",
+  currency: "NGN",
   setCurrency: () => {},
-  symbol: "$",
-  isAfrica: false,
-  isNigeria: false,
+  symbol: "₦",
+  isAfrica: true,
+  isNigeria: true,
 });
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<SupportedCurrency>("USD");
-  const [isAfrica, setIsAfrica] = useState(false);
-  const [isNigeria, setIsNigeria] = useState(false);
+  const [currency, setCurrencyState] = useState<SupportedCurrency>("NGN");
+  const [isAfrica, setIsAfrica] = useState(true);
+  const [isNigeria, setIsNigeria] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("zegamail_currency") as SupportedCurrency | null;
     if (saved && ["USD", "NGN", "EUR", "GBP"].includes(saved)) {
       setCurrencyState(saved);
+      setIsNigeria(saved === "NGN");
+      setIsAfrica(saved === "NGN");
     } else {
       const geo = detectClientRegion();
       setCurrencyState(geo.defaultCurrency);

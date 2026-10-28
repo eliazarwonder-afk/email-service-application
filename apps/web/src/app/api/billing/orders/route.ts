@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Transaction hash recorded. WHMCS admin notified for confirmation.",
+      message: "Transaction hash recorded. Billing administrator notified for confirmation.",
       order: updated,
     });
   } catch (err: any) {

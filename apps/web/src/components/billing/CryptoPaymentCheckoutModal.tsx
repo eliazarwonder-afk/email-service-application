@@ -185,12 +185,12 @@ export function CryptoPaymentCheckoutModal({
             </div>
             <div>
               <h3 className="font-semibold text-sm">
-                {step === "select" && "Upgrade Plan & WHMCS Billing Checkout"}
+                {step === "select" && "Upgrade Plan & Billing Checkout"}
                 {step === "pay" && "Awaiting Crypto Payment"}
                 {step === "confirmed" && "Order & Payment Confirmed"}
               </h3>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                Managed via WHMCS Server Module • 2048-bit Encrypted
+                ZegaCloud Secure Billing • 2048-bit Encrypted
               </p>
             </div>
           </div>
@@ -276,7 +276,7 @@ export function CryptoPaymentCheckoutModal({
               {/* Payment Gateways Selection */}
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  Select Payment Method (Controlled &amp; Managed in WHMCS)
+                  Select Payment Method
                 </label>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
@@ -371,7 +371,7 @@ export function CryptoPaymentCheckoutModal({
                 {isSubmitting ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    <span>Registering Order in WHMCS…</span>
+                    <span>Generating Secure Order…</span>
                   </>
                 ) : (
                   <>
@@ -390,7 +390,7 @@ export function CryptoPaymentCheckoutModal({
                 <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
                   <Clock className="h-4 w-4 shrink-0" />
                   <span>
-                    WHMCS Order <strong>{orderData.orderNumber}</strong> • Invoice <strong>{orderData.invoiceId}</strong>
+                    Order <strong>{orderData.orderNumber?.replace("WHMCS-", "ZCL-")}</strong> • Invoice <strong>{orderData.invoiceId?.replace("WHMCS-", "ZCL-")}</strong>
                   </span>
                 </div>
                 <span className="font-mono text-[11px] bg-amber-200/50 dark:bg-amber-900 px-2 py-0.5 rounded font-bold text-amber-900 dark:text-amber-200">
@@ -487,7 +487,7 @@ export function CryptoPaymentCheckoutModal({
                 {txConfirmed && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 mt-1">
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    Transaction recorded! WHMCS module admin has been notified for confirmation.
+                    Transaction recorded! Billing administrator has been notified for verification.
                   </p>
                 )}
               </form>
@@ -502,7 +502,7 @@ export function CryptoPaymentCheckoutModal({
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold hover:bg-emerald-600/20"
                 >
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span>Simulate WHMCS Admin Confirmation</span>
+                  <span>Simulate Instant Confirmation</span>
                 </button>
               </div>
             </div>
@@ -526,11 +526,11 @@ export function CryptoPaymentCheckoutModal({
               <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#161a25] border border-neutral-200 dark:border-neutral-800 text-xs max-w-xs mx-auto text-left space-y-1 font-mono">
                 <div className="flex justify-between">
                   <span className="text-neutral-400">Order:</span>
-                  <span className="font-semibold">{orderData?.orderNumber || "WHMCS-ORD-2026-9482"}</span>
+                  <span className="font-semibold">{orderData?.orderNumber?.replace("WHMCS-", "ZCL-") || "ZCL-ORD-2026-9482"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-neutral-400">Invoice:</span>
-                  <span className="font-semibold">{orderData?.invoiceId || "WHMCS-INV-10942"}</span>
+                  <span className="font-semibold">{orderData?.invoiceId?.replace("WHMCS-", "ZCL-") || "ZCL-INV-10942"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-neutral-400">Status:</span>

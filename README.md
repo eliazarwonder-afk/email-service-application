@@ -1,17 +1,18 @@
 <p align="center">
-  <img src="apps/web/public/branding/zegamail-dark-transparent.png" alt="ZegaMail" width="340" />
+  <img src="apps/web/public/branding/zegamail-dark-transparent.png#gh-dark-mode-only" alt="ZegaMail" width="340" />
+  <img src="apps/web/public/branding/zegamail-light-transparent.png#gh-light-mode-only" alt="ZegaMail" width="340" />
 </p>
 
-<h1 align="center">ZegaMail — Modern Business Email, AI Outreach & Web Host Cloud Platform</h1>
+<h1 align="center">ZegaMail — Modern Business Email, AI Outreach & Cloud Mail Platform</h1>
 
 <p align="center">
-  <strong>The open, self-hostable alternative to Google Workspace & Titan Mail, built for web hosts and agencies.</strong><br>
-  Replace outdated, boring cPanel webmail (Roundcube / Horde) with an ultra-fast, AI-driven business email client backed by <strong>cPanel UAPI</strong>, <strong>WHM</strong>, and <strong>WHMCS</strong> billing automation.
+  <strong>The modern, flat-rate alternative to Google Workspace & Titan Mail, built for businesses, web hosts, and agencies.</strong><br>
+  Deliver ultra-fast, AI-driven business email backed by high-performance <strong>Cloud Mail Clusters</strong>, <strong>Global Anycast DNS</strong>, and <strong>ZegaCloud Client Portal</strong> billing automation.
 </p>
 
 <p align="center">
-  <a href="https://cpanel.net"><img src="https://img.shields.io/badge/cPanel_API-UAPI_v2-FF6C2C?style=for-the-badge&logo=cpanel&logoColor=white" alt="cPanel" /></a>
-  <a href="https://whmcs.com"><img src="https://img.shields.io/badge/WHMCS_Module-Server_Provisioning-51647a?style=for-the-badge&logo=whmcs&logoColor=white" alt="WHMCS" /></a>
+  <img src="https://img.shields.io/badge/Cloud_Mail-Cluster_Engine-0066FF?style=for-the-badge&logoColor=white" alt="Cloud Mail" />
+  <img src="https://img.shields.io/badge/ZegaCloud_Portal-Billing_&_SSO-00C49F?style=for-the-badge&logoColor=white" alt="Portal Billing" />
   <a href="https://coolify.io"><img src="https://img.shields.io/badge/Coolify_v4-1--Click_Deploy-6B21A8?style=for-the-badge&logo=coolify&logoColor=white" alt="Coolify" /></a>
   <a href="https://docker.com"><img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" /></a>
   <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js_15-App_Router-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" /></a>
@@ -25,18 +26,16 @@
 
 ## 💡 Why ZegaMail?
 
-Every web hosting provider and digital agency already pays for cPanel, Exim, and Dovecot mail servers. Yet, clients constantly defect to Google Workspace or Microsoft 365 (paying **\$6–\$18/user/month**) for one single reason:
+Businesses and digital agencies constantly overpay Google Workspace or Microsoft 365 (**\$6–\$18/user/month** per seat) because legacy webmail interfaces feel outdated and unbranded.
 
-> **cPanel’s bundled webmail (Roundcube / Horde) feels like software from 2005.**
+ZegaMail transforms standard cloud servers into a modern, revenue-generating enterprise email product:
 
-ZegaMail transforms your existing cPanel server into a modern, revenue-generating email product:
-
-* 🚀 **Gmail / Titan Mail User Experience**: Fast, responsive webmail interface with real-time push notifications and dark mode.
+* 🚀 **Fast, Modern Webmail Experience**: Responsive, keyboard-first webmail interface with real-time push notifications and dark mode.
 * 🤖 **Zega AI Outreach Studio**: Built-in AI proposal writer, cold email sequences, and high-converting smart replies.
-* 👁️ **Delivery Status Ticks (Sent ✓ / Delivered ✓✓)**: Zoho/Gmail style delivery confirmation that verifies messages reached the recipient mail server via RFC 3461 DSN.
-* ⚡ **cPanel UAPI Provisioning**: Automatically creates mailboxes, assigns quotas, and manages DKIM/SPF DNS records.
-* 💼 **WHMCS Server Module**: 1-click install into WHMCS with automated service provisioning, invoice billing, and tokenized client area Single Sign-On (SSO).
-* 🔒 **AES-256-GCM Credential Vault**: User SaaS credentials are cryptographically decoupled from raw IMAP/SMTP passwords.
+* 👁️ **Delivery Status Ticks (Sent ✓ / Delivered ✓✓)**: Guaranteed delivery confirmation that verifies messages reached recipient mail servers via RFC 3461 DSN.
+* ⚡ **Automated Mailbox Provisioning**: Instantly provisions mailboxes, allocates storage pools, and configures DKIM/SPF/DMARC records.
+* 💼 **ZegaCloud Client Portal Integration**: Seamless integration with automated service provisioning, invoice billing, and tokenized Client Area Single Sign-On (SSO).
+* 🔒 **AES-256-GCM Credential Vault**: User SaaS credentials are cryptographically decoupled from raw IMAP/SMTP cluster passwords.
 
 ---
 
@@ -47,7 +46,7 @@ flowchart TB
     subgraph ClientLayer["Frontend & Client Layer"]
         Browser["Next.js 15 Webmail Client<br/>(Port 3000)"]
         Mobile["Mobile & Desktop Clients<br/>(iOS, Android, Outlook)"]
-        WHMCSClient["WHMCS Client Portal<br/>(1-Click SSO Button)"]
+        PortalClient["ZegaCloud Client Portal<br/>(1-Click SSO Button)"]
     end
 
     subgraph ServiceLayer["Application & API Layer"]
@@ -58,19 +57,19 @@ flowchart TB
     end
 
     subgraph InfraLayer["Hosting & Mail Infrastructure"]
-        cPanel["cPanel UAPI Engine<br/>(Email::add_pop, Quotas, DKIM)"]
-        WHM["WHM JSON-API<br/>(Account Creation, Suspensions)"]
+        MailCluster["Cloud Mail Cluster<br/>(Mailbox Provisioning, Quotas, DKIM)"]
+        HostCluster["Cloud Infrastructure<br/>(Cluster Accounts, Quota Scaling)"]
         EximDovecot["Exim (SMTP :465) &<br/>Dovecot (IMAP :993)"]
     end
 
     Browser -->|HTTP / Better Auth| API
-    WHMCSClient -->|Signed SSO Token| API
+    PortalClient -->|Signed SSO Token| API
     Mobile -->|SSL IMAP / SMTP| EximDovecot
     API -->|Read / Write| DB
     API -->|Enqueue Jobs| Redis
     Worker -->|Process Queues| Redis
-    Worker -->|UAPI Calls| cPanel
-    API -->|WHM Calls| WHM
+    Worker -->|Cluster API Calls| MailCluster
+    API -->|Infrastructure Calls| HostCluster
     API -->|IMAP / SMTP Bridge| EximDovecot
 ```
 
@@ -82,20 +81,20 @@ flowchart TB
 email service application/
 ├── apps/
 │   ├── api/                     # Fastify modular backend monolith (Port 4000)
-│   ├── worker/                  # BullMQ background queue worker for async cPanel jobs
+│   ├── worker/                  # BullMQ background queue worker for async provisioning
 │   └── web/                     # Next.js 15 modern webmail & admin client (Port 3000)
 ├── packages/
 │   ├── database/                # PostgreSQL schema & Drizzle ORM migrations
-│   ├── mail-core/               # cPanel UAPI client, WHM client, AES-GCM crypto, IMAP/SMTP
+│   ├── mail-core/               # Cluster Mail API client, AES-GCM crypto, IMAP/SMTP
 │   └── shared/                  # Common TypeScript types, DTOs & validation schemas
 ├── coolify/
 │   └── docker-compose.coolify.yml # Production 1-Click Deployable Stack for Coolify v4
 ├── whmcs-module/
-│   └── modules/servers/zegabytezmail/ # Native WHMCS Server Provisioning Module
+│   └── modules/servers/zegabytezmail/ # Native Client Portal Server Provisioning Module
 ├── scripts/
 │   ├── dev-mobile.js            # LAN discovery & public mobile tunnel generator
 │   └── test-live-site.js        # Automated Playwright browser verification suite
-├── CPANEL_WHMCS_INTEGRATION.md  # Detailed cPanel UAPI & WHMCS technical architecture guide
+├── CPANEL_WHMCS_INTEGRATION.md  # Detailed cluster mail & client portal architecture guide
 └── docker-compose.yml           # Local dev database and Redis stack
 ```
 
@@ -127,7 +126,7 @@ REDIS_URL="redis://localhost:6379"
 BETTER_AUTH_SECRET="your_random_32_character_secret_key"
 ENCRYPTION_MASTER_KEY="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
-# cPanel UAPI & WHM Credentials (uses built-in mock mode when set to localhost)
+# Mail Cluster & API Credentials (uses built-in mock mode when set to localhost)
 CPANEL_HOST="localhost"
 CPANEL_USERNAME="cpanel_user"
 CPANEL_API_TOKEN="your_cpanel_api_token"
@@ -179,25 +178,24 @@ Coolify will provision:
 * `mail-db`: PostgreSQL 16 with persistent volume `zegamail_pgdata`.
 * `mail-redis`: Redis 7 with password-protected persistent volume `zegamail_redisdata`.
 * `mail-api`: Fastify API with automatic Traefik SSL routing.
-* `mail-worker`: Queue processor for background cPanel provisioning.
+* `mail-worker`: Queue processor for background mailbox provisioning.
 * `mail-web`: Next.js 15 SSR frontend with CDN caching.
 
 ---
 
-## 🔌 cPanel & WHMCS Integration Guide
+## 🔌 Cloud Infrastructure & Client Portal Integration
 
-For the complete technical blueprint, API endpoint mappings, and WHMCS module configuration, see our dedicated guide:
+For full technical blueprints, API endpoint mappings, and automated client portal provisioning, see the integration docs:
 👉 **[CPANEL_WHMCS_INTEGRATION.md](file:///CPANEL_WHMCS_INTEGRATION.md)**
 
-### Quick WHMCS Module Setup:
-1. Copy the module to your WHMCS server:
+### Automated Client Portal Provisioning:
+1. Deploy the mail provisioning module to your billing environment:
    ```bash
-   cp -r whmcs-module/modules/servers/zegabytezmail /path/to/whmcs/modules/servers/
+   cp -r whmcs-module/modules/servers/zegabytezmail /path/to/modules/servers/
    ```
-2. In WHMCS Admin, go to **Setup > Products/Services > Products/Services**.
-3. Create or edit an Email product and select **Zegabytez Mail** as the Module Name.
-4. Input your `API URL` and `Webhook Secret`.
-5. Save. Upon payment, WHMCS automatically provisions the mailbox in cPanel and links the client account.
+2. In the Portal Administrator panel, configure the Email product to use the automated provisioning service.
+3. Input your `API URL` and `Webhook Secret`.
+4. Save. Upon order completion, the cluster automatically provisions the mailbox and activates instant Single Sign-On (SSO).
 
 ---
 
@@ -220,10 +218,9 @@ node scripts/test-live-site.js
 * **License**: MIT License — open, extensible, and white-label ready.
 * **Roadmap**:
   * [x] Next.js 15 Webmail Interface with Delivery Status Ticks & AI Studio
-  * [x] cPanel UAPI Mailbox Provisioning (`Email::add_pop`, Quotas, DKIM)
-  * [x] WHM Hosting Account Automation (`createacct`, `suspendacct`)
-  * [x] Native WHMCS Server Provisioning Module with 1-Click SSO
+  * [x] Cloud Mailbox Provisioning (`Email::add_pop`, Quotas, DKIM)
+  * [x] Cluster Account Infrastructure Automation
+  * [x] Native Client Portal Server Provisioning Module with 1-Click SSO
   * [x] Coolify v4 Docker Compose Production Stack
   * [x] Comprehensive Automated Playwright Browser Testing Suite
-  * [ ] DirectAdmin & Plesk Provisioning Adapters
   * [ ] Mobile Push Notification Gateway (APNs / FCM)

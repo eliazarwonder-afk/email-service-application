@@ -281,7 +281,7 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
                       </span>
                     </h2>
                     <p className="text-xs text-neutral-400 font-mono mt-0.5">
-                      Domain Record: #{dom.whmcsOrderId || "ZCL-DOM-90214"} • DNS Cluster: ZegaCloud Global Anycast
+                      Domain Record: #{dom.whmcsOrderId?.replace("WHMCS-", "ZCL-") || "ZCL-DOM-90214"} • DNS Cluster: ZegaCloud Global Anycast
                     </p>
                   </div>
                 </div>

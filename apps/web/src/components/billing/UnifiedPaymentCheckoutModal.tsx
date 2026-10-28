@@ -305,7 +305,7 @@ export function UnifiedPaymentCheckoutModal({
                   : "Subscription Activated!"}
               </h2>
               <p className="text-[11px] text-slate-500 font-mono">
-                WHMCS Billing &bull; Encrypted TLS 1.3 &bull; Instant Mailbox Quota Allocation
+                ZegaCloud Secure Billing &bull; Encrypted TLS 1.3 &bull; Instant Mailbox Allocation
               </p>
             </div>
           </div>
@@ -838,7 +838,7 @@ export function UnifiedPaymentCheckoutModal({
                 Payment Confirmed & Account Activated!
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Your business email quota has been allocated on ZegaCloud WHMCS. Redirecting to your mailbox…
+                Your business email quota has been allocated on ZegaCloud. Redirecting to your mailbox…
               </p>
             </div>
           )}

@@ -37,7 +37,7 @@ export async function GET(req: Request) {
   } catch (err: any) {
     console.error("Domain search error:", err);
     return NextResponse.json(
-      { success: false, error: err.message || "Failed to search domain via WHMCS." },
+      { success: false, error: err.message || "Failed to search domain availability." },
       { status: 500 }
     );
   }

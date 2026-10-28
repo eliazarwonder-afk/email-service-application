@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       success: true,
       redirectUrl: ssoResult.redirectUrl,
       clientEmail,
-      message: "One-Click SSO session initialized for ZegaCloud WHMCS Client Area.",
+      message: "One-Click SSO session initialized for ZegaCloud Client Portal.",
     });
   } catch (err: any) {
     console.error("WHMCS SSO error:", err);
