@@ -84,7 +84,7 @@ async function runTests() {
 
     // 3. Test Dashboard Compose Form Validation
     console.log("\n[Test 3] Testing /app webmail composer validations...");
-    await page.goto("http://localhost:3000/app", { waitUntil: "networkidle" });
+    await page.goto("http://localhost:3000/app", { waitUntil: "domcontentloaded" });
 
     // Check compose button
     const composeBtn = page.locator('button:has-text("Compose")').first();
