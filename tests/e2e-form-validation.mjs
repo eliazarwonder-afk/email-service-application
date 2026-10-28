@@ -23,6 +23,7 @@ async function runTests() {
     // 1. Test Login Form Validation
     console.log("\n[Test 1] Testing /login field validations & feedback...");
     await page.goto("http://localhost:3000/login", { waitUntil: "networkidle" });
+    await page.waitForSelector('#email');
 
     // Find email and password inputs
     const emailInput = page.locator('input[type="email"]');
@@ -35,7 +36,7 @@ async function runTests() {
     // Enter invalid email
     await emailInput.fill("not-an-email");
     await emailInput.blur();
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
 
     // Verify error banner or validation message appears
     const emailError = page.locator('text=/Please enter a valid email address/i');
@@ -105,6 +106,7 @@ async function runTests() {
 
     // 4. Test API Server-side validation parity directly via fetch
     console.log("\n[Test 4] Testing API server-side validation & injection prevention...");
+    await page.goto("about:blank");
     
     // Login API rejection of invalid email
     const loginRes = await page.request.post("http://localhost:3000/api/auth/login", {

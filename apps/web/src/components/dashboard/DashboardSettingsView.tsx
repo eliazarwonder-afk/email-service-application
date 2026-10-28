@@ -18,7 +18,8 @@ import {
   Trash2,
   CheckCircle2,
   Calendar,
-  AtSign
+  AtSign,
+  ExternalLink
 } from "lucide-react";
 import { sanitizeText } from "@/lib/validation";
 
@@ -349,25 +350,40 @@ export function DashboardSettingsView({
 
           {/* Team Members & Mailbox Quotas */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1017] p-5 sm:p-6 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <UserPlus className="h-4 w-4 text-blue-600" />
-                  <span>Team Mailboxes &amp; Quotas</span>
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Allocate dedicated storage quotas and RBAC roles across team accounts.
-                </p>
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <UserPlus className="h-4 w-4 text-blue-600" />
+                    <span>Team Mailboxes &amp; Quotas</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    View active team mailboxes provisioned for your company domain.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href="https://billing.zegacloud.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-semibold shadow-xs transition-all self-start sm:self-auto"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>Manage in ZegaCloud Portal</span>
+                  </a>
+                </div>
               </div>
 
-              <button
-                type="button"
-                onClick={onOpenAddMemberModal}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-semibold shadow-xs transition-all self-start sm:self-auto"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Provision Member</span>
-              </button>
+              {/* Cloud Provisioning Architecture Notice */}
+              <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60 text-xs text-blue-900 dark:text-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-start sm:items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5 sm:mt-0" />
+                  <span>
+                    <strong>Titan-Style Mailbox Architecture:</strong> New mailboxes (e.g. <code>support@acmedesign.co</code>), domain additions, and subscription upgrades are managed centrally via the <strong>ZegaCloud Client Area</strong>. Each mailbox receives dedicated login credentials for webmail.
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">

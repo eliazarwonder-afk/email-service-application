@@ -25,6 +25,7 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { HeroDashboardPreview } from "@/components/HeroDashboardPreview";
+import { MailDeliveryHeroAnimation } from "@/components/MailDeliveryHeroAnimation";
 import { ClientSetupModal } from "@/components/ClientSetupModal";
 import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { useCurrency } from "@/components/CurrencyProvider";
@@ -167,6 +168,9 @@ export default function HomePage() {
               </span>
             </div>
           </div>
+
+          {/* Live Delivery Telemetry Animation */}
+          <MailDeliveryHeroAnimation />
 
           {/* Interactive Webmail Interface Preview */}
           <HeroDashboardPreview />

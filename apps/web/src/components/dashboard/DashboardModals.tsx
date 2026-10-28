@@ -25,16 +25,16 @@ interface DashboardModalsProps {
   // Mobile / Client Setup Modal
   isClientModalOpen: boolean;
   onCloseClientModal: () => void;
-  // Domain Search & Order Modal
-  isWhmcsDomainModalOpen: boolean;
-  onCloseWhmcsDomainModal: () => void;
-  whmcsSearchDomain: string;
-  setWhmcsSearchDomain: (val: string) => void;
-  whmcsDomainAvailable: boolean | null;
-  isOrderingDomain: boolean;
-  domainOrderSuccess: string;
-  onOrderWhmcsDomain: (e: React.FormEvent) => void;
-  onSearchWhmcsDomain: (domain: string) => void;
+  // Domain Search & Order Modal (Optional)
+  isWhmcsDomainModalOpen?: boolean;
+  onCloseWhmcsDomainModal?: () => void;
+  whmcsSearchDomain?: string;
+  setWhmcsSearchDomain?: (val: string) => void;
+  whmcsDomainAvailable?: boolean | null;
+  isOrderingDomain?: boolean;
+  domainOrderSuccess?: string;
+  onOrderWhmcsDomain?: (e: React.FormEvent) => void;
+  onSearchWhmcsDomain?: (domain: string) => void;
   // New Custom Folder Modal
   isNewFolderModalOpen: boolean;
   onCloseNewFolderModal: () => void;
@@ -62,15 +62,15 @@ interface DashboardModalsProps {
 export function DashboardModals({
   isClientModalOpen,
   onCloseClientModal,
-  isWhmcsDomainModalOpen,
-  onCloseWhmcsDomainModal,
-  whmcsSearchDomain,
-  setWhmcsSearchDomain,
-  whmcsDomainAvailable,
-  isOrderingDomain,
-  domainOrderSuccess,
-  onOrderWhmcsDomain,
-  onSearchWhmcsDomain,
+  isWhmcsDomainModalOpen = false,
+  onCloseWhmcsDomainModal = () => {},
+  whmcsSearchDomain = "",
+  setWhmcsSearchDomain = () => {},
+  whmcsDomainAvailable = null,
+  isOrderingDomain = false,
+  domainOrderSuccess = "",
+  onOrderWhmcsDomain = () => {},
+  onSearchWhmcsDomain = () => {},
   isNewFolderModalOpen,
   onCloseNewFolderModal,
   newFolderName,

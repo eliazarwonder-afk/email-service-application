@@ -18,7 +18,6 @@ import { DashboardModals } from "@/components/dashboard/DashboardModals";
 
 import { CampaignsWorkspace } from "@/components/campaigns/CampaignsWorkspace";
 import { FullComposeWorkspace } from "@/components/mail/FullComposeWorkspace";
-import { DomainsWorkspace } from "@/components/domains/DomainsWorkspace";
 import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { MailboxSkeletonLoader } from "@/components/mail/MailboxSkeletonLoader";
 
@@ -26,9 +25,7 @@ export default function WebmailAppPage() {
   const router = useRouter();
 
   // Active Workspace Tab & Layout State
-  const [activeTab, setActiveTab] = useState<
-    "mail" | "ai" | "campaigns" | "contacts" | "domains" | "settings"
-  >("mail");
+  const [activeTab, setActiveTab] = useState<"mail" | "ai" | "campaigns" | "contacts" | "settings">("mail");
   const [selectedFolder, setSelectedFolder] = useState<string>("inbox");
   const [selectedMessageId, setSelectedMessageId] = useState<string | number>("msg_1");
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,7 +38,6 @@ export default function WebmailAppPage() {
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [isFullComposeOpen, setIsFullComposeOpen] = useState(false);
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
-  const [isWhmcsDomainModalOpen, setIsWhmcsDomainModalOpen] = useState(false);
   const [isNewMailboxModalOpen, setIsNewMailboxModalOpen] = useState(false);
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
@@ -84,12 +80,6 @@ export default function WebmailAppPage() {
   const [generatedAiEmail, setGeneratedAiEmail] = useState(
     `Subject: Quick observation on HyperScale Tech's web infrastructure\n\nHi David,\n\nI noticed HyperScale Tech recently announced your European expansion—congratulations on the milestone!\n\nGrowing traffic often introduces unexpected latency and mail deliverability spikes. We built dedicated hybrid mail infrastructure that maintains guaranteed 99.99% inbox placement without paying $7/seat enterprise penalties.\n\nWould you be open to a 10-minute sync this Thursday at 3:00 PM to review a quick deliverability diagnostic we ran for your domain?\n\nBest regards,\nAlex Carter\nAcme Creative Studio`
   );
-
-  // WHMCS Domain Search State
-  const [whmcsSearchDomain, setWhmcsSearchDomain] = useState("");
-  const [whmcsDomainAvailable, setWhmcsDomainAvailable] = useState<boolean | null>(null);
-  const [isOrderingDomain, setIsOrderingDomain] = useState(false);
-  const [domainOrderSuccess, setDomainOrderSuccess] = useState("");
 
   // Settings Workspace: Admin vs Member Perspective View
   const [settingsPerspective, setSettingsPerspective] = useState<"admin" | "member">("admin");
@@ -373,43 +363,6 @@ export default function WebmailAppPage() {
     }
   };
 
-  const handleOrderWhmcsDomain = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsOrderingDomain(true);
-    setDomainOrderSuccess("");
-
-    try {
-      const res = await fetch("/api/domains/whmcs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domainName: whmcsSearchDomain }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setDomainOrderSuccess(
-          `Domain ${whmcsSearchDomain} successfully ordered and registered under your organization profile (${data.orderId || data.whmcsOrderId?.replace("WHMCS-", "ZCL-") || "ZCL-DOM-ACTIVE"})!`
-        );
-        setCurrentDomain(data.domain);
-        setTimeout(() => {
-          setIsWhmcsDomainModalOpen(false);
-          setDomainOrderSuccess("");
-          setWhmcsSearchDomain("");
-          setWhmcsDomainAvailable(null);
-        }, 1500);
-      }
-    } catch (err) {
-      alert("Domain ordering error");
-    } finally {
-      setIsOrderingDomain(false);
-    }
-  };
-
-  const handleSearchWhmcsDomain = (domain: string) => {
-    if (!domain) return;
-    setWhmcsDomainAvailable(true);
-  };
-
   const handleCreateFolder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFolderName.trim()) return;
@@ -575,7 +528,6 @@ export default function WebmailAppPage() {
         currentUser={currentUser}
         currentOrg={currentOrg}
         onOpenClientModal={() => setIsClientModalOpen(true)}
-        onOpenDomainModal={() => setIsWhmcsDomainModalOpen(true)}
         onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
         onLogout={handleLogout}
         onSwitchPersona={handleSwitchDemoPersona}
@@ -752,14 +704,6 @@ export default function WebmailAppPage() {
             />
           )}
 
-          {/* TAB 5: DOMAINS & ENTERPRISE DNS WORKSPACE */}
-          {activeTab === "domains" && (
-            <DomainsWorkspace
-              initialDomains={currentDomain ? [currentDomain] : []}
-              onMailboxOpen={() => setIsNewMailboxModalOpen(true)}
-            />
-          )}
-
           {/* TAB 6: SETTINGS & TEAM MANAGEMENT */}
           {activeTab === "settings" && (
             <DashboardSettingsView
@@ -906,15 +850,6 @@ export default function WebmailAppPage() {
       <DashboardModals
         isClientModalOpen={isClientModalOpen}
         onCloseClientModal={() => setIsClientModalOpen(false)}
-        isWhmcsDomainModalOpen={isWhmcsDomainModalOpen}
-        onCloseWhmcsDomainModal={() => setIsWhmcsDomainModalOpen(false)}
-        whmcsSearchDomain={whmcsSearchDomain}
-        setWhmcsSearchDomain={setWhmcsSearchDomain}
-        whmcsDomainAvailable={whmcsDomainAvailable}
-        isOrderingDomain={isOrderingDomain}
-        domainOrderSuccess={domainOrderSuccess}
-        onOrderWhmcsDomain={handleOrderWhmcsDomain}
-        onSearchWhmcsDomain={handleSearchWhmcsDomain}
         isNewFolderModalOpen={isNewFolderModalOpen}
         onCloseNewFolderModal={() => setIsNewFolderModalOpen(false)}
         newFolderName={newFolderName}

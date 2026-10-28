@@ -28,8 +28,8 @@ interface CustomFolder {
 }
 
 interface DashboardSidebarProps {
-  activeTab: "mail" | "ai" | "campaigns" | "contacts" | "domains" | "settings";
-  setActiveTab: (tab: "mail" | "ai" | "campaigns" | "contacts" | "domains" | "settings") => void;
+  activeTab: "mail" | "ai" | "campaigns" | "contacts" | "settings";
+  setActiveTab: (tab: "mail" | "ai" | "campaigns" | "contacts" | "settings") => void;
   selectedFolder: string;
   setSelectedFolder: (folder: string) => void;
   customFolders: CustomFolder[];
@@ -75,7 +75,7 @@ export function DashboardSidebar({
   const workspaceLinks = [
     { id: "campaigns" as const, label: "Campaigns & Sequences", icon: BarChart3, badge: "Cold Mail" },
     { id: "ai" as const, label: "AI Outreach Studio", icon: Sparkles, badge: "Copilot" },
-    { id: "domains" as const, label: "Domain DNS & Routing", icon: Globe, badge: "2048 DKIM" },
+
     { id: "contacts" as const, label: "Client Directory", icon: Users },
     { id: "settings" as const, label: "Settings & Team", icon: Settings },
   ];
