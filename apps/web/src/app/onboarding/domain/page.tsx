@@ -23,7 +23,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
-import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { useCurrency } from "@/components/CurrencyProvider";
 import {
   validateDomain,
@@ -85,9 +84,6 @@ export default function DomainOnboardingPage() {
   const [phoneNumberError, setPhoneNumberError] = useState("");
   const [cacNumberError, setCacNumberError] = useState("");
 
-  // Checkout Modal State
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [selectedPlanForDomain, setSelectedPlanForDomain] = useState<"starter" | "growth" | "pro">("starter");
 
   // Load session user
   useEffect(() => {
@@ -548,8 +544,7 @@ export default function DomainOnboardingPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedDomainToRegister(searchPrimary);
-                        setIsCheckoutOpen(true);
+                        window.location.href = `https://billing.zegacloud.com/cart.php?a=add&domain=register&query=${encodeURIComponent(searchPrimary.domain)}`;
                       }}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
                     >
@@ -591,8 +586,7 @@ export default function DomainOnboardingPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setSelectedDomainToRegister(sug);
-                            setIsCheckoutOpen(true);
+                            window.location.href = `https://billing.zegacloud.com/cart.php?a=add&domain=register&query=${encodeURIComponent(sug.domain)}`;
                           }}
                           className="px-2.5 py-1 rounded bg-[#121212] dark:bg-white text-white dark:text-[#121212] text-[11px] font-semibold hover:opacity-90"
                         >
@@ -797,15 +791,6 @@ export default function DomainOnboardingPage() {
         )}
       </main>
 
-      {/* Unified Payment Checkout Modal for Domain + Plan Purchase */}
-      <UnifiedPaymentCheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        initialPlan={selectedPlanForDomain}
-        domainNameToRegister={selectedDomainToRegister?.domain}
-        clientEmail={currentUser?.email}
-        clientName={currentUser?.name}
-      />
     </div>
   );
 }

@@ -18,7 +18,6 @@ import { DashboardModals } from "@/components/dashboard/DashboardModals";
 
 import { CampaignsWorkspace } from "@/components/campaigns/CampaignsWorkspace";
 import { FullComposeWorkspace } from "@/components/mail/FullComposeWorkspace";
-import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { MailboxSkeletonLoader } from "@/components/mail/MailboxSkeletonLoader";
 
 export default function WebmailAppPage() {
@@ -41,7 +40,9 @@ export default function WebmailAppPage() {
   const [isNewMailboxModalOpen, setIsNewMailboxModalOpen] = useState(false);
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const handleOpenUpgradePortal = () => {
+    window.open("https://billing.zegacloud.com/upgrade.php", "_blank", "noopener,noreferrer");
+  };
 
   // Custom Folders & Templates
   const [customFolders, setCustomFolders] = useState<any[]>([]);
@@ -456,19 +457,6 @@ export default function WebmailAppPage() {
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#07090e] text-slate-900 dark:text-slate-100 overflow-hidden font-sans transition-colors">
-      {/* WHMCS BILLING & MULTI-GATEWAY CHECKOUT MODAL */}
-      <UnifiedPaymentCheckoutModal
-        isOpen={isUpgradeModalOpen}
-        onClose={() => setIsUpgradeModalOpen(false)}
-        defaultPlan={currentOrg?.plan === "pro" ? "pro" : currentOrg?.plan === "starter" ? "starter" : "growth"}
-        onPaymentSuccess={(newPlan) => {
-          if (currentOrg) {
-            setCurrentOrg({ ...currentOrg, plan: newPlan });
-          }
-          loadBillingOrders();
-        }}
-      />
-
       {/* INTERACTIVE GUIDED DEMO MODE BANNER */}
       {isDemoMode && (
         <aside
@@ -508,7 +496,7 @@ export default function WebmailAppPage() {
             </button>
             <button
               type="button"
-              onClick={() => setIsUpgradeModalOpen(true)}
+              onClick={() => handleOpenUpgradePortal()}
               className="ml-2 inline-flex items-center gap-1 rounded-lg bg-blue-600 text-white px-2.5 py-0.5 font-semibold text-[11px] hover:bg-blue-700 shadow-xs"
             >
               <span>Get Real Account</span>
@@ -528,7 +516,7 @@ export default function WebmailAppPage() {
         currentUser={currentUser}
         currentOrg={currentOrg}
         onOpenClientModal={() => setIsClientModalOpen(true)}
-        onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+        onOpenUpgradeModal={() => handleOpenUpgradePortal()}
         onLogout={handleLogout}
         onSwitchPersona={handleSwitchDemoPersona}
         isSidebarOpen={isSidebarOpen}
@@ -547,7 +535,7 @@ export default function WebmailAppPage() {
           messages={messages}
           onOpenCompose={() => setIsComposeOpen(true)}
           onOpenNewFolder={() => setIsNewFolderModalOpen(true)}
-          onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+          onOpenUpgradeModal={() => handleOpenUpgradePortal()}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           currentOrgPlan={currentOrg?.plan}
@@ -713,7 +701,7 @@ export default function WebmailAppPage() {
               currentUser={currentUser}
               currentDomain={currentDomain}
               billingOrders={billingOrders}
-              onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+              onOpenUpgradeModal={() => handleOpenUpgradePortal()}
               onOpenAddMemberModal={() => setIsAddMemberModalOpen(true)}
               adminTeamMembers={adminTeamMembers}
               onToggleMemberStatus={handleToggleMemberStatus}

@@ -143,76 +143,24 @@ CPANEL_SECURE=true
 
 ---
 
-### Group H: Payment Gateway 1 — Paystack (Nigeria & Africa)
-Primary payment processor for Nigeria (NGN), Ghana (GHS), and Kenya (KES) cards, bank transfers, USSD, and OPay.
+### Group H: Billing & Payment Processing Architecture (Centralized in ZegaCloud / WHMCS)
 
-#### How to Obtain:
-1. Register at [Paystack Dashboard](https://dashboard.paystack.com/).
-2. Navigate to **Settings > API Keys & Webhooks**.
-3. Set Webhook URL to: `https://mail.zegacloud.com/api/billing/webhook/paystack`.
-4. Copy into `.env.local`:
-```bash
-PAYSTACK_SECRET_KEY=sk_live_your_paystack_secret_key
-NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_live_your_paystack_public_key
-PAYSTACK_WEBHOOK_SECRET=your_paystack_webhook_signing_secret
-```
+In accordance with enterprise separation of concerns (identical to Titan Mail and Google Workspace), all payment processing, merchant gateways (Paystack, Flutterwave, Stripe), and crypto invoicing are handled centrally by the **ZegaCloud Billing & Client Portal** (`billing.zegacloud.com`).
 
----
+**Advantages**:
+- **Zero Local Secrets**: The webmail application requires no payment gateway secret keys in its `.env`.
+- **PCI-DSS Compliance**: Credit cards and payment credentials never touch the web application.
+- **Unified Invoicing**: All subscriptions, renewals, VAT compliance, and multi-gateway settlements are consolidated in WHMCS.
 
-### Group I: Payment Gateway 2 — Flutterwave (Pan-Africa)
-Secondary payment processor supporting 30+ African currencies and mobile money (M-Pesa, Airtel, MTN).
-
-#### How to Obtain:
-1. Register at [Flutterwave Dashboard](https://dashboard.flutterwave.com/).
-2. Navigate to **Settings > API Keys & Webhooks**.
-3. Copy into `.env.local`:
-```bash
-FLUTTERWAVE_SECRET_KEY=FLWSECK-your_flutterwave_secret_key
-NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY=FLWPUBK-your_flutterwave_public_key
-FLUTTERWAVE_ENCRYPTION_KEY=your_encryption_key
-FLUTTERWAVE_WEBHOOK_HASH=your_webhook_hash
-```
-
----
-
-### Group J: Payment Gateway 3 — Stripe (Global Cards in USD/EUR/GBP)
-Primary payment processor for international clients outside Africa.
-
-#### How to Obtain:
-1. Register at [Stripe Dashboard](https://dashboard.stripe.com/).
-2. Navigate to **Developers > API keys**.
-3. Set Webhook URL to: `https://mail.zegacloud.com/api/billing/webhook/stripe`.
-4. Copy into `.env.local`:
-```bash
-STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_stripe_publishable_key
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
-```
-
----
-
-### Group K: Payment Gateway 4 — Non-Custodial Web3 Cryptocurrency
-Allows clients to pay with USDT (TRC-20 / ERC-20), Bitcoin, Ethereum, and Solana with automated on-chain verification.
-
-```bash
-# Merchant receiving addresses displayed on invoices and QR codes
-NEXT_PUBLIC_CRYPTO_MERCHANT_ADDRESS=TX7k1dZega9xMailTRC20Wallet88NVMe
-CRYPTO_TRC20_WALLET=TX7k1dZega9xMailTRC20Wallet88NVMe
-CRYPTO_BTC_WALLET=bc1qzega9xmailcloud77anycast001btc
-CRYPTO_ETH_WALLET=0x71C2ega9xMailAnycastNVMeCluster8842
-CRYPTO_SOL_WALLET=ZegaSoL9xMailAnycastClusterSolana99
-
-# Public RPC Nodes for background transaction scanning
-TRONGRID_API_URL=https://api.trongrid.io
-BLOCKSTREAM_API_URL=https://blockstream.info/api
-ETH_RPC_URL=https://cloudflare-eth.com
-SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
-
-# Cron scanner execution secret
-CRON_SECRET=zegacloud-cron-secret
-CRYPTO_VERIFICATION_MODE=auto_scanner
-CRYPTO_MIN_CONFIRMATIONS=1
-```
+#### WHMCS Payment Gateways Setup:
+1. Log in to your WHMCS Admin Portal at `https://billing.zegacloud.com/admin`.
+2. Navigate to **System Settings > Payment Gateways**.
+3. Activate your desired gateways (Paystack, Flutterwave, Stripe, Crypto).
+4. Enter your live merchant credentials directly inside WHMCS.
+5. Create your ZegaMail products in WHMCS (`Setup > Products/Services`):
+   - Starter Plan (PID: 1)
+   - Growth Plan (PID: 2)
+   - Enterprise Pro Plan (PID: 3)
 
 ---
 
@@ -237,7 +185,7 @@ flowchart TD
     
     I -->|"Path 1: Register New"| J["Live WHMCS Domain Search (/api/domains/search)"]
     J --> K["Select Domain & Open Checkout Modal"]
-    K --> L["Pay with Paystack / Flutterwave / Stripe / Crypto"]
+    K --> L["Redirect to ZegaCloud Portal Cart for Payment"]
     L --> M["Auto-provision Domain, DNS & Mailboxes"]
     
     I -->|"Path 2: Connect Own"| N["Enter Existing Domain"]
@@ -258,5 +206,5 @@ flowchart TD
 - [x] **Email Signup + 6-Digit Code**: Tested via `/api/auth/signup` and `/api/auth/verify-email`.
 - [x] **Google & GitHub OAuth**: Handlers configured at `/api/auth/google`, `/api/auth/github` with Developer Sandbox fallback.
 - [x] **WHMCS Domain Search**: Tested at `/api/domains/search?domain=...`.
-- [x] **Unified Checkout Modal**: Supports Paystack, Flutterwave, Stripe, and Crypto.
+- [x] **Centralized Billing Integration**: Directly routes to ZegaCloud WHMCS Cart with zero local payment secrets.
 - [x] **App Performance**: Optimized with Next.js `optimizePackageImports` and unified `/api/bootstrap` endpoint.

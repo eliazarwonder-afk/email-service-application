@@ -69,27 +69,11 @@ CPANEL_API_TOKEN="CPANEL_UAPI_TOKEN_HEX_STRING_HERE"
 CPANEL_DEFAULT_QUOTA_MB="5000"
 
 # ==============================================================================
-# 4. PAYMENT GATEWAY API KEYS
+# 4. BILLING & PORTAL ARCHITECTURE (CENTRALIZED IN WHMCS)
 # ==============================================================================
-# Paystack (Nigeria & Africa - Cards, Bank Transfer, USSD)
-PAYSTACK_SECRET_KEY="sk_live_paystack_secret_key"
-PAYSTACK_PUBLIC_KEY="pk_live_paystack_public_key"
-
-# Flutterwave (Pan-African Mobile Money & Cards - GHS, KES, ZAR, NGN, USD)
-FLW_SECRET_KEY="FLWSECK-xxxxxxxxxxxxxxxxxxxx-X"
-FLW_PUBLIC_KEY="FLWPUBK-xxxxxxxxxxxxxxxxxxxx-X"
-FLW_ENCRYPTION_KEY="FLWSECK_ENC-xxxxxxxxxxxx"
-
-# Stripe (Global Visa/Mastercard/Amex)
-STRIPE_SECRET_KEY="sk_live_stripe_secret_key"
-STRIPE_PUBLISHABLE_KEY="pk_live_stripe_publishable_key"
-STRIPE_WEBHOOK_SECRET="whsec_stripe_webhook_secret"
-
-# Automated Crypto Settlement (TRC-20 USDT, BTC, ETH, SOL)
-CRYPTO_USDT_TRC20_WALLET="TX7k1dZega9xMailTRC20Wallet88NVMe"
-CRYPTO_BTC_WALLET="bc1qzega9xmailcloud77anycast001btc"
-CRYPTO_ETH_WALLET="0x71C2ega9xMailAnycastNVMeCluster8842"
-CRYPTO_SOL_WALLET="ZegaSoL9xMailAnycastClusterSolana99"
+# All payment gateways (Paystack, Flutterwave, Stripe, Crypto) are configured
+# and processed centrally inside the ZegaCloud WHMCS Client Portal (billing.zegacloud.com).
+# No payment gateway secret keys are needed or stored in this web application.
 ```
 
 ---
@@ -147,14 +131,15 @@ Every provisioned mailbox returns exact DNS records to ensure 99.9% inbox delive
 
 ---
 
-## 5. Payment Gateway Processing Matrix
+## 5. Centralized Billing & Checkout Architecture
 
-| Gateway | Supported Currencies | Target Audience | Settlement Method |
-| :--- | :--- | :--- | :--- |
-| **Paystack** | NGN, USD | Nigeria & West Africa | Bank Cards, Direct Bank Transfer, USSD |
-| **Flutterwave**| NGN, GHS, KES, ZAR, USD | Pan-Africa | Mobile Money (M-Pesa, MTN MoMo), Cards |
-| **Stripe** | USD, EUR, GBP, AUD, CAD | Global / International | Visa, Mastercard, American Express |
-| **Crypto** | USDT (TRC-20), BTC, ETH, SOL| Worldwide / Decentralized | Automated On-Chain TX Scanner & Instant Activation |
+All payment settlement is handled directly by the ZegaCloud Billing Platform (`billing.zegacloud.com`):
+- **Starter Plan**: Direct cart link (`cart.php?a=add&pid=1`)
+- **Growth Plan**: Direct cart link (`cart.php?a=add&pid=2`)
+- **Pro Plan**: Direct cart link (`cart.php?a=add&pid=3`)
+- **Domain Registrations**: Direct registrar cart link (`cart.php?a=add&domain=register&query=...`)
+
+Gateways enabled in WHMCS (Paystack, Flutterwave, Stripe, Crypto) process funds directly with zero intermediary handling by the webmail client.
 
 ---
 

@@ -6,21 +6,15 @@ import {
   writeDb,
   hashPassword,
   createOrderAndInvoice,
-  submitOrderCryptoTx,
-  verifyAndActivateOrder,
   StoredUser,
   StoredOrg,
   StoredDomain,
   StoredMailbox,
 } from "@/lib/store";
-import { initializePaystackTransaction, verifyPaystackTransaction } from "@/lib/payments/paystack";
-import { initializeFlutterwavePayment, verifyFlutterwaveTransaction } from "@/lib/payments/flutterwave";
-import { formatPlanPrice, SupportedCurrency } from "@/lib/geo";
 import {
   validateEmail,
   validatePassword,
   validateDomain,
-  validateTxHash,
 } from "@/lib/validation";
 
 export async function POST(req: Request) {
@@ -29,10 +23,7 @@ export async function POST(req: Request) {
     const {
       planId = "growth",
       billingCycle = "annually",
-      gateway,
-      paymentMethod,
       currency = "USD",
-      cryptoAsset = "usdt_trc20",
       clientEmail,
       clientName,
       password,
@@ -40,7 +31,6 @@ export async function POST(req: Request) {
       domainNameToRegister,
     } = body;
 
-    const chosenGateway = (gateway || paymentMethod || "stripe").toLowerCase();
     const isAnnual = billingCycle === "annually" || billingCycle === "annual";
 
     // 1. Session & User Verification / Auto-Provisioning
@@ -54,7 +44,7 @@ export async function POST(req: Request) {
     let newSessionToken: string | null = null;
 
     if (!user) {
-      // User is claiming free plan or checking out without prior session
+      // User is claiming free plan or onboarding without prior session
       const emailCheck = validateEmail(clientEmail, "Contact Email");
       if (!emailCheck.isValid) {
         return NextResponse.json(
@@ -90,7 +80,7 @@ export async function POST(req: Request) {
       } else {
         const userId = "usr_" + crypto.randomUUID().slice(0, 8);
         const orgId = "org_" + crypto.randomUUID().slice(0, 8);
-        const whmcsClientId = "WHMCS-CL-" + Math.floor(10000 + Math.random() * 90000);
+        const whmcsClientId = "ZCL-CL-" + Math.floor(10000 + Math.random() * 90000);
 
         org = {
           id: orgId,
@@ -152,7 +142,7 @@ export async function POST(req: Request) {
         spfStatus: "verified",
         dkimStatus: "verified",
         dmarcStatus: "verified",
-        whmcsOrderId: "WHMCS-ORD-" + Math.floor(10000 + Math.random() * 90000),
+        whmcsOrderId: "ZCL-ORD-" + Math.floor(10000 + Math.random() * 90000),
         createdAt: new Date().toISOString(),
       };
       if (!db.domains) db.domains = [];
@@ -192,7 +182,6 @@ export async function POST(req: Request) {
 
     // 3. FREE PLAN CLAIMS ($0 / ₦0 FOREVER)
     if (planId === "free") {
-      // Ensure second mailbox for the 2 free mailboxes
       const secondMailboxAddress = `info@${targetDomain}`;
       if (!db.mailboxes.some((m) => m.orgId === orgId && m.emailAddress.toLowerCase() === secondMailboxAddress)) {
         db.mailboxes.push({
@@ -234,120 +223,20 @@ export async function POST(req: Request) {
       return setSessionOnResponse(response);
     }
 
-    // 4. PAID PLANS (Starter, Growth, Enterprise Pro)
-    const pricing = formatPlanPrice(
-      planId as "free" | "starter" | "growth" | "pro",
-      currency as SupportedCurrency,
-      isAnnual
-    );
-
-    let storePaymentMethod = chosenGateway;
-    if (chosenGateway === "crypto") {
-      storePaymentMethod = `crypto_${cryptoAsset}`;
-    }
-
-    const { order, invoice } = createOrderAndInvoice({
-      orgId,
-      userId,
-      clientEmail: email,
-      clientName: name,
-      planId: planId as "free" | "starter" | "growth" | "pro",
-      billingCycle: isAnnual ? "annually" : "monthly",
-      paymentMethod: storePaymentMethod,
-      currency,
-      customAmount: pricing.amount,
-    });
-
-    writeDb(db);
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
-    // 4A. Paystack (Nigeria & Africa)
-    if (chosenGateway === "paystack") {
-      const paystackRes = await initializePaystackTransaction({
-        email,
-        amountNgn: pricing.amount,
-        planId: planId as "starter" | "growth" | "pro",
-        billingCycle: isAnnual ? "annually" : "monthly",
-        callbackUrl: `${baseUrl}/app?payment=success&orderId=${order.id}&gateway=paystack`,
-        metadata: {
-          orderId: order.id,
-          invoiceId: invoice.id,
-          domainName: targetDomain,
-        },
-      });
-
-      const response = NextResponse.json({
-        success: paystackRes.success,
-        orderId: order.id,
-        invoiceId: invoice.id,
-        amount: order.amount,
-        currency: order.currency,
-        reference: paystackRes.reference,
-        redirectUrl: paystackRes.authorizationUrl,
-      });
-
-      return setSessionOnResponse(response);
-    }
-
-    // 4B. Flutterwave (Pan-Africa Mobile Money & Cards)
-    if (chosenGateway === "flutterwave") {
-      const flwRes = await initializeFlutterwavePayment({
-        email,
-        name,
-        amount: pricing.amount,
-        currency: (currency === "NGN" ? "NGN" : "USD") as "NGN" | "USD",
-        planId: planId as "starter" | "growth" | "pro",
-        billingCycle: isAnnual ? "annually" : "monthly",
-        redirectUrl: `${baseUrl}/app?payment=success&orderId=${order.id}&gateway=flutterwave`,
-      });
-
-      const response = NextResponse.json({
-        success: flwRes.success,
-        orderId: order.id,
-        invoiceId: invoice.id,
-        amount: order.amount,
-        currency: order.currency,
-        tx_ref: flwRes.txRef,
-        redirectUrl: flwRes.paymentLink,
-      });
-
-      return setSessionOnResponse(response);
-    }
-
-    // 4C. Stripe (Global Cards)
-    if (chosenGateway === "stripe") {
-      const stripeCheckoutUrl = `${baseUrl}/app?payment=success&orderId=${order.id}&gateway=stripe`;
-      const response = NextResponse.json({
-        success: true,
-        orderId: order.id,
-        invoiceId: invoice.id,
-        amount: order.amount,
-        currency: order.currency,
-        redirectUrl: stripeCheckoutUrl,
-      });
-
-      return setSessionOnResponse(response);
-    }
-
-    // 4D. Crypto Automated Settlement (USDT, BTC, ETH, SOL)
-    if (chosenGateway === "crypto") {
-      const response = NextResponse.json({
-        success: true,
-        orderId: order.id,
-        invoiceId: invoice.id,
-        amount: order.amount,
-        currency: order.currency,
-        cryptoDetails: order.cryptoDetails,
-      });
-
-      return setSessionOnResponse(response);
-    }
+    // 4. PAID PLANS (Starter, Growth, Enterprise Pro) -> Redirect to ZegaCloud Client Portal
+    const productPidMap: Record<string, string> = {
+      starter: "1",
+      growth: "2",
+      pro: "3",
+    };
+    const pid = productPidMap[planId] || "2";
+    const cycle = isAnnual ? "annually" : "monthly";
+    const whmcsCheckoutUrl = `https://billing.zegacloud.com/cart.php?a=add&pid=${pid}&billingcycle=${cycle}`;
 
     const response = NextResponse.json({
       success: true,
-      order,
-      invoice,
+      redirectUrl: whmcsCheckoutUrl,
+      message: "Redirecting to ZegaCloud Portal for secure payment and automated provisioning.",
     });
 
     return setSessionOnResponse(response);
@@ -361,82 +250,8 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  try {
-    const body = await req.json();
-    const { orderId, invoiceId, txHash, reference, tx_ref } = body;
-
-    const lookupId = orderId || invoiceId;
-    if (!lookupId && !reference && !tx_ref) {
-      return NextResponse.json(
-        { success: false, error: "Missing order reference or identifier." },
-        { status: 400 }
-      );
-    }
-
-    // If Paystack reference verification
-    if (reference) {
-      const verifyRes = await verifyPaystackTransaction(reference);
-      if (verifyRes.status === "success") {
-        if (lookupId) {
-          verifyAndActivateOrder(lookupId);
-        }
-        return NextResponse.json({
-          success: true,
-          status: "paid",
-          message: "Paystack transaction verified! Your business mailboxes are active.",
-        });
-      } else {
-        return NextResponse.json(
-          { success: false, error: "Paystack transaction could not be verified." },
-          { status: 400 }
-        );
-      }
-    }
-
-    // If Flutterwave tx_ref verification
-    if (tx_ref) {
-      const verifyRes = await verifyFlutterwaveTransaction(tx_ref);
-      if (verifyRes.status === "successful") {
-        if (lookupId) {
-          verifyAndActivateOrder(lookupId);
-        }
-        return NextResponse.json({
-          success: true,
-          status: "paid",
-          message: "Flutterwave transaction verified! Your business mailboxes are active.",
-        });
-      } else {
-        return NextResponse.json(
-          { success: false, error: "Flutterwave transaction could not be verified." },
-          { status: 400 }
-        );
-      }
-    }
-
-    // If Crypto Transaction Hash Submission
-    if (txHash && lookupId) {
-      const txCheck = validateTxHash(txHash);
-      if (!txCheck.isValid) {
-        return NextResponse.json({ success: false, error: txCheck.error }, { status: 400 });
-      }
-
-      const updatedOrder = submitOrderCryptoTx(lookupId, txCheck.value);
-      if (updatedOrder) {
-        verifyAndActivateOrder(lookupId);
-        return NextResponse.json({
-          success: true,
-          status: "confirmed",
-          order: updatedOrder,
-          message: "Blockchain payment verified on node! Your mail quota has been credited.",
-        });
-      } else {
-        return NextResponse.json({ success: false, error: "Order not found." }, { status: 404 });
-      }
-    }
-
-    return NextResponse.json({ success: false, error: "Invalid verification parameters." }, { status: 400 });
-  } catch (err: any) {
-    console.error("Verification error:", err);
-    return NextResponse.json({ success: false, error: err.message || "Verification failed." }, { status: 500 });
-  }
+  return NextResponse.json({
+    success: true,
+    message: "Payments are processed centrally by the ZegaCloud Client Portal.",
+  });
 }

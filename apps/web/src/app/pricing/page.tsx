@@ -20,7 +20,6 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useCurrency } from "@/components/CurrencyProvider";
 import { formatPlanPrice, SupportedCurrency, CURRENCY_SYMBOLS } from "@/lib/geo";
-import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import {
   AnimatedShield,
   AnimatedMail,
@@ -34,29 +33,17 @@ import {
 export default function PricingPage() {
   const { currency, setCurrency, symbol, isAfrica, isNigeria } = useCurrency();
   const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
-  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [checkoutPlan, setCheckoutPlan] = useState<"free" | "starter" | "growth" | "pro">("growth");
 
   // Calculated Pricing Tiers based on selected currency and billing cycle
   const starterPrice = formatPlanPrice("starter", currency, billingCycle === "annual");
   const growthPrice = formatPlanPrice("growth", currency, billingCycle === "annual");
   const proPrice = formatPlanPrice("pro", currency, billingCycle === "annual");
 
-  const openCheckout = (plan: "free" | "starter" | "growth" | "pro") => {
-    setCheckoutPlan(plan);
-    setIsCheckoutModalOpen(true);
+  const getWhmcsPlanUrl = (plan: "starter" | "growth" | "pro") => {
+    const pids = { starter: 1, growth: 2, pro: 3 };
+    const cycle = billingCycle === "annual" ? "annually" : "monthly";
+    return `https://billing.zegacloud.com/cart.php?a=add&pid=${pids[plan]}&billingcycle=${cycle}`;
   };
-
-  // Automatically trigger modal if query parameter plan is specified
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const planParam = params.get("plan");
-      if (planParam && ["free", "starter", "growth", "pro"].includes(planParam)) {
-        openCheckout(planParam as any);
-      }
-    }
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf9f6] dark:bg-[#090a0f] text-[#121212] dark:text-[#f3f4f6] transition-colors selection:bg-blue-500/20">
@@ -212,13 +199,12 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => openCheckout("free")}
-              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            <Link
+              href="/signup?plan=free"
+              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors block"
             >
               Claim Free Mailboxes
-            </button>
+            </Link>
           </div>
 
           {/* CARD 2: Starter Plan */}
@@ -288,13 +274,12 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => openCheckout("starter")}
-              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs"
+            <a
+              href={getWhmcsPlanUrl("starter")}
+              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs block"
             >
               Get Starter
-            </button>
+            </a>
           </div>
 
           {/* CARD 3: Business Growth (Featured / Google Killer) */}
@@ -373,14 +358,13 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => openCheckout("growth")}
+            <a
+              href={getWhmcsPlanUrl("growth")}
               className="w-full text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white py-2.5 text-xs font-semibold shadow-md transition-colors flex items-center justify-center gap-1.5"
             >
               <span>Get Growth Plan</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            </a>
           </div>
 
           {/* CARD 4: Enterprise Pro */}
@@ -454,13 +438,12 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => openCheckout("pro")}
-              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs"
+            <a
+              href={getWhmcsPlanUrl("pro")}
+              className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs block"
             >
               Get Enterprise Pro
-            </button>
+            </a>
           </div>
         </section>
 
@@ -609,13 +592,12 @@ export default function PricingPage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => openCheckout("growth")}
-              className="px-6 py-3 rounded-xl bg-white text-slate-900 font-bold text-xs hover:bg-slate-100 transition-colors shadow-lg"
+            <a
+              href={getWhmcsPlanUrl("growth")}
+              className="px-6 py-3 rounded-xl bg-white text-slate-900 font-bold text-xs hover:bg-slate-100 transition-colors shadow-lg inline-block"
             >
               Start 14-Day Free Growth Trial
-            </button>
+            </a>
             <Link
               href="/app"
               className="px-6 py-3 rounded-xl border border-white/30 text-white font-semibold text-xs hover:bg-white/10 transition-colors"
@@ -628,16 +610,7 @@ export default function PricingPage() {
 
       <Footer />
 
-      {/* MULTI-GATEWAY CHECKOUT MODAL */}
-      <UnifiedPaymentCheckoutModal
-        isOpen={isCheckoutModalOpen}
-        onClose={() => setIsCheckoutModalOpen(false)}
-        defaultPlan={checkoutPlan}
-        onPaymentSuccess={(plan) => {
-          setIsCheckoutModalOpen(false);
-          window.location.href = `/app?upgraded=${plan}`;
-        }}
-      />
+
     </div>
   );
 }

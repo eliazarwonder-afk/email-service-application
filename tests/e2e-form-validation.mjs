@@ -64,24 +64,21 @@ async function runTests() {
     const errorCountAfterValid = await page.locator('text=/Please enter a valid email address/i').count();
     assert(errorCountAfterValid === 0, "Error cleared when valid email is provided");
 
-    // 2. Test Pricing / Unified Checkout Form Validation
-    console.log("\n[Test 2] Testing /pricing checkout modal validations...");
+    // 2. Test Pricing Plan Links & Direct ZegaCloud Routing
+    console.log("\n[Test 2] Testing /pricing direct portal links and free claim routing...");
     await page.goto("http://localhost:3000/pricing", { waitUntil: "networkidle" });
 
-    // Click on starter plan CTA to trigger checkout modal
-    const getStartedBtn = page.locator('button:has-text("Get Started"), button:has-text("Choose Starter")').first();
-    if (await getStartedBtn.count() > 0) {
-      await getStartedBtn.click();
-      await page.waitForTimeout(600);
+    // Check Starter CTA href
+    const starterLink = page.locator('a:has-text("Get Starter"), a:has-text("Choose Starter")').first();
+    assert(await starterLink.count() > 0, "Starter plan CTA exists on /pricing");
+    const starterHref = await starterLink.getAttribute("href");
+    assert(starterHref.includes("billing.zegacloud.com/cart.php"), "Starter plan links directly to ZegaCloud Billing cart");
 
-      const modalInputEmail = page.locator('input[type="email"], input[placeholder*="@"]');
-      if (await modalInputEmail.count() > 0) {
-        await modalInputEmail.first().fill("invalid@@corp");
-        await modalInputEmail.first().blur();
-        await page.waitForTimeout(300);
-        console.log("  ✅ Modal email input touched and validated");
-      }
-    }
+    // Check Free Plan CTA href
+    const freePlanLink = page.locator('a:has-text("Claim Free Mailboxes"), a:has-text("Claim Free Plan")').first();
+    assert(await freePlanLink.count() > 0, "Free plan CTA exists on /pricing");
+    const freeHref = await freePlanLink.getAttribute("href");
+    assert(freeHref.includes("/signup?plan=free"), "Free plan links directly to signup flow");
 
     // 3. Test Dashboard Compose Form Validation
     console.log("\n[Test 3] Testing /app webmail composer validations...");

@@ -27,7 +27,6 @@ import { Footer } from "@/components/Footer";
 import { HeroDashboardPreview } from "@/components/HeroDashboardPreview";
 import { MailDeliveryHeroAnimation } from "@/components/MailDeliveryHeroAnimation";
 import { ClientSetupModal } from "@/components/ClientSetupModal";
-import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { useCurrency } from "@/components/CurrencyProvider";
 import { formatPlanPrice, SupportedCurrency, CURRENCY_SYMBOLS } from "@/lib/geo";
 import {
@@ -46,10 +45,14 @@ export default function HomePage() {
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  // Billing cycle & modal checkout state
+  // Billing cycle
   const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
-  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [checkoutPlan, setCheckoutPlan] = useState<"free" | "starter" | "growth" | "pro">("free");
+
+  const getWhmcsPlanUrl = (plan: "starter" | "growth" | "pro") => {
+    const pids = { starter: 1, growth: 2, pro: 3 };
+    const cycle = billingCycle === "annual" ? "annually" : "monthly";
+    return `https://billing.zegacloud.com/cart.php?a=add&pid=${pids[plan]}&billingcycle=${cycle}`;
+  };
 
   // Calculated pricing tiers
   const freePrice = formatPlanPrice("free", currency, billingCycle === "annual");
@@ -77,11 +80,6 @@ export default function HomePage() {
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
-  };
-
-  const openCheckout = (plan: "free" | "starter" | "growth" | "pro") => {
-    setCheckoutPlan(plan);
-    setIsCheckoutModalOpen(true);
   };
 
   return (
@@ -130,14 +128,13 @@ export default function HomePage() {
 
             {/* Clear Primary & Secondary CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => openCheckout("free")}
+              <Link
+                href="/signup?plan=free"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.98]"
               >
                 <span>Claim 2 Free Mailboxes</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
 
               <Link
                 href="/app"
@@ -454,13 +451,12 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <button
-                type="button"
-                onClick={() => openCheckout("free")}
-                className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              <Link
+                href="/signup?plan=free"
+                className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors block"
               >
                 Claim Free Mailboxes
-              </button>
+              </Link>
             </div>
 
             {/* CARD 2: Starter Plan */}
@@ -507,13 +503,12 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <button
-                type="button"
-                onClick={() => openCheckout("starter")}
-                className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              <a
+                href={getWhmcsPlanUrl("starter")}
+                className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors block"
               >
                 Choose Starter
-              </button>
+              </a>
             </div>
 
             {/* CARD 3: Growth Plan (Recommended) */}
@@ -558,18 +553,17 @@ export default function HomePage() {
                     <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Multi-Touch Cold Outreach Engine
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Paystack, Stripe & Crypto Ready
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Instant Provisioning via ZegaCloud
                   </li>
                 </ul>
               </div>
 
-              <button
-                type="button"
-                onClick={() => openCheckout("growth")}
-                className="mt-8 w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold text-xs shadow-md transition-colors"
+              <a
+                href={getWhmcsPlanUrl("growth")}
+                className="mt-8 w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold text-xs shadow-md transition-colors block"
               >
                 Start Growth
-              </button>
+              </a>
             </div>
 
             {/* CARD 4: Enterprise Pro Plan */}
@@ -614,13 +608,12 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <button
-                type="button"
-                onClick={() => openCheckout("pro")}
-                className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              <a
+                href={getWhmcsPlanUrl("pro")}
+                className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors block"
               >
                 Choose Enterprise Pro
-              </button>
+              </a>
             </div>
           </div>
         </section>
@@ -697,13 +690,12 @@ export default function HomePage() {
                 Join thousands of businesses who switched from Google Workspace. Set up your custom domain in 60 seconds with zero risk.
               </p>
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => openCheckout("free")}
-                  className="w-full sm:w-auto px-7 py-3 rounded-xl bg-white text-blue-600 hover:bg-blue-50 font-bold text-sm shadow-md transition-colors"
+                <Link
+                  href="/signup?plan=free"
+                  className="w-full sm:w-auto px-7 py-3 rounded-xl bg-white text-blue-600 hover:bg-blue-50 font-bold text-sm shadow-md transition-colors block text-center"
                 >
                   Claim 2 Free Mailboxes
-                </button>
+                </Link>
                 <Link
                   href="/pricing"
                   className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-semibold text-sm transition-colors"
@@ -725,15 +717,7 @@ export default function HomePage() {
         defaultEmail="you@yourcompany.com"
       />
 
-      {/* UNIFIED PAYMENT & FREE CLAIM CHECKOUT MODAL */}
-      <UnifiedPaymentCheckoutModal
-        isOpen={isCheckoutModalOpen}
-        onClose={() => setIsCheckoutModalOpen(false)}
-        initialPlan={checkoutPlan}
-        onPaymentSuccess={() => {
-          setIsCheckoutModalOpen(false);
-        }}
-      />
+
     </div>
   );
 }

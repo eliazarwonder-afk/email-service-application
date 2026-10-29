@@ -23,7 +23,6 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { ZegaLogo } from "@/components/ZegaLogo";
 import { useCurrency } from "@/components/CurrencyProvider";
-import { UnifiedPaymentCheckoutModal } from "@/components/billing/UnifiedPaymentCheckoutModal";
 import { validateDomain } from "@/lib/validation";
 
 export default function SignupGatewayPage() {
@@ -228,23 +227,23 @@ export default function SignupGatewayPage() {
 
               <div className="shrink-0 flex items-center gap-2">
                 {domainResult.status === "available" ? (
-                  <button
-                    type="button"
-                    onClick={() => openCheckoutWithDomain("growth", domainResult.domain)}
+                  <a
+                    href={`https://billing.zegacloud.com/cart.php?a=add&domain=register&query=${encodeURIComponent(domainResult.domain)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-all"
                   >
                     <span>Order on ZegaCloud</span>
                     <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
+                  </a>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => openCheckoutWithDomain("starter", domainResult.domain)}
+                  <Link
+                    href={`/login?domain=${encodeURIComponent(domainResult.domain)}`}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-sm transition-all"
                   >
                     <span>Connect Domain to ZegaMail</span>
                     <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
+                  </Link>
                 )}
               </div>
             </div>
@@ -279,7 +278,7 @@ export default function SignupGatewayPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-                  <span>Pay with Paystack, Stripe or Crypto</span>
+                  <span>Instant provisioning via ZegaCloud</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
@@ -421,24 +420,13 @@ export default function SignupGatewayPage() {
                 2. Unified Billing & Centralized Team Seats
               </p>
               <p>
-                Business administrators manage their invoices, team quotas, renewals, and payment methods (Paystack, Stripe, Crypto) in one unified ZegaCloud dashboard without juggling multiple disjointed logins.
+                Business administrators manage their invoices, team quotas, renewals, and payment methods in one unified ZegaCloud dashboard without juggling multiple disjointed logins.
               </p>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Unified Payment Checkout Modal */}
-      <UnifiedPaymentCheckoutModal
-        isOpen={isCheckoutModalOpen}
-        onClose={() => setIsCheckoutModalOpen(false)}
-        initialPlan={selectedPlanForModal}
-        domainNameToRegister={targetDomainForModal || undefined}
-        onPaymentSuccess={() => {
-          setIsCheckoutModalOpen(false);
-          router.push("/app?onboarding=complete");
-        }}
-      />
     </div>
   );
 }
