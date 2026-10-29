@@ -1011,6 +1011,14 @@ export function readDb(): DatabaseSchema {
       parsed.domains = getInitialDatabase().domains;
       needsSync = true;
     }
+    if (!parsed.contactLists || parsed.contactLists.length === 0) {
+      parsed.contactLists = getInitialDatabase().contactLists;
+      needsSync = true;
+    }
+    if (!parsed.contacts || parsed.contacts.length === 0) {
+      parsed.contacts = getInitialDatabase().contacts;
+      needsSync = true;
+    }
     if (needsSync) {
       fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
     }
