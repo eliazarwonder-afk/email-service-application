@@ -137,6 +137,6 @@ email service application/
   - Webmail REST endpoints for inbox, folder navigation, message details, attachments.
   - Resend-style `/v1/emails` API with API key authorization.
 - [ ] **Phase 5: Next.js Frontend**
-  - Modern webmail interface (Titan / Gmail-inspired).
+  - Modern webmail interface (Gmail-inspired).
   - Admin domain & mailbox management dashboard.
   - Developer SMTP & API keys center.

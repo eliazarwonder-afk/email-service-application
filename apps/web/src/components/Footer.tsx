@@ -143,7 +143,7 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
               </li>
               <li>
                 <Link href="/pricing" className="hover:text-[#121212] dark:hover:text-white transition-colors">
-                  vs Titan Email
+                  vs Microsoft 365
                 </Link>
               </li>
             </ul>

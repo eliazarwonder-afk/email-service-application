@@ -125,7 +125,7 @@ export default function SignupGatewayPage() {
           </h1>
 
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            Like Titan Mail and Google Workspace with web hosting partners, ZegaMail business accounts, custom domains, and DNS security are provisioned through the <strong>ZegaCloud Platform</strong>.
+            ZegaMail business accounts, custom domains, and enterprise DNS security are securely provisioned through the <strong>ZegaCloud Platform</strong>.
           </p>
         </div>
 
@@ -250,7 +250,7 @@ export default function SignupGatewayPage() {
           )}
         </div>
 
-        {/* 3 GATEWAY PATHWAYS (TITAN / WHMCS MODEL) */}
+        {/* 3 GATEWAY PATHWAYS (ZEGACLOUD PROVISIONING MODEL) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* PATHWAY 1: New Business Email Plan */}
           <div className="rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between shadow-lg relative">

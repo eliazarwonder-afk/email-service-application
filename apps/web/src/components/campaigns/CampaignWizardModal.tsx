@@ -20,6 +20,9 @@ import {
   Mail,
   FileText,
   HelpCircle,
+  Upload,
+  Tag,
+  FileSpreadsheet,
 } from "lucide-react";
 import { CampaignStep, StoredCampaign } from "@/lib/store";
 import {
@@ -66,7 +69,63 @@ export function CampaignWizardModal({
     availableMailboxes[0]?.emailAddress || "sales@acmedesign.co",
   ]);
 
-  // Step 2: Audience
+  // Step 2: Audience & Lists Integration
+  const [audienceSource, setAudienceSource] = useState<"list" | "csv">("list");
+  const [contactLists, setContactLists] = useState<any[]>([]);
+  const [selectedListId, setSelectedListId] = useState<string>("all");
+  const [isLoadingLists, setIsLoadingLists] = useState<boolean>(false);
+  const csvFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Fetch available contact lists when wizard opens
+  React.useEffect(() => {
+    async function loadLists() {
+      try {
+        setIsLoadingLists(true);
+        const res = await fetch("/api/contacts");
+        const data = await res.json();
+        if (data.success && data.lists) {
+          setContactLists(data.lists);
+        }
+      } catch (err) {
+        console.error("Failed to load contact lists in wizard:", err);
+      } finally {
+        setIsLoadingLists(false);
+      }
+    }
+    if (isOpen) {
+      loadLists();
+    }
+  }, [isOpen]);
+
+  // Load contacts from chosen list
+  const handleSelectAudienceList = async (listId: string) => {
+    setSelectedListId(listId);
+    try {
+      const res = await fetch(`/api/contacts?listId=${listId}`);
+      const data = await res.json();
+      if (data.success && data.contacts && data.contacts.length > 0) {
+        const lines = data.contacts.map((c: any) => {
+          const fn = c.firstName || c.name?.split(" ")[0] || "";
+          const ln = c.lastName || c.name?.split(" ").slice(1).join(" ") || "";
+          return `${fn},${ln},${c.email},${c.company || "Independent"},${c.jobTitle || "Lead"}`;
+        });
+        setLeadsInput(lines.join("\n"));
+      }
+    } catch (e) {
+      console.error("Failed to load list contacts:", e);
+    }
+  };
+
+  const handleCsvFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = (event.target?.result as string) || "";
+      setLeadsInput(text);
+    };
+    reader.readAsText(file);
+  };
   const [leadsInput, setLeadsInput] = useState<string>(
     `Sarah,Jenkins,s.jenkins@meridiancorp.com,Meridian Corp,VP Operations
 David,Miller,david@hyperscaletech.com,HyperScale Tech,VP Marketing
@@ -497,67 +556,200 @@ Marcus,Thorne,marcus@vanguardmedia.com,Vanguard Media Group,Managing Director`
           {/* STEP 2: AUDIENCE & CSV IMPORT */}
           {currentStep === 2 && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xs font-bold text-neutral-900 dark:text-white">
-                    Target Contacts & Lead Data
-                  </h3>
-                  <p className="text-xs text-neutral-500">
-                    Paste CSV or lead records. Format: <code className="text-blue-600 font-mono text-[11px]">firstName, lastName, email, company, jobTitle</code>
-                  </p>
-                </div>
+              {/* Audience Source Selector Tabs */}
+              <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
-                    {parsedLeads.length} Valid Leads Loaded
-                  </span>
                   <button
                     type="button"
-                    onClick={() =>
-                      setLeadsInput(
-                        `Sarah,Jenkins,s.jenkins@meridiancorp.com,Meridian Corp,VP Operations
+                    onClick={() => setAudienceSource("list")}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all ${
+                      audienceSource === "list"
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200"
+                    }`}
+                  >
+                    <Users className="h-3.5 w-3.5" />
+                    <span>Select from Contact Lists</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setAudienceSource("csv")}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all ${
+                      audienceSource === "csv"
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200"
+                    }`}
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Bulk Upload CSV / Raw Leads</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    {parsedLeads.length} Leads in Audience
+                  </span>
+                </div>
+              </div>
+
+              {/* Source Option A: Contact Lists */}
+              {audienceSource === "list" && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-neutral-500">
+                      Select one of your pre-configured audience lists from the Directory:
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectAudienceList("all")}
+                      className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      Load All Directory Contacts
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* All Contacts card */}
+                    <div
+                      onClick={() => handleSelectAudienceList("all")}
+                      className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                        selectedListId === "all"
+                          ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-600"
+                          : "border-neutral-200 dark:border-neutral-800 hover:border-blue-300 bg-white dark:bg-[#161a25]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-7 w-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
+                          <Layers className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-neutral-900 dark:text-white">All Directory Contacts</div>
+                          <div className="text-[10px] text-neutral-400">Complete organization database</div>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-mono font-bold text-blue-600">Select</span>
+                    </div>
+
+                    {/* Custom Lists cards */}
+                    {contactLists.map((lst) => {
+                      const isSelected = selectedListId === lst.id;
+                      return (
+                        <div
+                          key={lst.id}
+                          onClick={() => handleSelectAudienceList(lst.id)}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                            isSelected
+                              ? "border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-blue-600"
+                              : "border-neutral-200 dark:border-neutral-800 hover:border-blue-300 bg-white dark:bg-[#161a25]"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span
+                              className={`h-3 w-3 rounded-full shrink-0 ${
+                                lst.color === "emerald"
+                                  ? "bg-emerald-500"
+                                  : lst.color === "purple"
+                                  ? "bg-purple-500"
+                                  : lst.color === "amber"
+                                  ? "bg-amber-500"
+                                  : lst.color === "rose"
+                                  ? "bg-rose-500"
+                                  : "bg-blue-500"
+                              }`}
+                            />
+                            <div>
+                              <div className="text-xs font-bold text-neutral-900 dark:text-white">{lst.name}</div>
+                              <div className="text-[10px] text-neutral-400 line-clamp-1">{lst.description || "Audience list"}</div>
+                            </div>
+                          </div>
+                          <span className="text-[11px] font-mono font-bold text-blue-600">Select</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Source Option B: Bulk Upload CSV / Raw Leads */}
+              {audienceSource === "csv" && (
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <p className="text-xs text-neutral-500">
+                      Upload a CSV file or paste lead records. Required format: <code className="text-blue-600 font-mono text-[11px]">firstName, lastName, email, company, jobTitle</code>
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <input
+                        ref={csvFileInputRef}
+                        type="file"
+                        accept=".csv,.txt"
+                        onChange={handleCsvFileUpload}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => csvFileInputRef.current?.click()}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        <FileSpreadsheet className="h-3.5 w-3.5" />
+                        <span>Upload .CSV File</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setLeadsInput(
+                            `Sarah,Jenkins,s.jenkins@meridiancorp.com,Meridian Corp,VP Operations
 David,Miller,david@hyperscaletech.com,HyperScale Tech,VP Marketing
 Elena,Rostova,elena@vanguardrobotics.io,Vanguard Robotics,Head of Growth
 Marcus,Thorne,marcus@vanguardmedia.com,Vanguard Media Group,Managing Director
 Lucas,Vance,lucas@vanceholding.com,Vance Holding,CEO
 Rachel,Kim,rachel@kimfintech.io,Kim FinTech,Head of Infrastructure`
-                      )
-                    }
-                    className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    + Load Sample B2B Leads
-                  </button>
-                </div>
-              </div>
+                          )
+                        }
+                        className="text-xs font-semibold text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                      >
+                        + Sample Leads
+                      </button>
+                    </div>
+                  </div>
 
-              <textarea
-                rows={6}
-                value={leadsInput}
-                onChange={(e) => setLeadsInput(e.target.value)}
-                placeholder="firstName, lastName, email, company, jobTitle"
-                className="w-full font-mono text-xs p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#161a25] text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
-              />
+                  <textarea
+                    rows={5}
+                    value={leadsInput}
+                    onChange={(e) => setLeadsInput(e.target.value)}
+                    placeholder="firstName, lastName, email, company, jobTitle"
+                    className="w-full font-mono text-xs p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#161a25] text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+                  />
+                </div>
+              )}
 
               {/* Parsed Preview Table */}
               <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#12151e] overflow-hidden">
                 <div className="px-4 py-2 bg-neutral-50 dark:bg-[#151924] border-b border-neutral-200 dark:border-neutral-800 text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 flex justify-between">
-                  <span>Field Mapping Preview ({parsedLeads.length} leads)</span>
+                  <span>Field Mapping Preview ({parsedLeads.length} leads loaded)</span>
                   <span className="text-emerald-600 font-mono">100% Syntax Verified</span>
                 </div>
-                <div className="max-h-48 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800/60">
-                  {parsedLeads.map((ld, i) => (
-                    <div key={i} className="px-4 py-2 flex items-center justify-between text-xs font-mono">
-                      <div className="flex items-center gap-3">
-                        <span className="text-neutral-400 w-5">{i + 1}.</span>
-                        <span className="font-semibold text-neutral-900 dark:text-white">
-                          {ld.firstName} {ld.lastName}
-                        </span>
-                        <span className="text-blue-600 dark:text-blue-400">&lt;{ld.email}&gt;</span>
-                      </div>
-                      <div className="text-neutral-500 text-[11px]">
-                        {ld.company} • {ld.jobTitle}
-                      </div>
+                <div className="max-h-44 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800/60">
+                  {parsedLeads.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-neutral-400">
+                      No leads loaded yet. Select a list above or paste CSV data.
                     </div>
-                  ))}
+                  ) : (
+                    parsedLeads.map((ld, i) => (
+                      <div key={i} className="px-4 py-2 flex items-center justify-between text-xs font-mono">
+                        <div className="flex items-center gap-3">
+                          <span className="text-neutral-400 w-5">{i + 1}.</span>
+                          <span className="font-semibold text-neutral-900 dark:text-white">
+                            {ld.firstName} {ld.lastName}
+                          </span>
+                          <span className="text-blue-600 dark:text-blue-400">&lt;{ld.email}&gt;</span>
+                        </div>
+                        <div className="text-neutral-500 text-[11px]">
+                          {ld.company} • {ld.jobTitle}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>

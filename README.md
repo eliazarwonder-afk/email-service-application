@@ -6,7 +6,7 @@
 <h1 align="center">ZegaMail — Modern Business Email, AI Outreach & Cloud Mail Platform</h1>
 
 <p align="center">
-  <strong>The modern, flat-rate alternative to Google Workspace & Titan Mail, built for businesses, web hosts, and agencies.</strong><br>
+  <strong>The modern, flat-rate alternative to Google Workspace & Microsoft 365, built for businesses, web hosts, and agencies.</strong><br>
   Deliver ultra-fast, AI-driven business email backed by high-performance <strong>Cloud Mail Clusters</strong>, <strong>Global Anycast DNS</strong>, and <strong>ZegaCloud Client Portal</strong> billing automation.
 </p>
 

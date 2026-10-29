@@ -145,7 +145,7 @@ CPANEL_SECURE=true
 
 ### Group H: Billing & Payment Processing Architecture (Centralized in ZegaCloud / WHMCS)
 
-In accordance with enterprise separation of concerns (identical to Titan Mail and Google Workspace), all payment processing, merchant gateways (Paystack, Flutterwave, Stripe), and crypto invoicing are handled centrally by the **ZegaCloud Billing & Client Portal** (`billing.zegacloud.com`).
+In accordance with enterprise separation of concerns (identical to Microsoft 365 and Google Workspace), all payment processing, merchant gateways (Paystack, Flutterwave, Stripe), and crypto invoicing are handled centrally by the **ZegaCloud Billing & Client Portal** (`billing.zegacloud.com`).
 
 **Advantages**:
 - **Zero Local Secrets**: The webmail application requires no payment gateway secret keys in its `.env`.

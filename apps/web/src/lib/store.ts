@@ -57,6 +57,33 @@ export interface StoredMailbox {
   createdAt: string;
 }
 
+export interface StoredContactList {
+  id: string;
+  orgId: string;
+  name: string;
+  description?: string;
+  color: "blue" | "emerald" | "purple" | "amber" | "rose" | "indigo" | string;
+  createdAt: string;
+}
+
+export interface StoredContact {
+  id: string;
+  orgId: string;
+  listId: string;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  company: string;
+  jobTitle?: string;
+  phone?: string;
+  relationship: string;
+  relationshipColor: "blue" | "amber" | "emerald" | "purple" | "slate";
+  opens?: string;
+  notes?: string;
+  createdAt: string;
+}
+
 export interface StoredMessage {
   id: string;
   orgId: string;
@@ -243,6 +270,8 @@ export interface DatabaseSchema {
   leads: StoredCampaignLead[];
   orders: StoredOrder[];
   invoices: StoredInvoice[];
+  contactLists: StoredContactList[];
+  contacts: StoredContact[];
   sessions: StoredSession[];
 }
 
@@ -791,6 +820,144 @@ function getInitialDatabase(): DatabaseSchema {
         description: "ZegaMail Pro Scale Upgrade (Unlimited Mailboxes + 100GB NVMe Storage)",
         createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
       }
+    ],
+    contactLists: [
+      {
+        id: "lst_general",
+        orgId: orgId,
+        name: "General Directory",
+        description: "Primary company contacts, verified partners and clients.",
+        color: "blue",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "lst_leads",
+        orgId: orgId,
+        name: "Sales Leads & Prospects",
+        description: "Inbound prospects and qualified pipeline opportunities.",
+        color: "amber",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "lst_vip",
+        orgId: orgId,
+        name: "VIP Accounts & C-Suite",
+        description: "Key decision makers, enterprise accounts and executives.",
+        color: "emerald",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "lst_outreach",
+        orgId: orgId,
+        name: "Q4 Cold Outreach",
+        description: "Target accounts for AI sequences and cold email campaigns.",
+        color: "purple",
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    contacts: [
+      {
+        id: "cnt_1",
+        orgId: orgId,
+        listId: "lst_leads",
+        name: "Sarah Jenkins",
+        firstName: "Sarah",
+        lastName: "Jenkins",
+        email: "s.jenkins@meridiancorp.com",
+        company: "Meridian Corp",
+        jobTitle: "VP Operations",
+        phone: "+1 (555) 234-5678",
+        relationship: "Proposal Active",
+        relationshipColor: "blue",
+        opens: "3 opens recorded",
+        notes: "Interested in annual flat-domain migration.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "cnt_2",
+        orgId: orgId,
+        listId: "lst_outreach",
+        name: "David Miller",
+        firstName: "David",
+        lastName: "Miller",
+        email: "david@hyperscaletech.com",
+        company: "HyperScale Tech",
+        jobTitle: "VP Marketing",
+        phone: "+1 (555) 876-5432",
+        relationship: "Prospect Lead",
+        relationshipColor: "amber",
+        opens: "No emails yet",
+        notes: "SaaS scaleup with 45 mailboxes.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "cnt_3",
+        orgId: orgId,
+        listId: "lst_vip",
+        name: "Elena Rostova",
+        firstName: "Elena",
+        lastName: "Rostova",
+        email: "elena@vanguarddigital.io",
+        company: "Vanguard Digital",
+        jobTitle: "Head of Growth",
+        phone: "+44 20 7946 0912",
+        relationship: "Contract Sent",
+        relationshipColor: "emerald",
+        opens: "7 opens recorded",
+        notes: "Requested dedicated Anycast cluster routing.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "cnt_4",
+        orgId: orgId,
+        listId: "lst_general",
+        name: "Marcus Thorne",
+        firstName: "Marcus",
+        lastName: "Thorne",
+        email: "marcus@apexlogistics.com",
+        company: "Apex Logistics",
+        jobTitle: "Managing Director",
+        phone: "+1 (555) 345-6789",
+        relationship: "Follow-up Due",
+        relationshipColor: "purple",
+        opens: "1 open recorded",
+        notes: "Discussed custom SPF/DKIM verification.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "cnt_5",
+        orgId: orgId,
+        listId: "lst_outreach",
+        name: "Rachel Kim",
+        firstName: "Rachel",
+        lastName: "Kim",
+        email: "rachel@kimfintech.io",
+        company: "Kim FinTech",
+        jobTitle: "Head of Infrastructure",
+        phone: "+1 (555) 901-2345",
+        relationship: "Prospect Lead",
+        relationshipColor: "amber",
+        opens: "2 opens recorded",
+        notes: "Evaluating white-label webmail for agency clients.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "cnt_6",
+        orgId: orgId,
+        listId: "lst_vip",
+        name: "Lucas Vance",
+        firstName: "Lucas",
+        lastName: "Vance",
+        email: "lucas@vanceholding.com",
+        company: "Vance Holding",
+        jobTitle: "CEO",
+        phone: "+1 (555) 432-1098",
+        relationship: "Active Customer",
+        relationshipColor: "emerald",
+        opens: "14 opens recorded",
+        notes: "Enterprise Pro subscription active.",
+        createdAt: new Date().toISOString(),
+      },
     ],
     sessions: [],
   };
@@ -1344,4 +1511,142 @@ export function verifyAndActivateOrder(orderId: string): StoredOrder | null {
 
   writeDb(db);
   return order;
+}
+
+// ==============================================================================
+// CONTACTS & LIST MANAGEMENT HELPERS
+// ==============================================================================
+
+export function getContactLists(orgId: string): StoredContactList[] {
+  const db = readDb();
+  return (db.contactLists || []).filter((l) => l.orgId === orgId || l.orgId === "org_acme_001");
+}
+
+export function createContactList(orgId: string, name: string, description = "", color = "blue"): StoredContactList {
+  const db = readDb();
+  if (!db.contactLists) db.contactLists = [];
+  const listId = "lst_" + crypto.randomUUID().slice(0, 8);
+  const newList: StoredContactList = {
+    id: listId,
+    orgId,
+    name: name.trim(),
+    description: description.trim(),
+    color: color as any,
+    createdAt: new Date().toISOString(),
+  };
+  db.contactLists.push(newList);
+  writeDb(db);
+  return newList;
+}
+
+export function deleteContactList(orgId: string, listId: string): boolean {
+  const db = readDb();
+  if (!db.contactLists) return false;
+  const initialLength = db.contactLists.length;
+  db.contactLists = db.contactLists.filter((l) => l.id !== listId);
+  if (db.contacts) {
+    db.contacts.forEach((c) => {
+      if (c.listId === listId) c.listId = "lst_general";
+    });
+  }
+  writeDb(db);
+  return db.contactLists.length < initialLength;
+}
+
+export function getContacts(orgId: string, listId?: string, search?: string): StoredContact[] {
+  const db = readDb();
+  let results = (db.contacts || []).filter((c) => c.orgId === orgId || c.orgId === "org_acme_001");
+  if (listId && listId !== "all") {
+    results = results.filter((c) => c.listId === listId);
+  }
+  if (search && search.trim()) {
+    const q = search.toLowerCase().trim();
+    results = results.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        (c.company && c.company.toLowerCase().includes(q)) ||
+        (c.jobTitle && c.jobTitle.toLowerCase().includes(q))
+    );
+  }
+  return results;
+}
+
+export function createContact(orgId: string, data: Partial<StoredContact>): StoredContact {
+  const db = readDb();
+  if (!db.contacts) db.contacts = [];
+  const contactId = "cnt_" + crypto.randomUUID().slice(0, 8);
+  const newContact: StoredContact = {
+    id: contactId,
+    orgId,
+    listId: data.listId || "lst_general",
+    name: data.name?.trim() || `${data.firstName || ""} ${data.lastName || ""}`.trim() || "Contact",
+    firstName: data.firstName?.trim() || data.name?.split(" ")[0] || "",
+    lastName: data.lastName?.trim() || data.name?.split(" ").slice(1).join(" ") || "",
+    email: data.email?.toLowerCase().trim() || "",
+    company: data.company?.trim() || "Independent",
+    jobTitle: data.jobTitle?.trim() || "Lead",
+    phone: data.phone?.trim() || "",
+    relationship: data.relationship || "Prospect Lead",
+    relationshipColor: (data.relationshipColor as any) || "blue",
+    opens: data.opens || "No emails yet",
+    notes: data.notes || "",
+    createdAt: new Date().toISOString(),
+  };
+  db.contacts.unshift(newContact);
+  writeDb(db);
+  return newContact;
+}
+
+export function bulkImportContacts(
+  orgId: string,
+  listId: string,
+  items: Array<Partial<StoredContact>>
+): { added: number; contacts: StoredContact[] } {
+  const db = readDb();
+  if (!db.contacts) db.contacts = [];
+  
+  const created: StoredContact[] = [];
+  for (const item of items) {
+    if (!item.email || !item.email.includes("@")) continue;
+    
+    const exists = db.contacts.find((c) => (c.orgId === orgId || c.orgId === "org_acme_001") && c.email.toLowerCase() === item.email?.toLowerCase());
+    if (exists) {
+      if (listId && listId !== "all") exists.listId = listId;
+      continue;
+    }
+
+    const contactId = "cnt_" + crypto.randomUUID().slice(0, 8);
+    const newContact: StoredContact = {
+      id: contactId,
+      orgId,
+      listId: listId && listId !== "all" ? listId : "lst_general",
+      name: item.name?.trim() || `${item.firstName || ""} ${item.lastName || ""}`.trim() || item.email.split("@")[0],
+      firstName: item.firstName?.trim() || item.name?.split(" ")[0] || "",
+      lastName: item.lastName?.trim() || item.name?.split(" ").slice(1).join(" ") || "",
+      email: item.email.toLowerCase().trim(),
+      company: item.company?.trim() || "Company",
+      jobTitle: item.jobTitle?.trim() || "Contact",
+      phone: item.phone?.trim() || "",
+      relationship: item.relationship || "Prospect Lead",
+      relationshipColor: (item.relationshipColor as any) || "blue",
+      opens: "Imported via CSV",
+      notes: item.notes || "",
+      createdAt: new Date().toISOString(),
+    };
+    db.contacts.unshift(newContact);
+    created.push(newContact);
+  }
+  
+  writeDb(db);
+  return { added: created.length, contacts: created };
+}
+
+export function deleteContact(orgId: string, contactId: string): boolean {
+  const db = readDb();
+  if (!db.contacts) return false;
+  const initialLen = db.contacts.length;
+  db.contacts = db.contacts.filter((c) => c.id !== contactId);
+  writeDb(db);
+  return db.contacts.length < initialLen;
 }

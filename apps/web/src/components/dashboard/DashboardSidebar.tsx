@@ -76,8 +76,8 @@ export function DashboardSidebar({
     { id: "campaigns" as const, label: "Campaigns & Sequences", icon: BarChart3, badge: "Cold Mail" },
     { id: "ai" as const, label: "AI Outreach Studio", icon: Sparkles, badge: "Copilot" },
 
-    { id: "contacts" as const, label: "Client Directory", icon: Users },
-    { id: "settings" as const, label: "Settings & Team", icon: Settings },
+    { id: "contacts" as const, label: "Contacts & Lists", icon: Users },
+    { id: "settings" as const, label: "Settings", icon: Settings },
   ];
 
   return (

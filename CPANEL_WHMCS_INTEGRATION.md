@@ -20,7 +20,7 @@ For over twenty years, web hosting providers and digital agencies have provided 
 * **No Modern Delivery Ticks**: Traditional cPanel webmail lacks clean delivery status ticks (Sent ✓ / Delivered ✓✓).
 * **Expensive Alternatives**: Competing solutions like Google Workspace or Microsoft 365 charge \$6–\$18/user/month, squeezing hosting margins.
 
-**ZegaMail** solves this challenge by serving as an ultra-modern, high-performance webmail front-end and automation layer. It integrates directly with your existing **cPanel/WHM** servers and **WHMCS** billing automation, giving your clients an interface comparable to Gmail or Titan Mail while leveraging your existing cPanel infrastructure.
+**ZegaMail** solves this challenge by serving as an ultra-modern, high-performance webmail front-end and automation layer. It integrates directly with your existing **cPanel/WHM** servers and **WHMCS** billing automation, giving your clients an interface comparable to Gmail or Microsoft 365 while leveraging your existing cPanel infrastructure.
 
 ---
 
