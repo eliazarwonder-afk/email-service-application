@@ -14,7 +14,6 @@ import {
   Building2,
   Phone,
   Hash,
-  Sparkles,
   Server,
   RefreshCw,
   Copy,
@@ -258,7 +257,7 @@ export default function DomainOnboardingPage() {
         {/* Progress Stepper */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-300 text-xs font-medium">
-            <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+            <ShieldCheck className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
             <span>Step 2 of 2: Domain Setup & Infrastructure</span>
           </div>
 
@@ -418,8 +417,8 @@ export default function DomainOnboardingPage() {
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
-                <Sparkles className="h-4 w-4" />
+              <span className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                <Server className="h-4 w-4" />
               </span>
               <span className="rounded bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5">
                 Instant Sandbox
@@ -730,11 +729,11 @@ export default function DomainOnboardingPage() {
           <div className="rounded-2xl border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-6 shadow-sm space-y-5">
             <div className="space-y-1">
               <h2 className="text-sm font-bold text-[#121212] dark:text-white flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-500" />
+                <Server className="h-4 w-4 text-emerald-500" />
                 <span>Instant Developer Sandbox Subdomain</span>
               </h2>
               <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-                Try out the webmail interface, AI proposal writer, and delivery status ticks without purchasing or pointing a domain right now.
+                Try out the webmail interface, outreach composer, and delivery status ticks without purchasing or pointing a domain right now.
               </p>
             </div>
 

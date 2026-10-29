@@ -11,7 +11,6 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
-  Sparkles,
   RefreshCw,
   X,
 } from "lucide-react";
@@ -175,7 +174,7 @@ export default function LoginPage() {
           <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/40 p-4 space-y-3 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-900 dark:text-blue-300">
-                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span>Interactive Guided Demo</span>
               </div>
               <span className="text-[10px] bg-white dark:bg-[#161a25] text-blue-700 dark:text-blue-300 font-mono px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800">
@@ -184,7 +183,7 @@ export default function LoginPage() {
             </div>
 
             <p className="text-[11px] text-blue-800 dark:text-blue-300 leading-snug">
-              Select a persona to test live delivery status ticks, AI proposal generator, and automated domain DNS sync:
+              Select a persona to test live delivery status ticks, outbound template studio, and automated domain DNS sync:
             </p>
 
             <div className="grid grid-cols-3 gap-1.5">

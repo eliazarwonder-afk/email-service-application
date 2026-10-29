@@ -579,7 +579,7 @@ export function DashboardSettingsView({
                 <div>
                   <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <CreditCard className="h-4 w-4 text-blue-600" />
-                    <span>Plan Invoices &amp; WHMCS Subscription</span>
+                    <span>Plan Invoices &amp; Client Portal Subscription</span>
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Account subscriptions, domain additions, and receipts are managed via the ZegaCloud Client Portal.

@@ -850,7 +850,7 @@ function getInitialDatabase(): DatabaseSchema {
         id: "lst_outreach",
         orgId: orgId,
         name: "Q4 Cold Outreach",
-        description: "Target accounts for AI sequences and cold email campaigns.",
+        description: "Target accounts for cadence sequences and cold email campaigns.",
         color: "purple",
         createdAt: new Date().toISOString(),
       },

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import {
   Building,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
+  FileText,
   Layers,
   ChevronDown
 } from "lucide-react";
@@ -25,7 +25,6 @@ import {
   AnimatedMail,
   AnimatedServer,
   AnimatedGlobe,
-  AnimatedSparkles,
   AnimatedCheckCheck,
   AnimatedCreditCard,
 } from "@/components/ui/AnimatedIcon";
@@ -53,7 +52,7 @@ export default function PricingPage() {
         {/* HEADER SECTION */}
         <section className="text-center max-w-3xl mx-auto space-y-5">
           <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 shadow-xs">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
             <span className="font-semibold text-slate-900 dark:text-white">Predictable Flat-Rate Email</span>
             <span>•</span>
             <span className="text-blue-600 dark:text-blue-400 font-medium">Zero Per-Seat Taxes</span>
@@ -136,7 +135,7 @@ export default function PricingPage() {
           {/* NIGERIA & GLOBAL LAUNCH PROMO BANNER */}
           <div className="rounded-2xl border border-rose-300 dark:border-rose-900 bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 dark:from-rose-950/50 dark:via-amber-950/40 dark:to-orange-950/50 p-4 text-center shadow-xs">
             <div className="inline-flex items-center gap-2 text-rose-700 dark:text-rose-400 font-extrabold text-xs uppercase tracking-wider">
-              <span className="flex h-2 w-2 rounded-full bg-rose-600 animate-ping" />
+              <span className="flex h-2 w-2 rounded-full bg-rose-600" />
               <span>🔥 Limited-Time Launch Promo — Drastically Reduced Flat-Rate Tiers (Up to 77% OFF)</span>
             </div>
             <p className="text-xs text-slate-700 dark:text-slate-300 mt-1 max-w-2xl mx-auto">
@@ -265,7 +264,7 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>500 AI Assistant Credits/mo</span>
+                  <span>500 Outbound Template Drafts/mo</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -285,7 +284,7 @@ export default function PricingPage() {
           {/* CARD 3: Business Growth (Featured / Google Killer) */}
           <div className="relative rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-[#151924] p-6 flex flex-col justify-between space-y-6 shadow-xl">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 text-white px-3.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
-              <AnimatedSparkles size={13} />
+              <Zap className="w-3.5 h-3.5 text-amber-300" />
               <span>Most Popular</span>
             </div>
 
@@ -344,8 +343,8 @@ export default function PricingPage() {
                   <span>Verified 250 OK Server Delivery Status</span>
                 </div>
                 <div className="flex items-start gap-2 text-indigo-900 dark:text-indigo-200 bg-indigo-50/70 dark:bg-indigo-950/40 p-2 rounded-lg font-medium">
-                  <AnimatedSparkles size={16} />
-                  <span>3,000 AI Outreach & Proposal Credits/mo</span>
+                  <FileText className="h-4 w-4 text-indigo-600 shrink-0 mt-0.5" />
+                  <span>3,000 Outreach & Proposal Drafts/mo</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
@@ -425,7 +424,7 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>10,000 AI Credits/mo</span>
+                  <span>10,000 Outreach Template Dispatches/mo</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -497,7 +496,7 @@ export default function PricingPage() {
                 </tr>
                 <tr>
                   <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
-                    AI Cold Outreach & Lead Engine
+                    Cold Outreach & Contact Lists Engine
                   </td>
                   <td className="py-3.5 px-4 text-blue-600 dark:text-blue-400 font-medium bg-blue-50/50 dark:bg-blue-950/20">
                     Built-in (Multi-step Sequences)

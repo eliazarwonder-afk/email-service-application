@@ -8,7 +8,6 @@ import {
   Code,
   Eye,
   FileText,
-  Sparkles,
   Bold,
   Italic,
   Underline,

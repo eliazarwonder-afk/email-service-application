@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   Globe,
   ArrowRight,
-  Sparkles,
+  Zap,
   Server,
   Lock,
   Mail,
@@ -256,7 +256,7 @@ export default function SignupGatewayPage() {
           <div className="rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between shadow-lg relative">
             <div className="space-y-4">
               <div className="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-                <Sparkles className="h-5 w-5" />
+                <Zap className="h-5 w-5" />
               </div>
 
               <div className="space-y-1.5">
@@ -373,8 +373,8 @@ export default function SignupGatewayPage() {
 
               <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <li className="flex items-center gap-2">
-                  <Check className="h-3.5 w-3.5 text-purple-600 shrink-0" />
-                  <span>Access emails, contacts & AI Studio</span>
+                  <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                  <span>Access emails, contacts &amp; Copy Studio</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-purple-600 shrink-0" />

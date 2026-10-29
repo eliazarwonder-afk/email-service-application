@@ -3,11 +3,11 @@
   <img src="apps/web/public/branding/zegamail-light-transparent.png#gh-light-mode-only" alt="ZegaMail" width="340" />
 </p>
 
-<h1 align="center">ZegaMail — Modern Business Email, AI Outreach & Cloud Mail Platform</h1>
+<h1 align="center">ZegaMail — Modern Business Email, Outreach Campaigns & Cloud Mail Platform</h1>
 
 <p align="center">
   <strong>The modern, flat-rate alternative to Google Workspace & Microsoft 365, built for businesses, web hosts, and agencies.</strong><br>
-  Deliver ultra-fast, AI-driven business email backed by high-performance <strong>Cloud Mail Clusters</strong>, <strong>Global Anycast DNS</strong>, and <strong>ZegaCloud Client Portal</strong> billing automation.
+  Deliver ultra-fast business email backed by high-performance <strong>Cloud Mail Clusters</strong>, <strong>Global Anycast DNS</strong>, and <strong>ZegaCloud Client Portal</strong> billing automation.
 </p>
 
 <p align="center">

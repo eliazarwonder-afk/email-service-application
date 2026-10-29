@@ -16,7 +16,6 @@ import {
   ChevronDown,
   ShieldCheck,
   User,
-  Sparkles,
   BarChart3,
   Mail,
   Users,
@@ -198,7 +197,7 @@ export function DashboardHeader({
           className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-xs font-mono text-slate-700 dark:text-slate-300"
           title="Mailbox Domain: Active & Encrypted"
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span className="truncate max-w-[130px] font-medium">{currentDomain?.domainName || "acmedesign.co"}</span>
         </div>
 

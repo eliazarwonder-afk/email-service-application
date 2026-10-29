@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -25,7 +25,6 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { HeroDashboardPreview } from "@/components/HeroDashboardPreview";
-import { MailDeliveryHeroAnimation } from "@/components/MailDeliveryHeroAnimation";
 import { ClientSetupModal } from "@/components/ClientSetupModal";
 import { useCurrency } from "@/components/CurrencyProvider";
 import { formatPlanPrice, SupportedCurrency, CURRENCY_SYMBOLS } from "@/lib/geo";
@@ -34,7 +33,6 @@ import {
   AnimatedMail,
   AnimatedServer,
   AnimatedGlobe,
-  AnimatedSparkles,
   AnimatedCheckCheck,
   AnimatedCreditCard,
 } from "@/components/ui/AnimatedIcon";
@@ -110,7 +108,7 @@ export default function HomePage() {
           <div className="max-w-3xl mx-auto space-y-6">
             {/* Category Eyebrow */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>Dedicated Business Email Infrastructure</span>
               <span className="text-slate-400">•</span>
               <span className="text-blue-600 dark:text-blue-400 font-mono text-[11px]">100% Ad-Free</span>
@@ -165,9 +163,6 @@ export default function HomePage() {
               </span>
             </div>
           </div>
-
-          {/* Live Delivery Telemetry Animation */}
-          <MailDeliveryHeroAnimation />
 
           {/* Interactive Webmail Interface Preview */}
           <HeroDashboardPreview />
@@ -514,7 +509,7 @@ export default function HomePage() {
             {/* CARD 3: Growth Plan (Recommended) */}
             <div className="rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-xl relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-blue-600 text-white font-bold text-[10px] tracking-wide uppercase flex items-center gap-1 shadow-sm">
-                <AnimatedSparkles size={12} />
+                <Zap className="w-3 h-3 text-amber-300" />
                 <span>Most Popular</span>
               </div>
 

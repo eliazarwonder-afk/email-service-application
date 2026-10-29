@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import Link from "next/link";
 import { Shield, CheckCircle2 } from "lucide-react";
 import { ZegaLogo } from "./ZegaLogo";
@@ -24,12 +24,12 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
             </linearGradient>
           </defs>
           <rect width="100%" height="100%" fill="url(#footer-server-grid)" />
-          <line x1="0%" y1="1" x2="100%" y2="1" stroke="url(#footer-glow-beam)" strokeWidth="2" className="animate-pulse" />
+          <line x1="0%" y1="1" x2="100%" y2="1" stroke="url(#footer-glow-beam)" strokeWidth="2" />
         </svg>
       </div>
 
       {/* Cyber aurora ambient glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[150px] bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full blur-[90px] pointer-events-none animate-pulseGlow" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[150px] bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full blur-[90px] pointer-events-none" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
@@ -40,11 +40,11 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
             </div>
 
             <p className="text-sm text-[#706f6c] dark:text-[#9ca3af] max-w-sm leading-relaxed">
-              Ad-free, privacy-first business email, AI writing assistant, and client outreach campaigns for founders, agencies, and growing teams. Stop paying \$7 per mailbox every month.
+              Ad-free, privacy-first business email, professional template studio, and client outreach campaigns for founders, agencies, and growing teams. Stop paying \$7 per mailbox every month.
             </p>
 
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 dark:border-emerald-900 bg-emerald-50/60 dark:bg-emerald-950/40 px-3 py-1 text-xs text-emerald-800 dark:text-emerald-300">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span>All Systems Operational • 99.99% Uptime SLA</span>
             </div>
 
@@ -84,7 +84,7 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
           {/* Links Column 1: Product */}
           <div className="space-y-3">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[#121212] dark:text-white">
-              Product & AI
+              Product & Features
             </h2>
             <ul className="space-y-2">
               <li>
@@ -99,7 +99,7 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
               </li>
               <li>
                 <Link href="/app?tab=ai" className="hover:text-[#121212] dark:hover:text-white transition-colors">
-                  AI Email & Reply Generator
+                  Email Copy Studio & Templates
                 </Link>
               </li>
               <li>

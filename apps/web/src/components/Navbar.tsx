@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -41,13 +41,13 @@ export function Navbar() {
             href="/pricing"
             className="hover:text-[#121212] dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 rounded px-1.5 py-1"
           >
-            Pricing & AI
+            Pricing & Plans
           </Link>
           <Link
             href="/app"
             className="flex items-center gap-1.5 text-neutral-900 dark:text-neutral-100 hover:text-black dark:hover:text-white font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 rounded px-1.5 py-1"
           >
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
             Live App Preview
           </Link>
         </nav>
@@ -130,7 +130,7 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-medium text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white"
           >
-            Pricing & AI Outreach
+            Pricing & Plans
           </Link>
           <Link
             href="/app"

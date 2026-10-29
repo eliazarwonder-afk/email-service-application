@@ -18,7 +18,6 @@ import {
   BarChart3,
   Clock,
   Layers,
-  Sparkles,
   ArrowRight,
   Sliders,
 } from "lucide-react";

@@ -5,7 +5,6 @@ import {
   Users,
   Plus,
   Mail,
-  Sparkles,
   Upload,
   Download,
   Search,
@@ -463,7 +462,7 @@ Marcus,Thorne,marcus@apexlogistics.com,Apex Logistics,Managing Director,+1 (555)
             <span>Contacts &amp; Audience Lists</span>
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Organize clients into distinct contact lists, bulk upload CSV databases, and launch targeted AI outreach.
+            Organize clients into distinct contact lists, bulk upload CSV databases, and launch targeted outreach campaigns.
           </p>
         </div>
 
@@ -733,10 +732,10 @@ Marcus,Thorne,marcus@apexlogistics.com,Apex Logistics,Managing Director,+1 (555)
                           <button
                             type="button"
                             onClick={() => onDraftAi(contact.name, contact.company)}
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:underline"
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
                           >
-                            <Sparkles className="h-3 w-3" />
-                            <span>AI Draft</span>
+                            <FileText className="h-3 w-3" />
+                            <span>Draft Pitch</span>
                           </button>
                           <button
                             type="button"

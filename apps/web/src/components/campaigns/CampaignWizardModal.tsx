@@ -5,7 +5,6 @@ import {
   X,
   Plus,
   Trash2,
-  Sparkles,
   ShieldCheck,
   AlertTriangle,
   Clock,

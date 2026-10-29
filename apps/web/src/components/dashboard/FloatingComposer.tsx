@@ -7,7 +7,7 @@ import {
   Maximize2,
   Send,
   Paperclip,
-  Sparkles,
+  FileText,
   Trash2,
   CheckCheck,
   Check,
@@ -294,10 +294,10 @@ export function FloatingComposer({
                     <button
                       type="button"
                       onClick={onAiPolish}
-                      className="p-2 rounded-xl text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors"
-                      title="Polish with AI"
+                      className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      title="Insert Template Pitch"
                     >
-                      <Sparkles className="h-4 w-4" />
+                      <FileText className="h-4 w-4" />
                     </button>
                   )}
                 </div>

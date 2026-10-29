@@ -15,7 +15,7 @@ import {
   ShieldAlert,
   Paperclip,
   Download,
-  Sparkles,
+  FileText,
   Send,
   MoreVertical,
   ChevronDown,
@@ -321,8 +321,8 @@ export function MailReadingPane({
             onClick={() => onSmartAiReply(message.subject)}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium transition-colors"
           >
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-            <span>Draft AI Reply</span>
+            <FileText className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+            <span>Use Template Reply</span>
           </button>
 
           <button
@@ -371,10 +371,10 @@ export function MailReadingPane({
                 <button
                   type="button"
                   onClick={() => onSmartAiReply(message.subject)}
-                  className="text-xs text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 font-medium"
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-medium"
                 >
-                  <Sparkles className="h-3 w-3" />
-                  <span>Generate response with AI</span>
+                  <FileText className="h-3 w-3" />
+                  <span>Insert template response</span>
                 </button>
 
                 <button

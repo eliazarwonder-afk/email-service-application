@@ -122,24 +122,23 @@ export function AnimatedGlobe({ className = "w-6 h-6", size = 24 }: AnimatedIcon
 }
 
 /**
- * 5. Animated AI Sparkles (Outreach Copilot, Copy Generation)
+ * 5. Star Icon (Badge & Priority Indicator)
  */
-export function AnimatedSparkles({ className = "w-6 h-6", size = 24 }: AnimatedIconProps) {
+export function AnimatedSparkles({ className = "w-4 h-4", size = 16 }: AnimatedIconProps) {
   return (
-    <div className={`relative group inline-flex items-center justify-center shrink-0 ${className}`}>
-      <span className="absolute -inset-1 rounded-full bg-amber-500/15 group-hover:bg-amber-500/30 blur-sm transition-all duration-300" />
+    <div className={`inline-flex items-center justify-center shrink-0 ${className}`}>
       <svg
         width={size}
         height={size}
         viewBox="0 0 24 24"
-        fill="none"
+        fill="currentColor"
         stroke="currentColor"
-        strokeWidth="1.75"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="relative transition-transform duration-500 group-hover:rotate-180 group-hover:scale-110 text-amber-500 dark:text-amber-400"
+        className="text-amber-400"
       >
-        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
       </svg>
     </div>
   );

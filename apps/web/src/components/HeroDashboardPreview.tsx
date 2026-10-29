@@ -19,7 +19,6 @@ import {
   ExternalLink,
   Shield,
   Clock,
-  Sparkles,
   ArrowRight,
   Filter,
   CheckCircle2,
