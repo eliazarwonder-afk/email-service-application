@@ -579,7 +579,7 @@ export function DashboardSettingsView({
               </div>
 
               <a
-                href="https://billing.zegacloud.com/clientarea.php?action=invoices"
+                href="https://panel.zegacloud.com/clientarea.php?action=invoices"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-semibold shadow-xs transition-all self-start sm:self-auto"
@@ -598,7 +598,7 @@ export function DashboardSettingsView({
                 <span className="text-slate-400 ml-2">• Flat Domain Rate • Verified Inbox Delivery</span>
               </div>
               <a
-                href="https://billing.zegacloud.com/upgrade.php"
+                href="https://panel.zegacloud.com/upgrade.php"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"

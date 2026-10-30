@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -41,7 +41,8 @@ export default function PricingPage() {
   const getWhmcsPlanUrl = (plan: "starter" | "growth" | "pro") => {
     const pids = { starter: 1, growth: 2, pro: 3 };
     const cycle = billingCycle === "annual" ? "annually" : "monthly";
-    return `https://billing.zegacloud.com/cart.php?a=add&pid=${pids[plan]}&billingcycle=${cycle}`;
+    const whmcsBase = process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "https://panel.zegacloud.com";
+    return `${whmcsBase}/cart.php?a=add&pid=${pids[plan]}&billingcycle=${cycle}`;
   };
 
   return (

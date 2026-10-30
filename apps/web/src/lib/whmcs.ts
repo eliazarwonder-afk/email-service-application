@@ -59,7 +59,7 @@ export interface WhmcsSsoResult {
 
 export function getWhmcsConfig(): WhmcsConfig {
   return {
-    apiUrl: process.env.WHMCS_API_URL || "https://billing.zegacloud.com/includes/api.php",
+    apiUrl: process.env.WHMCS_API_URL || "https://panel.zegacloud.com/includes/api.php",
     apiIdentifier: process.env.WHMCS_API_IDENTIFIER,
     apiSecret: process.env.WHMCS_API_SECRET,
     accessKey: process.env.WHMCS_API_ACCESS_KEY,
@@ -251,9 +251,10 @@ function handleWhmcsMock(action: string, params: Record<string, any>): any {
   }
 
   if (action === "CreateSsoToken") {
+    const base = process.env.WHMCS_BASE_URL || "https://panel.zegacloud.com";
     return {
       result: "success",
-      redirect_url: `https://billing.zegacloud.com/clientarea.php?sso_auth=sandbox_${Date.now()}`,
+      redirect_url: `${base}/clientarea.php?sso_auth=sandbox_${Date.now()}`,
     };
   }
 

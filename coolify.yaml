@@ -15,7 +15,10 @@ services:
       - HOSTNAME=0.0.0.0
       - DATABASE_URL=postgresql://zegabytez:zegabytez_secure_pass@postgres:5432/zegabytez_mail
       - REDIS_URL=redis://redis:6379
-      - NEXT_PUBLIC_APP_URL=${COOLIFY_FQDN:-https://panel.zegacloud.com}
+      - NEXT_PUBLIC_APP_URL=${COOLIFY_FQDN:-http://localhost:3000}
+      - WHMCS_BASE_URL=${WHMCS_BASE_URL:-https://panel.zegacloud.com}
+      - WHMCS_API_URL=${WHMCS_API_URL:-https://panel.zegacloud.com/includes/api.php}
+      - NEXT_PUBLIC_WHMCS_BASE_URL=${NEXT_PUBLIC_WHMCS_BASE_URL:-https://panel.zegacloud.com}
       - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-mail.zegacloud.com}
       - CPANEL_SMTP_PORT=${CPANEL_SMTP_PORT:-465}
       - WHMCS_INTERNAL_WEBHOOK_SECRET=${WHMCS_INTERNAL_WEBHOOK_SECRET:-super_secret_whmcs_webhook_token}

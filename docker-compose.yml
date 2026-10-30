@@ -27,7 +27,10 @@ services:
       - REDIS_URL=redis://mail-redis:6379
       
       # Coolify Magic Variable: Resolves automatically to the domain assigned in Coolify UI
-      - NEXT_PUBLIC_APP_URL=${SERVICE_FQDN_APP:-https://panel.zegacloud.com}
+      - NEXT_PUBLIC_APP_URL=${SERVICE_FQDN_APP:-http://localhost:3000}
+      - WHMCS_BASE_URL=${WHMCS_BASE_URL:-https://panel.zegacloud.com}
+      - WHMCS_API_URL=${WHMCS_API_URL:-https://panel.zegacloud.com/includes/api.php}
+      - NEXT_PUBLIC_WHMCS_BASE_URL=${NEXT_PUBLIC_WHMCS_BASE_URL:-https://panel.zegacloud.com}
       
       # cPanel Exim/Dovecot Mail Gateway Bridge
       - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-mail.zegacloud.com}

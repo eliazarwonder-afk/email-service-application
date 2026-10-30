@@ -107,7 +107,7 @@ SMTP_FROM_NAME="ZegaCloud Security & Verification"
 ---
 
 ### Group F: WHMCS Billing & Domain Automation API
-Controls real-time domain availability search, domain purchases, invoice generation, and 1-Click Client SSO into `billing.zegacloud.com`.
+Controls real-time domain availability search, domain purchases, invoice generation, and 1-Click Client SSO into `panel.zegacloud.com`.
 
 #### How to Obtain:
 1. In WHMCS Admin, go to **Setup > Staff Management > API Roles**.
@@ -115,8 +115,8 @@ Controls real-time domain availability search, domain purchases, invoice generat
 3. Go to **Setup > Staff Management > Administrator Users** and assign the API Role.
 4. Copy into `.env.local`:
 ```bash
-WHMCS_API_URL=https://billing.zegacloud.com/includes/api.php
-WHMCS_BASE_URL=https://billing.zegacloud.com
+WHMCS_API_URL=https://panel.zegacloud.com/includes/api.php
+WHMCS_BASE_URL=https://panel.zegacloud.com
 WHMCS_API_IDENTIFIER=your_whmcs_api_role_identifier
 WHMCS_API_SECRET=your_whmcs_api_role_secret
 WHMCS_CLIENT_SSO_SECRET=super_secret_whmcs_sso_shared_key

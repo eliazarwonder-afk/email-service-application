@@ -72,7 +72,7 @@ async function runTests() {
     const starterLink = page.locator('a:has-text("Get Starter"), a:has-text("Choose Starter")').first();
     assert(await starterLink.count() > 0, "Starter plan CTA exists on /pricing");
     const starterHref = await starterLink.getAttribute("href");
-    assert(starterHref.includes("billing.zegacloud.com/cart.php"), "Starter plan links directly to ZegaCloud Billing cart");
+    assert(starterHref.includes("panel.zegacloud.com/cart.php") || starterHref.includes("billing.zegacloud.com/cart.php"), "Starter plan links directly to ZegaCloud Billing cart");
 
     // Check Free Plan CTA href
     const freePlanLink = page.locator('a:has-text("Claim Free Mailboxes"), a:has-text("Claim Free Plan")').first();

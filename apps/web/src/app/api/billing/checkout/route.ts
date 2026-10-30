@@ -231,7 +231,8 @@ export async function POST(req: Request) {
     };
     const pid = productPidMap[planId] || "2";
     const cycle = isAnnual ? "annually" : "monthly";
-    const whmcsCheckoutUrl = `https://billing.zegacloud.com/cart.php?a=add&pid=${pid}&billingcycle=${cycle}`;
+    const whmcsBase = process.env.WHMCS_BASE_URL || "https://panel.zegacloud.com";
+    const whmcsCheckoutUrl = `${whmcsBase}/cart.php?a=add&pid=${pid}&billingcycle=${cycle}`;
 
     const response = NextResponse.json({
       success: true,

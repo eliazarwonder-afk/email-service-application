@@ -41,7 +41,8 @@ export default function WebmailAppPage() {
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const handleOpenUpgradePortal = () => {
-    window.open("https://billing.zegacloud.com/upgrade.php", "_blank", "noopener,noreferrer");
+    const whmcsBase = process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "https://panel.zegacloud.com";
+    window.open(`${whmcsBase}/upgrade.php`, "_blank", "noopener,noreferrer");
   };
 
   // Custom Folders & Templates
