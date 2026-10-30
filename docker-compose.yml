@@ -9,10 +9,11 @@ services:
   # 1. CORE APPLICATION (Next.js 15 Web App + REST API)
   # ---------------------------------------------------------------------------
   app:
+    image: ${ZEGAMAIL_IMAGE:-ghcr.io/eliazarwonder-afk/email-service-application:latest}
     build:
       context: .
       dockerfile: Dockerfile
-    image: zegabytez-mail-app:latest
+    pull_policy: always
     restart: unless-stopped
     ports:
       - "3000:3000"

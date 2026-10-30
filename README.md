@@ -163,16 +163,24 @@ pnpm dev:mobile
 
 ---
 
-## 🚢 Deploying to Production (Coolify & PaaS)
+## 🚢 Deploying to Production (Deploy in < 1 Minute)
 
-ZegaMail includes a production-ready **Coolify v4 Stack Template** located at [`coolify/docker-compose.coolify.yml`](file:///coolify/docker-compose.coolify.yml).
+ZegaMail supports **instant, zero-compile production deployments** using pre-compiled standalone images on GitHub Container Registry (`ghcr.io`):
 
-### Deploy in Coolify:
+```bash
+docker pull ghcr.io/eliazarwonder-afk/email-service-application:latest
+docker compose up -d
+```
+
+### Instant 1-Click Deployment on Coolify:
 1. Open your **Coolify Dashboard**.
-2. Click **+ Create Resource** ➔ **Docker Compose**.
-3. Select this repository or paste the content of [`coolify/docker-compose.coolify.yml`](file:///coolify/docker-compose.coolify.yml).
-4. Define your production environment variables in the Coolify UI.
-5. Click **Deploy**.
+2. Click **+ Create Resource** ➔ **Docker Image** (or **Docker Compose**).
+3. Image source: `ghcr.io/eliazarwonder-afk/email-service-application:latest` (or use `coolify.yaml`).
+4. Set your environment variables in Coolify UI.
+5. Click **Deploy** — your server pulls the ~130MB standalone image and starts in **under 30 seconds** without compiling or stressing the server's CPU/RAM.
+
+### Automated CI/CD (GitHub Actions):
+Every push to `main` automatically triggers `.github/workflows/deploy.yml` which compiles the Next.js standalone container on GitHub's high-speed runners, pushes the layer-cached image to GHCR, and optionally pings your Coolify Webhook (`COOLIFY_WEBHOOK`) for zero-downtime redeployment.
 
 Coolify will provision:
 * `mail-db`: PostgreSQL 16 with persistent volume `zegamail_pgdata`.
