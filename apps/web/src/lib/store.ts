@@ -2,7 +2,12 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// Resolve data directory safely across both local dev and standalone Docker environments
+const DATA_DIR =
+  process.env.DATA_DIR ||
+  (fs.existsSync(path.join(process.cwd(), "apps/web/data"))
+    ? path.join(process.cwd(), "apps/web/data")
+    : path.join(process.cwd(), "data"));
 const DB_FILE = path.join(DATA_DIR, "database.json");
 
 export interface StoredUser {

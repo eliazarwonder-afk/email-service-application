@@ -52,9 +52,13 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
+# Ensure data directory exists and is writable by nextjs user
+RUN mkdir -p /app/data /app/apps/web/data && chown -R nextjs:nodejs /app
+
 # Copy essential runtime assets and standalone minimal server
-COPY --from=builder /app/apps/web/public ./apps/web/public
-COPY --from=builder /app/apps/web/data ./apps/web/data
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/data ./data
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/data ./apps/web/data
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 
