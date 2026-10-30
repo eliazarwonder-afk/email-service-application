@@ -1,6 +1,6 @@
 # ZegaMail Integration & Architecture Guide
 **Enterprise White-Label Business Email & Client Outreach Architecture**
-*A Product of ZegaCloud (Anycast NVMe Cluster)*
+*Open-Source Business Mail Architecture*
 
 ---
 
@@ -45,13 +45,13 @@ Add these variables to your `.env.local` or production container deployment:
 # ==============================================================================
 # 1. APPLICATION & DOMAIN BASE URL
 # ==============================================================================
-NEXT_PUBLIC_APP_URL="https://mail.zegacloud.com"
+NEXT_PUBLIC_APP_URL="https://mail.yourdomain.com"
 
 # ==============================================================================
 # 2. WHMCS API INTEGRATION (Domain Search, Registration, Orders & Client SSO)
 # Documentation: https://developers.whmcs.com/api/
 # ==============================================================================
-WHMCS_API_URL="https://billing.zegacloud.com/includes/api.php"
+WHMCS_API_URL="https://billing.yourdomain.com/includes/api.php"
 WHMCS_API_IDENTIFIER="your_whmcs_api_identifier"
 WHMCS_API_SECRET="your_whmcs_api_secret"
 WHMCS_API_ACCESS_KEY="optional_whmcs_ip_access_key"
@@ -63,8 +63,8 @@ WHMCS_API_ACCESS_KEY="optional_whmcs_ip_access_key"
 # 3. cPanel UAPI INTEGRATION (Dovecot Mailboxes, DNS Telemetry, Exim MTA)
 # Documentation: https://api.docs.cpanel.net/openapi/cpanel/overview/
 # ==============================================================================
-CPANEL_HOST="cpanel.zegacloud.com"
-CPANEL_USER="zegacloud"
+CPANEL_HOST="cpanel.yourdomain.com"
+CPANEL_USER="cpaneluser"
 CPANEL_API_TOKEN="CPANEL_UAPI_TOKEN_HEX_STRING_HERE"
 CPANEL_DEFAULT_QUOTA_MB="5000"
 
@@ -72,7 +72,7 @@ CPANEL_DEFAULT_QUOTA_MB="5000"
 # 4. BILLING & PORTAL ARCHITECTURE (CENTRALIZED IN WHMCS)
 # ==============================================================================
 # All payment gateways (Paystack, Flutterwave, Stripe, Crypto) are configured
-# and processed centrally inside the ZegaCloud WHMCS Client Portal (billing.zegacloud.com).
+# and processed centrally inside the Client Portal (billing.yourdomain.com).
 # No payment gateway secret keys are needed or stored in this web application.
 ```
 
@@ -93,11 +93,11 @@ CPANEL_DEFAULT_QUOTA_MB="5000"
   2. Creates order and invoice record.
   3. Prepares direct payment link via Paystack, Flutterwave, or Stripe.
 
-### C. One-Click ZegaCloud Client Area SSO
+### C. One-Click Client Area SSO
 - **Endpoint**: `/api/auth/whmcs-sso` (POST or GET)
 - **WHMCS Action**: `CreateSsoToken`
 - **Parameters**: `client_id`, `destination: "clientarea:home"`
-- **Redirect**: Redirects client directly to authenticated ZegaCloud management dashboard without prompting for separate passwords.
+- **Redirect**: Redirects client directly to authenticated client management dashboard without prompting for separate passwords.
 
 ---
 
@@ -133,7 +133,7 @@ Every provisioned mailbox returns exact DNS records to ensure 99.9% inbox delive
 
 ## 5. Centralized Billing & Checkout Architecture
 
-All payment settlement is handled directly by the ZegaCloud Billing Platform (`billing.zegacloud.com`):
+All payment settlement is handled directly by the Billing Platform (`billing.yourdomain.com`):
 - **Starter Plan**: Direct cart link (`cart.php?a=add&pid=1`)
 - **Growth Plan**: Direct cart link (`cart.php?a=add&pid=2`)
 - **Pro Plan**: Direct cart link (`cart.php?a=add&pid=3`)

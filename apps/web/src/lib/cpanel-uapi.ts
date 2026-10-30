@@ -44,7 +44,7 @@ export interface CpanelDnsConfiguration {
 
 export function getCpanelConfig(): CpanelConfig {
   return {
-    host: process.env.CPANEL_HOST || "cpanel.zegacloud.com",
+    host: process.env.CPANEL_HOST || "localhost",
     username: process.env.CPANEL_USER,
     apiToken: process.env.CPANEL_API_TOKEN,
     defaultQuotaMb: parseInt(process.env.CPANEL_DEFAULT_QUOTA_MB || "5000", 10),

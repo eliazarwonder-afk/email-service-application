@@ -41,7 +41,7 @@ export function TechServerRibbon() {
           <div className="flex items-center gap-2 text-[11px] text-neutral-500 dark:text-neutral-400">
             <span>Global DNS Synchronized</span>
             <span className="h-1.5 w-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-            <span className="text-neutral-800 dark:text-neutral-200 font-semibold">ZegaCloud Network</span>
+            <span className="text-neutral-800 dark:text-neutral-200 font-semibold">Anycast Network</span>
           </div>
         </div>
       </div>

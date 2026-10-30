@@ -108,7 +108,7 @@ export function DashboardLoadingSplash({
         <div className="space-y-1 mb-6">
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-950/80 border border-blue-800/50 text-[11px] font-mono text-blue-300 uppercase tracking-widest">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>ZegaCloud Cluster • 250 OK</span>
+            <span>Mail Cluster • 250 OK</span>
           </div>
           <h2 className="text-xl font-bold tracking-tight text-white font-sans mt-2">
             Loading Workspace

@@ -136,7 +136,7 @@ export async function POST(req: Request) {
         id: "dom_" + crypto.randomUUID().slice(0, 8),
         orgId,
         domainName: targetDomain,
-        domainType: "zegacloud",
+        domainType: "direct",
         verified: true,
         mxStatus: "verified",
         spfStatus: "verified",
@@ -223,7 +223,7 @@ export async function POST(req: Request) {
       return setSessionOnResponse(response);
     }
 
-    // 4. PAID PLANS (Starter, Growth, Enterprise Pro) -> Redirect to ZegaCloud Client Portal
+    // 4. PAID PLANS (Starter, Growth, Enterprise Pro) -> Redirect to Client Billing Portal
     const productPidMap: Record<string, string> = {
       starter: "1",
       growth: "2",
@@ -231,13 +231,15 @@ export async function POST(req: Request) {
     };
     const pid = productPidMap[planId] || "2";
     const cycle = isAnnual ? "annually" : "monthly";
-    const whmcsBase = process.env.WHMCS_BASE_URL || "https://panel.zegacloud.com";
-    const whmcsCheckoutUrl = `${whmcsBase}/cart.php?a=add&pid=${pid}&billingcycle=${cycle}`;
+    const whmcsBase = process.env.WHMCS_BASE_URL || process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "";
+    const whmcsCheckoutUrl = whmcsBase
+      ? `${whmcsBase.replace(/\/+$/, "")}/cart.php?a=add&pid=${pid}&billingcycle=${cycle}`
+      : `/app?plan=${planId}&checkout=mock`;
 
     const response = NextResponse.json({
       success: true,
       redirectUrl: whmcsCheckoutUrl,
-      message: "Redirecting to ZegaCloud Portal for secure payment and automated provisioning.",
+      message: "Redirecting to billing portal for secure payment and automated provisioning.",
     });
 
     return setSessionOnResponse(response);
@@ -253,6 +255,6 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   return NextResponse.json({
     success: true,
-    message: "Payments are processed centrally by the ZegaCloud Client Portal.",
+    message: "Payments are processed centrally by the Client Portal.",
   });
 }

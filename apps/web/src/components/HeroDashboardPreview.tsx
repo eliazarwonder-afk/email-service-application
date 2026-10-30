@@ -57,7 +57,7 @@ const PREVIEW_EMAILS: PreviewEmail[] = [
   {
     id: "2",
     sender: "Acme Payments",
-    senderEmail: "billing@zegacloud.com",
+    senderEmail: "billing@acmepayments.co",
     subject: "Invoice #INV-2026-891 Settled ($49.00 USD)",
     preview: "Your monthly business email subscription has been confirmed via on-chain blockchain settlement...",
     time: "9:15 AM",
@@ -324,7 +324,7 @@ export function HeroDashboardPreview() {
               <div className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
                 {selectedEmail.preview}
                 {"\n\n"}
-                We confirmed the DNS records: MX points to mail.zegacloud.com with priority 10, and DKIM 2048-bit keys are fully verified. All outbound traffic flows with RFC 3461 delivery receipts.
+                We confirmed the DNS records: MX points to mail.acmedesign.co with priority 10, and DKIM 2048-bit keys are fully verified. All outbound traffic flows with RFC 3461 delivery receipts.
                 {"\n\n"}
                 Looking forward to our continued partnership.
               </div>

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { getWhmcsCartUrl } from "@/lib/config";
 import { useCurrency } from "@/components/CurrencyProvider";
 import { formatPlanPrice, SupportedCurrency, CURRENCY_SYMBOLS } from "@/lib/geo";
 import {
@@ -41,8 +42,8 @@ export default function PricingPage() {
   const getWhmcsPlanUrl = (plan: "starter" | "growth" | "pro") => {
     const pids = { starter: 1, growth: 2, pro: 3 };
     const cycle = billingCycle === "annual" ? "annually" : "monthly";
-    const whmcsBase = process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "https://panel.zegacloud.com";
-    return `${whmcsBase}/cart.php?a=add&pid=${pids[plan]}&billingcycle=${cycle}`;
+    const cartUrl = getWhmcsCartUrl({ pid: pids[plan], billingcycle: cycle });
+    return cartUrl !== "#" ? cartUrl : `/signup?plan=${plan}&cycle=${cycle}`;
   };
 
   return (
@@ -159,7 +160,7 @@ export default function PricingPage() {
                   <AnimatedMail size={22} />
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400">
-                  Included free with any active domain registered or hosted on ZegaCloud.
+                  Included free with any active registered or hosted domain.
                 </p>
               </div>
 
@@ -429,7 +430,7 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>1-Click ZegaCloud Client Area SSO</span>
+                  <span>1-Click Client Portal SSO</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />

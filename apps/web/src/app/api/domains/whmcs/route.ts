@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       id: "dom_" + crypto.randomUUID().slice(0, 8),
       orgId,
       domainName: cleanDomain,
-      domainType: "zegacloud",
+      domainType: "direct",
       verified: true,
       mxStatus: "verified",
       spfStatus: "verified",

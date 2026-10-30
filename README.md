@@ -7,12 +7,12 @@
 
 <p align="center">
   <strong>The modern, flat-rate alternative to Google Workspace & Microsoft 365, built for businesses, web hosts, and agencies.</strong><br>
-  Deliver ultra-fast business email backed by high-performance <strong>Cloud Mail Clusters</strong>, <strong>Global Anycast DNS</strong>, and <strong>ZegaCloud Client Portal</strong> billing automation.
+  Deliver ultra-fast business email backed by high-performance <strong>Cloud Mail Clusters</strong>, <strong>Global Anycast DNS</strong>, and <strong>Client Billing Portal</strong> billing automation.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Cloud_Mail-Cluster_Engine-0066FF?style=for-the-badge&logoColor=white" alt="Cloud Mail" />
-  <img src="https://img.shields.io/badge/ZegaCloud_Portal-Billing_&_SSO-00C49F?style=for-the-badge&logoColor=white" alt="Portal Billing" />
+  <img src="https://img.shields.io/badge/Client_Portal-Billing_&_SSO-00C49F?style=for-the-badge&logoColor=white" alt="Portal Billing" />
   <a href="https://coolify.io"><img src="https://img.shields.io/badge/Coolify_v4-1--Click_Deploy-6B21A8?style=for-the-badge&logo=coolify&logoColor=white" alt="Coolify" /></a>
   <a href="https://docker.com"><img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" /></a>
   <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js_15-App_Router-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" /></a>
@@ -34,7 +34,7 @@ ZegaMail transforms standard cloud servers into a modern, revenue-generating ent
 * 🤖 **Zega AI Outreach Studio**: Built-in AI proposal writer, cold email sequences, and high-converting smart replies.
 * 👁️ **Delivery Status Ticks (Sent ✓ / Delivered ✓✓)**: Guaranteed delivery confirmation that verifies messages reached recipient mail servers via RFC 3461 DSN.
 * ⚡ **Automated Mailbox Provisioning**: Instantly provisions mailboxes, allocates storage pools, and configures DKIM/SPF/DMARC records.
-* 💼 **ZegaCloud Client Portal Integration**: Seamless integration with automated service provisioning, invoice billing, and tokenized Client Area Single Sign-On (SSO).
+* 💼 **Client Billing Portal Integration**: Seamless integration with automated service provisioning, invoice billing, and tokenized Client Area Single Sign-On (SSO).
 * 🔒 **AES-256-GCM Credential Vault**: User SaaS credentials are cryptographically decoupled from raw IMAP/SMTP cluster passwords.
 
 ---
@@ -46,7 +46,7 @@ flowchart TB
     subgraph ClientLayer["Frontend & Client Layer"]
         Browser["Next.js 15 Webmail Client<br/>(Port 3000)"]
         Mobile["Mobile & Desktop Clients<br/>(iOS, Android, Outlook)"]
-        PortalClient["ZegaCloud Client Portal<br/>(1-Click SSO Button)"]
+        PortalClient["Client Billing Portal<br/>(1-Click SSO Button)"]
     end
 
     subgraph ServiceLayer["Application & API Layer"]

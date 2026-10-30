@@ -64,7 +64,7 @@ async function runTests() {
     const errorCountAfterValid = await page.locator('text=/Please enter a valid email address/i').count();
     assert(errorCountAfterValid === 0, "Error cleared when valid email is provided");
 
-    // 2. Test Pricing Plan Links & Direct ZegaCloud Routing
+    // 2. Test Pricing Plan Links & Direct Portal Routing
     console.log("\n[Test 2] Testing /pricing direct portal links and free claim routing...");
     await page.goto("http://localhost:3000/pricing", { waitUntil: "networkidle" });
 
@@ -72,7 +72,7 @@ async function runTests() {
     const starterLink = page.locator('a:has-text("Get Starter"), a:has-text("Choose Starter")').first();
     assert(await starterLink.count() > 0, "Starter plan CTA exists on /pricing");
     const starterHref = await starterLink.getAttribute("href");
-    assert(starterHref.includes("panel.zegacloud.com/cart.php") || starterHref.includes("billing.zegacloud.com/cart.php"), "Starter plan links directly to ZegaCloud Billing cart");
+    assert(starterHref.includes("cart.php") || starterHref.includes("/signup"), "Starter plan links to checkout or signup");
 
     // Check Free Plan CTA href
     const freePlanLink = page.locator('a:has-text("Claim Free Mailboxes"), a:has-text("Claim Free Plan")').first();

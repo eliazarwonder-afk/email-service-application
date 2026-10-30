@@ -23,6 +23,7 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { ZegaLogo } from "@/components/ZegaLogo";
 import { useCurrency } from "@/components/CurrencyProvider";
+import { getWhmcsCartUrl } from "@/lib/config";
 import { validateDomain } from "@/lib/validation";
 
 export default function SignupGatewayPage() {
@@ -83,7 +84,7 @@ export default function SignupGatewayPage() {
       const res = await fetch("/api/auth/whmcs-sso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "owner@zegacloud.com" }),
+        body: JSON.stringify({ email: "admin@example.com" }),
       });
       const data = await res.json();
       if (data.success && data.redirectUrl) {
@@ -117,15 +118,15 @@ export default function SignupGatewayPage() {
 
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 px-3.5 py-1 text-xs text-blue-800 dark:text-blue-300 font-medium">
             <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span>ZegaCloud Secure Provisioning Gateway</span>
+            <span>Secure Provisioning Gateway</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Get Your Business Email on ZegaCloud
+            Get Your Business Email
           </h1>
 
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            ZegaMail business accounts, custom domains, and enterprise DNS security are securely provisioned through the <strong>ZegaCloud Platform</strong>.
+            ZegaMail business accounts, custom domains, and enterprise DNS security are securely provisioned through the <strong>Client Billing Gateway</strong>.
           </p>
         </div>
 
@@ -135,7 +136,7 @@ export default function SignupGatewayPage() {
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span>Check Domain Availability on ZegaCloud</span>
+                <span>Check Domain Availability</span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Check whether your business name is available or connect an existing registered domain.
@@ -228,12 +229,12 @@ export default function SignupGatewayPage() {
               <div className="shrink-0 flex items-center gap-2">
                 {domainResult.status === "available" ? (
                   <a
-                    href={`https://panel.zegacloud.com/cart.php?a=add&domain=register&query=${encodeURIComponent(domainResult.domain)}`}
+                    href={getWhmcsCartUrl({ domain: domainResult.domain })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-all"
                   >
-                    <span>Order on ZegaCloud</span>
+                    <span>Order Domain</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </a>
                 ) : (
@@ -250,7 +251,7 @@ export default function SignupGatewayPage() {
           )}
         </div>
 
-        {/* 3 GATEWAY PATHWAYS (ZEGACLOUD PROVISIONING MODEL) */}
+        {/* 3 GATEWAY PATHWAYS (PROVISIONING MODEL) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* PATHWAY 1: New Business Email Plan */}
           <div className="rounded-2xl border-2 border-blue-600 dark:border-blue-500 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between shadow-lg relative">
@@ -264,7 +265,7 @@ export default function SignupGatewayPage() {
                   Recommended For Businesses
                 </span>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  Order on ZegaCloud
+                  Order Business Plan
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   Select your flat-rate email plan. Get up to 30 mailboxes, high-speed NVMe storage, and automated DNS routing from <strong>₦1,500/mo</strong> or <strong>$3.90/mo</strong> flat.
@@ -278,7 +279,7 @@ export default function SignupGatewayPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-                  <span>Instant provisioning via ZegaCloud</span>
+                  <span>Instant automated provisioning</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />
@@ -298,7 +299,7 @@ export default function SignupGatewayPage() {
             </div>
           </div>
 
-          {/* PATHWAY 2: ZegaCloud Client SSO */}
+          {/* PATHWAY 2: Client SSO */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 flex flex-col justify-between shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all">
             <div className="space-y-4">
               <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
@@ -307,13 +308,13 @@ export default function SignupGatewayPage() {
 
               <div className="space-y-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                  Existing ZegaCloud Client
+                  Existing Client Account
                 </span>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  1-Click ZegaCloud SSO
+                  1-Click Client SSO
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Already have hosting, domains, or an active account in the ZegaCloud Client Area? Access webmail directly with cryptographic HMAC-SHA256 Single Sign-On.
+                  Already have hosting, domains, or an active account in the Client Portal? Access webmail directly with cryptographic HMAC-SHA256 Single Sign-On.
                 </p>
               </div>
 
@@ -344,7 +345,7 @@ export default function SignupGatewayPage() {
                   <span>Authenticating SSO…</span>
                 ) : (
                   <>
-                    <span>Sign In via ZegaCloud SSO</span>
+                    <span>Sign In via Client SSO</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </>
                 )}
@@ -403,7 +404,7 @@ export default function SignupGatewayPage() {
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#12151e] p-6 shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <HelpCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span>Why is registration handled via ZegaCloud?</span>
+            <span>Why is registration handled via Client Portal?</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             <div className="space-y-1.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800">
@@ -420,7 +421,7 @@ export default function SignupGatewayPage() {
                 2. Unified Billing & Centralized Team Seats
               </p>
               <p>
-                Business administrators manage their invoices, team quotas, renewals, and payment methods in one unified ZegaCloud dashboard without juggling multiple disjointed logins.
+                Business administrators manage their invoices, team quotas, renewals, and payment methods in one unified portal dashboard without juggling multiple disjointed logins.
               </p>
             </div>
           </div>

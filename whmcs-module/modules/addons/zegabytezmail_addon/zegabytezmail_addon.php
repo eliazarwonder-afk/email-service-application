@@ -19,7 +19,7 @@ function zegabytezmail_addon_config()
         'name' => 'ZegaMail Master Cluster & Crypto Billing Manager',
         'description' => 'Central multi-tenant control dashboard for ZegaMail, cPanel Exim/Dovecot mail clusters, automated blockchain crypto verification, and order settlement.',
         'version' => '2.1',
-        'author' => 'ZegaCloud',
+        'author' => 'Community',
         'fields' => array(
             'api_url' => array(
                 'FriendlyName' => 'ZegaMail API URL',
@@ -53,14 +53,14 @@ function zegabytezmail_addon_config()
                 'FriendlyName' => 'Cron Scanner Secret Token',
                 'Type' => 'password',
                 'Size' => '40',
-                'Default' => 'zegacloud-cron-secret',
+                'Default' => 'cron-secret-token',
                 'Description' => 'Shared secret token for triggering background on-chain scans',
             ),
             'cpanel_cluster_host' => array(
                 'FriendlyName' => 'Master cPanel/WHM Server Host',
                 'Type' => 'text',
                 'Size' => '40',
-                'Default' => 'mail.zegacloud.com',
+                'Default' => 'mail.yourdomain.com',
                 'Description' => 'Fully qualified hostname of your primary Exim/Dovecot mail server',
             ),
             'default_ai_credits' => array(
@@ -109,7 +109,7 @@ function zegabytezmail_addon_output($vars)
     $clusterHost = $vars['cpanel_cluster_host'];
     $verificationMode = isset($vars['crypto_verification_mode']) ? $vars['crypto_verification_mode'] : 'auto_scanner';
     $minConfirmations = isset($vars['crypto_min_confirmations']) ? $vars['crypto_min_confirmations'] : '1';
-    $cronToken = isset($vars['cron_scanner_token']) ? $vars['cron_scanner_token'] : 'zegacloud-cron-secret';
+    $cronToken = isset($vars['cron_scanner_token']) ? $vars['cron_scanner_token'] : 'cron-secret-token';
 
     // Fetch tenant records from WHMCS database
     $tenants = array();
@@ -148,7 +148,7 @@ function zegabytezmail_addon_output($vars)
             'serviceId' => 101,
             'clientId' => 1,
             'clientName' => 'Alex Carter (Acme Creative Studio)',
-            'email' => 'owner@zegacloud.com',
+            'email' => 'alex@acmedesign.co',
             'domain' => 'acmedesign.co',
             'product' => 'ZegaMail Business Growth',
             'status' => 'Active',

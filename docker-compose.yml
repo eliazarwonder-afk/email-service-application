@@ -28,21 +28,21 @@ services:
       
       # Coolify Magic Variable: Resolves automatically to the domain assigned in Coolify UI
       - NEXT_PUBLIC_APP_URL=${SERVICE_FQDN_APP:-http://localhost:3000}
-      - WHMCS_BASE_URL=${WHMCS_BASE_URL:-https://panel.zegacloud.com}
-      - WHMCS_API_URL=${WHMCS_API_URL:-https://panel.zegacloud.com/includes/api.php}
-      - NEXT_PUBLIC_WHMCS_BASE_URL=${NEXT_PUBLIC_WHMCS_BASE_URL:-https://panel.zegacloud.com}
+      - WHMCS_BASE_URL=${WHMCS_BASE_URL:-}
+      - WHMCS_API_URL=${WHMCS_API_URL:-}
+      - NEXT_PUBLIC_WHMCS_BASE_URL=${NEXT_PUBLIC_WHMCS_BASE_URL:-}
       
       # cPanel Exim/Dovecot Mail Gateway Bridge
-      - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-mail.zegacloud.com}
+      - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-localhost}
       - CPANEL_SMTP_PORT=${CPANEL_SMTP_PORT:-465}
       - CPANEL_SMTP_SECURE=${CPANEL_SMTP_SECURE:-true}
       
       # WHMCS Addon Module Secret & Cron Scanner
       - WHMCS_INTERNAL_WEBHOOK_SECRET=${WHMCS_INTERNAL_WEBHOOK_SECRET:-super_secret_whmcs_webhook_token}
-      - CRON_SECRET=${CRON_SECRET:-zegacloud-cron-secret}
+      - CRON_SECRET=${CRON_SECRET:-production-cron-secret-token}
       - CRYPTO_VERIFICATION_MODE=${CRYPTO_VERIFICATION_MODE:-auto_scanner}
       - CRYPTO_MIN_CONFIRMATIONS=${CRYPTO_MIN_CONFIRMATIONS:-1}
-      - SESSION_SECRET=${SESSION_SECRET:-zegacloud_session_secret_production_key}
+      - SESSION_SECRET=${SESSION_SECRET:-session_secret_production_key}
     depends_on:
       mail-postgres:
         condition: service_healthy
@@ -103,7 +103,7 @@ services:
     image: dpage/pgadmin4:latest
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@zegacloud.com}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin_password_local}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:

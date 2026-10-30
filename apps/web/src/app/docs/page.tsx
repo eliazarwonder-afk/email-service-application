@@ -43,7 +43,7 @@ const ENDPOINTS: ApiEndpoint[] = [
     category: "System & Reliability",
     auth: "Public",
     description: "Lightweight zero-overhead health check utilized by Docker, Coolify Sentinel, and load balancers to ensure service uptime.",
-    sampleCurl: "curl -X GET https://mail.zegacloud.com/api/health",
+    sampleCurl: "curl -X GET https://mail.yourdomain.com/api/health",
     sampleFetch: `fetch('/api/health')\n  .then(r => r.json())\n  .then(console.log);`,
   },
   {
@@ -54,9 +54,9 @@ const ENDPOINTS: ApiEndpoint[] = [
     category: "Authentication",
     auth: "Public",
     description: "Authenticates organization users, applies brute-force rate-limiting, and issues an HttpOnly SameSite=Lax session cookie.",
-    sampleBody: JSON.stringify({ email: "owner@zegacloud.com", password: "password123" }, null, 2),
-    sampleCurl: `curl -X POST https://mail.zegacloud.com/api/auth/login \\\n  -H "Content-Type: application/json" \\\n  -d '{"email":"owner@zegacloud.com","password":"password123"}'`,
-    sampleFetch: `fetch('/api/auth/login', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ email: 'owner@zegacloud.com', password: 'password123' })\n}).then(r => r.json());`,
+    sampleBody: JSON.stringify({ email: "user@yourdomain.com", password: "password123" }, null, 2),
+    sampleCurl: `curl -X POST https://mail.yourdomain.com/api/auth/login \\\n  -H "Content-Type: application/json" \\\n  -d '{"email":"user@yourdomain.com","password":"password123"}'`,
+    sampleFetch: `fetch('/api/auth/login', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ email: 'user@yourdomain.com', password: 'password123' })\n}).then(r => r.json());`,
   },
   {
     id: "mail-send",
@@ -76,7 +76,7 @@ const ENDPOINTS: ApiEndpoint[] = [
       null,
       2
     ),
-    sampleCurl: `curl -X POST https://mail.zegacloud.com/api/mail \\\n  -H "Content-Type: application/json" \\\n  --cookie "zega_session=ses_YOUR_TOKEN" \\\n  -d '{"to":"recipient@company.com","subject":"Hello","content":"Meeting at 2pm"}'`,
+    sampleCurl: `curl -X POST https://mail.yourdomain.com/api/mail \\\n  -H "Content-Type: application/json" \\\n  --cookie "zega_session=ses_YOUR_TOKEN" \\\n  -d '{"to":"recipient@company.com","subject":"Hello","content":"Meeting at 2pm"}'`,
     sampleFetch: `fetch('/api/mail', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ to: 'recipient@company.com', subject: 'Hello', content: 'Meeting at 2pm' })\n});`,
   },
   {
@@ -87,7 +87,7 @@ const ENDPOINTS: ApiEndpoint[] = [
     category: "Mail Transport",
     auth: "Session Cookie",
     description: "Retrieves mailbox messages with RFC 3461 delivery status ticks (sent, delivered, bounced), attachment manifests, and custom folder classification.",
-    sampleCurl: `curl -X GET "https://mail.zegacloud.com/api/mail?folder=inbox" \\\n  --cookie "zega_session=ses_YOUR_TOKEN"`,
+    sampleCurl: `curl -X GET "https://mail.yourdomain.com/api/mail?folder=inbox" \\\n  --cookie "zega_session=ses_YOUR_TOKEN"`,
     sampleFetch: `fetch('/api/mail?folder=inbox').then(r => r.json());`,
   },
   {
@@ -107,7 +107,7 @@ const ENDPOINTS: ApiEndpoint[] = [
       null,
       2
     ),
-    sampleCurl: `curl -X POST https://mail.zegacloud.com/api/billing/checkout \\\n  -H "Content-Type: application/json" \\\n  --cookie "zega_session=ses_YOUR_TOKEN" \\\n  -d '{"planId":"growth","billingCycle":"monthly","paymentMethod":"crypto_usdt_trc20"}'`,
+    sampleCurl: `curl -X POST https://mail.yourdomain.com/api/billing/checkout \\\n  -H "Content-Type: application/json" \\\n  --cookie "zega_session=ses_YOUR_TOKEN" \\\n  -d '{"planId":"growth","billingCycle":"monthly","paymentMethod":"crypto_usdt_trc20"}'`,
     sampleFetch: `fetch('/api/billing/checkout', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ planId: 'growth', billingCycle: 'monthly', paymentMethod: 'crypto_usdt_trc20' })\n});`,
   },
   {
@@ -118,7 +118,7 @@ const ENDPOINTS: ApiEndpoint[] = [
     category: "Billing & Cryptocurrency",
     auth: "Session Cookie",
     description: "Lists all registered orders, associated invoices, and cryptocurrency settlement statuses.",
-    sampleCurl: `curl -X GET https://mail.zegacloud.com/api/billing/orders \\\n  --cookie "zega_session=ses_YOUR_TOKEN"`,
+    sampleCurl: `curl -X GET https://mail.yourdomain.com/api/billing/orders \\\n  --cookie "zega_session=ses_YOUR_TOKEN"`,
     sampleFetch: `fetch('/api/billing/orders').then(r => r.json());`,
   },
   {
@@ -129,8 +129,8 @@ const ENDPOINTS: ApiEndpoint[] = [
     category: "Billing & Cryptocurrency",
     auth: "Bearer / Cron Token",
     description: "Scans all pending cryptocurrency orders against live blockchain nodes (TronGrid, Blockstream, Cloudflare ETH, Solana Beta) and auto-activates confirmed services.",
-    sampleCurl: `curl -X GET https://mail.zegacloud.com/api/cron/crypto-scanner \\\n  -H "Authorization: Bearer zegacloud-cron-secret"`,
-    sampleFetch: `fetch('/api/cron/crypto-scanner', {\n  headers: { 'Authorization': 'Bearer zegacloud-cron-secret' }\n}).then(r => r.json());`,
+    sampleCurl: `curl -X GET https://mail.yourdomain.com/api/cron/crypto-scanner \\\n  -H "Authorization: Bearer your-cron-secret"`,
+    sampleFetch: `fetch('/api/cron/crypto-scanner', {\n  headers: { 'Authorization': 'Bearer your-cron-secret' }\n}).then(r => r.json());`,
   },
   {
     id: "whmcs-order-verify",
@@ -141,7 +141,7 @@ const ENDPOINTS: ApiEndpoint[] = [
     auth: "Portal Secret / HMAC",
     description: "Internal webhook called by the central client portal module or addon to immediately activate and provision an organization upon payment.",
     sampleBody: JSON.stringify({ orderId: "ord_init_002" }, null, 2),
-    sampleCurl: `curl -X POST https://mail.zegacloud.com/api/internal/v1/whmcs/order-verify \\\n  -H "Content-Type: application/json" \\\n  -H "x-zegabytez-whmcs-secret: super_secret_whmcs_webhook_token" \\\n  -d '{"orderId":"ord_init_002"}'`,
+    sampleCurl: `curl -X POST https://mail.yourdomain.com/api/internal/v1/whmcs/order-verify \\\n  -H "Content-Type: application/json" \\\n  -H "x-zegabytez-whmcs-secret: super_secret_whmcs_webhook_token" \\\n  -d '{"orderId":"ord_init_002"}'`,
     sampleFetch: `fetch('/api/internal/v1/whmcs/order-verify', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'x-zegabytez-whmcs-secret': 'super_secret_whmcs_webhook_token'\n  },\n  body: JSON.stringify({ orderId: 'ord_init_002' })\n});`,
   },
 ];

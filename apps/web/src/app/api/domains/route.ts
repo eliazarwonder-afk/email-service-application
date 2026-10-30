@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, error: domCheck.error }, { status: 400 });
       }
 
-      const type = action === "register" ? "zegacloud" : domainType;
+      const type = action === "register" ? "direct" : domainType;
       const domain = addDomain(orgId, domCheck.value, type);
 
       const dnsRecords = {
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
         dkim: {
           type: "TXT",
           host: "default._domainkey",
-          value: "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA32X+ZegaCloud2026DKIMKey...",
+          value: "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA32X+EnterpriseDKIMKey...",
         },
         dmarc: { type: "TXT", host: "_dmarc", value: "v=DMARC1; p=quarantine; sp=quarantine" },
       };

@@ -9,9 +9,9 @@ export async function GET() {
       description:
         "High-performance API for multi-tenant business email, cPanel Exim/Dovecot mail routing, multi-touch cold email campaigns, and automated cryptocurrency billing integration for WHMCS.",
       contact: {
-        name: "ZegaCloud Engineering",
-        url: "https://zegacloud.com",
-        email: "api-support@zegacloud.com",
+        name: "Support & Community",
+        url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        email: "support@example.com",
       },
     },
     servers: [

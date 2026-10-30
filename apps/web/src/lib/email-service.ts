@@ -9,7 +9,7 @@ export interface SendEmailResult {
 }
 
 export function getSmtpTransporter() {
-  const host = process.env.SMTP_HOST || "mail.zegacloud.com";
+  const host = process.env.SMTP_HOST || "localhost";
   const port = parseInt(process.env.SMTP_PORT || "465", 10);
   const secure = process.env.SMTP_SECURE === "true" || port === 465;
   const user = process.env.SMTP_USER || "";
@@ -41,8 +41,8 @@ export async function sendVerificationEmail(
   fullName: string,
   code: string
 ): Promise<SendEmailResult> {
-  const fromEmail = process.env.SMTP_FROM_EMAIL || "noreply@zegacloud.com";
-  const fromName = process.env.SMTP_FROM_NAME || "ZegaCloud Security & Verification";
+  const fromEmail = process.env.SMTP_FROM_EMAIL || "noreply@example.com";
+  const fromName = process.env.SMTP_FROM_NAME || "Mail Security & Verification";
 
   const transporter = getSmtpTransporter();
 
@@ -79,7 +79,7 @@ export async function sendVerificationEmail(
         <div class="container">
           <div class="header">
             <div class="brand">ZEGA<span>MAIL</span></div>
-            <p style="font-size: 13px; color: #6b7280; margin: 6px 0 0 0;">Business Email Infrastructure • A Product of ZegaCloud</p>
+            <p style="font-size: 13px; color: #6b7280; margin: 6px 0 0 0;">Business Email Infrastructure • Enterprise Business Email</p>
           </div>
           
           <h2 style="font-size: 18px; font-weight: 600; margin: 0 0 12px 0;">Verify your business email account</h2>
@@ -98,7 +98,7 @@ export async function sendVerificationEmail(
           </p>
           
           <div class="footer">
-            © 2026 ZegaCloud Global Infrastructure Ltd. All rights reserved.<br>
+            © 2026 Enterprise Mail Infrastructure. All rights reserved.<br>
             Enforced with 2048-bit DKIM, SPF & DMARC Security Protocols.
           </div>
         </div>
@@ -111,7 +111,7 @@ export async function sendVerificationEmail(
       from: `"${fromName}" <${fromEmail}>`,
       to: toEmail,
       subject: `${code} is your Zega Mail confirmation code`,
-      text: `Hello ${fullName},\n\nYour 6-digit confirmation code for Zega Mail is: ${code}\n\nThis code expires in 15 minutes.\n\nWarm regards,\nZegaCloud Security Team`,
+      text: `Hello ${fullName},\n\nYour 6-digit confirmation code for Zega Mail is: ${code}\n\nThis code expires in 15 minutes.\n\nWarm regards,\nSecurity & Verification Team`,
       html: htmlContent,
     });
 

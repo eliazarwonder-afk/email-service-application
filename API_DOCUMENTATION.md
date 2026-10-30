@@ -1,8 +1,8 @@
 # ZegaMail Developer Platform & REST API Specification
 **Version:** 2.1.0 (OpenAPI 3.1.0 Compliant)  
-**Base URL:** `https://mail.zegacloud.com` (or `http://localhost:3000` in development)  
-**Interactive Docs:** `https://mail.zegacloud.com/docs`  
-**OpenAPI JSON:** `https://mail.zegacloud.com/api/openapi.json`
+**Base URL:** `https://mail.yourdomain.com` (or `http://localhost:3000` in development)  
+**Interactive Docs:** `https://mail.yourdomain.com/docs`  
+**OpenAPI JSON:** `https://mail.yourdomain.com/api/openapi.json`
 
 ---
 
@@ -56,7 +56,7 @@ ZegaMail supports four authentication methods tailored to different integration 
 - Configured via `CRON_SECRET` in `.env`.
 - Example header:
   ```http
-  Authorization: Bearer zegacloud-cron-secret
+  Authorization: Bearer cron-secret-token
   ```
 
 ### 3. WHMCS Shared Webhook Secret (`x-zegabytez-whmcs-secret`)
@@ -128,15 +128,15 @@ Authenticates a user, verifies password hash with timing-safe comparison, and se
 * **Request Body:**
 ```json
 {
-  "email": "owner@zegacloud.com",
+  "email": "alex@acmedesign.co",
   "password": "password123"
 }
 ```
 * **Sample cURL:**
 ```bash
-curl -X POST https://mail.zegacloud.com/api/auth/login \
+curl -X POST https://mail.yourdomain.com/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"owner@zegacloud.com","password":"password123"}' \
+  -d '{"email":"alex@acmedesign.co","password":"password123"}' \
   -c cookies.txt
 ```
 
@@ -331,8 +331,8 @@ Scans all pending cryptocurrency orders with submitted transaction hashes agains
 * **Authentication:** `Authorization: Bearer <CRON_SECRET>` or `?token=<CRON_SECRET>`
 * **Sample cURL:**
 ```bash
-curl -X GET "https://mail.zegacloud.com/api/cron/crypto-scanner" \
-  -H "Authorization: Bearer zegacloud-cron-secret"
+curl -X GET "https://mail.yourdomain.com/api/cron/crypto-scanner" \
+  -H "Authorization: Bearer cron-secret-token"
 ```
 * **Sample Response (200 OK):**
 ```json
@@ -382,7 +382,7 @@ Webhook invoked by WHMCS modules upon order settlement.
 ```
 * **Sample cURL:**
 ```bash
-curl -X POST https://mail.zegacloud.com/api/internal/v1/whmcs/order-verify \
+curl -X POST https://mail.yourdomain.com/api/internal/v1/whmcs/order-verify \
   -H "Content-Type: application/json" \
   -H "x-zegabytez-whmcs-secret: super_secret_whmcs_webhook_token" \
   -d '{"orderId":"ord_94821"}'
@@ -413,4 +413,4 @@ pnpm test
 ```
 
 ### Interactive Test UI
-Visit `https://mail.zegacloud.com/docs` to test every endpoint interactively directly inside your browser with live response inspection and copyable code snippets.
+Visit `https://mail.yourdomain.com/docs` to test every endpoint interactively directly inside your browser with live response inspection and copyable code snippets.

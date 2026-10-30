@@ -398,7 +398,7 @@ function zegabytezmail_ClientArea(array $params)
                             Business Email for <?php echo $domain; ?>
                         </h3>
                         <p style="margin: 0; color: #94a3b8; font-size: 13px;">
-                            Managed via ZegaCloud Anycast Infrastructure • 100% Ad-Free NVMe Storage
+                            Managed via Anycast Cloud Infrastructure • 100% Ad-Free NVMe Storage
                         </p>
                     </div>
                     <div class="col-sm-4 text-right" style="margin-top: 10px;">

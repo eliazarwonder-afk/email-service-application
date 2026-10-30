@@ -41,7 +41,7 @@ export interface StoredDomain {
   id: string;
   orgId: string;
   domainName: string;
-  domainType: "existing" | "zegacloud" | "sandbox";
+  domainType: "existing" | "direct" | "sandbox";
   verified: boolean;
   mxStatus: "verified" | "pending";
   spfStatus: "verified" | "pending";
@@ -304,7 +304,7 @@ function getInitialDatabase(): DatabaseSchema {
       {
         id: ownerId,
         name: "Alex Carter",
-        email: "owner@zegacloud.com",
+        email: "admin@acmedesign.co",
         passwordHash: hashPassword("OwnerDemo#2026"),
         role: "owner",
         orgId: orgId,
@@ -322,7 +322,7 @@ function getInitialDatabase(): DatabaseSchema {
       {
         id: "usr_support_003",
         name: "Support Desk",
-        email: "support@zegacloud.com",
+        email: "support@acmedesign.co",
         passwordHash: hashPassword("SupportDemo#2026"),
         role: "member",
         orgId: orgId,
@@ -357,7 +357,7 @@ function getInitialDatabase(): DatabaseSchema {
         id: "dom_acme_002",
         orgId: orgId,
         domainName: "acmegroup.com",
-        domainType: "zegacloud",
+        domainType: "direct",
         verified: true,
         mxStatus: "verified",
         spfStatus: "verified",
@@ -455,12 +455,12 @@ function getInitialDatabase(): DatabaseSchema {
       {
         id: "msg_3",
         orgId: orgId,
-        from: "ZegaCloud DNS Automation",
-        fromEmail: "systems@zegacloud.com",
+        from: "DNS Automation",
+        fromEmail: "systems@acmedesign.co",
         toEmail: "admin@acmedesign.co",
         subject: "DNS Records Verified: DKIM, SPF and MX are Active",
         preview: "All DNS records for acmedesign.co have propagated successfully across the network…",
-        body: `Hello Alex,\n\nGreat news! The DNS health-check worker has confirmed full propagation for your business domain: acmedesign.co.\n\nVerification Summary:\n• MX: mail.zegamail.com (Priority 10) — Passed\n• SPF: v=spf1 include:spf.zegamail.com ~all — Passed\n• DKIM: 2048-bit RSA selector (default._domainkey) — Passed\n• DMARC: v=DMARC1; p=quarantine; sp=quarantine — Passed\n\nYour outgoing emails now have the highest possible reputation score and will deliver directly into recipient inboxes.\n\nZegaCloud Infrastructure Team`,
+        body: `Hello Alex,\n\nGreat news! The DNS health-check worker has confirmed full propagation for your business domain: acmedesign.co.\n\nVerification Summary:\n• MX: mail.acmedesign.co (Priority 10) — Passed\n• SPF: v=spf1 include:spf.acmedesign.co ~all — Passed\n• DKIM: 2048-bit RSA selector (default._domainkey) — Passed\n• DMARC: v=DMARC1; p=quarantine; sp=quarantine — Passed\n\nYour outgoing emails now have the highest possible reputation score and will deliver directly into recipient inboxes.\n\nInfrastructure Team`,
         date: "Oct 9",
         folder: "inbox",
         isRead: true,
@@ -749,7 +749,7 @@ function getInitialDatabase(): DatabaseSchema {
         orderNumber: "WHMCS-ORD-2026-8819",
         orgId: orgId,
         userId: ownerId,
-        clientEmail: "owner@zegacloud.com",
+        clientEmail: "alex@acmedesign.co",
         clientName: "Alex Carter",
         planId: "growth",
         planName: "ZegaMail Business Growth",
@@ -780,7 +780,7 @@ function getInitialDatabase(): DatabaseSchema {
         orderNumber: "WHMCS-ORD-2026-9482",
         orgId: orgId,
         userId: ownerId,
-        clientEmail: "owner@zegacloud.com",
+        clientEmail: "alex@acmedesign.co",
         clientName: "Alex Carter",
         planId: "pro",
         planName: "ZegaMail Pro Scale",
@@ -1252,7 +1252,7 @@ export function getDomains(orgId?: string): StoredDomain[] {
 export function addDomain(
   orgId: string,
   domainName: string,
-  domainType: "existing" | "zegacloud" | "sandbox" = "existing"
+  domainType: "existing" | "direct" | "sandbox" = "existing"
 ): StoredDomain {
   const db = readDb();
   if (!db.domains) db.domains = [];
@@ -1260,7 +1260,7 @@ export function addDomain(
   const existing = db.domains.find((d) => d.domainName.toLowerCase() === cleanName);
   if (existing) return existing;
 
-  const isZegaOrSandbox = domainType === "zegacloud" || domainType === "sandbox";
+  const isZegaOrSandbox = domainType === "direct" || domainType === "sandbox";
 
   const newDomain: StoredDomain = {
     id: "dom_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 6),

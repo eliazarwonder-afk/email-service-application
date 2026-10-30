@@ -1,12 +1,12 @@
-﻿import "./globals.css";
+import "./globals.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { CurrencyProvider } from "@/components/CurrencyProvider";
 
 export const metadata: Metadata = {
-  title: "Zega Mail — Professional Business Email & Client Outreach | A product of ZegaCloud",
+  title: "Zega Mail — Professional Business Email & Client Outreach",
   description:
-    "Ad-free, secure business email with verified delivery status ticks (Sent ✓ and Delivered ✓✓), outreach campaigns, multi-list contact management, and flat-rate pricing. A product of ZegaCloud.",
+    "Ad-free, secure business email with verified delivery status ticks (Sent ✓ and Delivered ✓✓), outreach campaigns, multi-list contact management, and flat-rate pricing.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/branding/logo-icon.png",

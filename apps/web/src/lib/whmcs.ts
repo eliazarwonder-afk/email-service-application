@@ -1,5 +1,5 @@
 /**
- * WHMCS API Integration Client for ZegaMail / ZegaCloud
+ * WHMCS API Integration Client for Webmail
  * 
  * Official WHMCS API Reference: https://developers.whmcs.com/api/
  * 
@@ -7,7 +7,7 @@
  * - Domain WHOIS & Availability Check (`DomainWhois`)
  * - TLD Pricing Matrix (`GetTLDList` / `GetDomainPricing`)
  * - Client Registration & Order Placement (`AddClient`, `AddOrder`)
- * - One-Click ZegaCloud Client Area SSO (`CreateSsoToken`)
+ * - One-Click Client Area SSO (`CreateSsoToken`)
  * - Recurring Invoices & Order Verification (`GetInvoices`, `GetOrders`)
  */
 
@@ -58,8 +58,9 @@ export interface WhmcsSsoResult {
 }
 
 export function getWhmcsConfig(): WhmcsConfig {
+  const base = process.env.WHMCS_BASE_URL || process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "";
   return {
-    apiUrl: process.env.WHMCS_API_URL || "https://panel.zegacloud.com/includes/api.php",
+    apiUrl: process.env.WHMCS_API_URL || (base ? `${base.replace(/\/+$/, "")}/includes/api.php` : ""),
     apiIdentifier: process.env.WHMCS_API_IDENTIFIER,
     apiSecret: process.env.WHMCS_API_SECRET,
     accessKey: process.env.WHMCS_API_ACCESS_KEY,
@@ -195,7 +196,7 @@ export async function createWhmcsOrder(params: WhmcsOrderParams): Promise<WhmcsO
 }
 
 /**
- * Generate a One-Click Single Sign-On (SSO) redirect token for ZegaCloud WHMCS Client Area.
+ * Generate a One-Click Single Sign-On (SSO) redirect token for Client Area Portal.
  * Allows client to jump directly into cPanel / WHMCS management with 1 click.
  */
 export async function createWhmcsSsoToken(clientId: string | number): Promise<WhmcsSsoResult> {
@@ -251,10 +252,10 @@ function handleWhmcsMock(action: string, params: Record<string, any>): any {
   }
 
   if (action === "CreateSsoToken") {
-    const base = process.env.WHMCS_BASE_URL || "https://panel.zegacloud.com";
+    const base = process.env.WHMCS_BASE_URL || process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "";
     return {
       result: "success",
-      redirect_url: `${base}/clientarea.php?sso_auth=sandbox_${Date.now()}`,
+      redirect_url: base ? `${base.replace(/\/+$/, "")}/clientarea.php?sso_auth=sandbox_${Date.now()}` : "/app",
     };
   }
 

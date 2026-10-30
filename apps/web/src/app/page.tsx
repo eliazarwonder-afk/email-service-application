@@ -23,6 +23,7 @@ import {
   Building,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
+import { getWhmcsCartUrl } from "@/lib/config";
 import { Footer } from "@/components/Footer";
 import { HeroDashboardPreview } from "@/components/HeroDashboardPreview";
 import { ClientSetupModal } from "@/components/ClientSetupModal";
@@ -49,8 +50,8 @@ export default function HomePage() {
   const getWhmcsPlanUrl = (plan: "starter" | "growth" | "pro") => {
     const pids = { starter: 1, growth: 2, pro: 3 };
     const cycle = billingCycle === "annual" ? "annually" : "monthly";
-    const whmcsBase = process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "https://panel.zegacloud.com";
-    return `${whmcsBase}/cart.php?a=add&pid=${pids[plan]}&billingcycle=${cycle}`;
+    const cartUrl = getWhmcsCartUrl({ pid: pids[plan], billingcycle: cycle });
+    return cartUrl !== "#" ? cartUrl : `/signup?plan=${plan}&cycle=${cycle}`;
   };
 
   // Calculated pricing tiers
@@ -549,7 +550,7 @@ export default function HomePage() {
                     <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Multi-Touch Cold Outreach Engine
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Instant Provisioning via ZegaCloud
+                    <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" /> Instant Cloud Provisioning
                   </li>
                 </ul>
               </div>

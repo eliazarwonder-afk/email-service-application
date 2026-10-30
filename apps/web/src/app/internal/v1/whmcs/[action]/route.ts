@@ -88,7 +88,7 @@ export async function POST(
       const now = Math.floor(Date.now() / 1000);
       const payload = {
         whmcsClientId,
-        email: email || "owner@zegacloud.com",
+        email: email || "admin@example.com",
         exp: now + 300,
       };
 

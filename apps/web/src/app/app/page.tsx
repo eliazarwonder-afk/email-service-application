@@ -19,6 +19,7 @@ import { DashboardModals } from "@/components/dashboard/DashboardModals";
 import { CampaignsWorkspace } from "@/components/campaigns/CampaignsWorkspace";
 import { FullComposeWorkspace } from "@/components/mail/FullComposeWorkspace";
 import { MailboxSkeletonLoader } from "@/components/mail/MailboxSkeletonLoader";
+import { getWhmcsUpgradeUrl } from "@/lib/config";
 
 export default function WebmailAppPage() {
   const router = useRouter();
@@ -41,8 +42,12 @@ export default function WebmailAppPage() {
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const handleOpenUpgradePortal = () => {
-    const whmcsBase = process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "https://panel.zegacloud.com";
-    window.open(`${whmcsBase}/upgrade.php`, "_blank", "noopener,noreferrer");
+    const url = getWhmcsUpgradeUrl();
+    if (url && url !== "#") {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      router.push("/pricing");
+    }
   };
 
   // Custom Folders & Templates

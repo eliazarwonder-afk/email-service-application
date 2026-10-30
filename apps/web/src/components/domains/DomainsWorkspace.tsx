@@ -277,11 +277,11 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
                     <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                       <span>{dom.domainName}</span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-                        {dom.domainType === "zegacloud" ? "ZegaCloud Direct" : "Custom Connected"}
+                        {dom.domainType === "direct" ? "Direct Provisioned" : "Custom Connected"}
                       </span>
                     </h2>
                     <p className="text-xs text-neutral-400 font-mono mt-0.5">
-                      Domain Record: #{dom.whmcsOrderId?.replace("WHMCS-", "ZCL-") || "ZCL-DOM-90214"} • DNS Cluster: ZegaCloud Global Anycast
+                      Domain Record: #{dom.whmcsOrderId?.replace("WHMCS-", "ZCL-") || "DOM-90214"} • DNS Cluster: Global Anycast
                     </p>
                   </div>
                 </div>
@@ -374,7 +374,7 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
               Search & Register Business Domains
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Instantly register business domains directly through ZegaCloud with automatic DNS configuration.
+              Instantly register business domains directly with automatic DNS configuration.
             </p>
           </div>
 
@@ -458,7 +458,7 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
               Connect Domain You Already Own
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Add any custom domain from your own registrar and route it to ZegaCloud mail infrastructure.
+              Add any custom domain from your own registrar and route it to mail infrastructure.
             </p>
           </div>
 
@@ -525,7 +525,7 @@ export function DomainsWorkspace({ initialDomains = [], onMailboxOpen }: Domains
                   type: "TXT",
                   host: "default._domainkey",
                   value:
-                    "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA32X+ZegaCloud2026DKIMKey...",
+                    "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA32X+EnterpriseDKIMKey...",
                   priority: "-",
                 },
                 {

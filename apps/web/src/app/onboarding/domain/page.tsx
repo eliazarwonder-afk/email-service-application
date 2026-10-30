@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { useCurrency } from "@/components/CurrencyProvider";
+import { getWhmcsCartUrl } from "@/lib/config";
 import {
   validateDomain,
   validateFullName,
@@ -54,10 +55,10 @@ export default function DomainOnboardingPage() {
   const [showOptionalProfile, setShowOptionalProfile] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
 
-  // Domain Path: "zegacloud" (Register New) | "existing" (Connect Own) | "sandbox" (Instant Test)
-  const [domainPath, setDomainPath] = useState<"zegacloud" | "existing" | "sandbox">("zegacloud");
+  // Domain Path: "direct" (Register New) | "existing" (Connect Own) | "sandbox" (Instant Test)
+  const [domainPath, setDomainPath] = useState<"direct" | "existing" | "sandbox">("direct");
 
-  // Search State for Path 1 (Register via ZegaCloud WHMCS)
+  // Search State for Path 1 (Register via WHMCS)
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchPrimary, setSearchPrimary] = useState<DomainSearchResult | null>(null);
@@ -167,9 +168,9 @@ export default function DomainOnboardingPage() {
     const domain = domCheck.value;
     const records = [
       { type: "MX", host: "@", value: `mail.${domain}`, priority: 10, status: "pending" },
-      { type: "TXT", host: "@", value: "v=spf1 include:spf.zegacloud.com ~all", status: "pending" },
+      { type: "TXT", host: "@", value: `v=spf1 include:${process.env.NEXT_PUBLIC_SPF_HOST || "spf." + domain} ~all`, status: "pending" },
       { type: "TXT", host: `default._domainkey.${domain}`, value: "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0...", status: "pending" },
-      { type: "CNAME", host: "webmail", value: "mail.zegacloud.com", status: "pending" },
+      { type: "CNAME", host: "webmail", value: `mail.${domain}`, status: "pending" },
     ];
     setExistingDnsRecords(records);
   };
@@ -361,9 +362,9 @@ export default function DomainOnboardingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             type="button"
-            onClick={() => setDomainPath("zegacloud")}
+            onClick={() => setDomainPath("direct")}
             className={`p-4 rounded-2xl border text-left transition-all ${
-              domainPath === "zegacloud"
+              domainPath === "direct"
                 ? "border-blue-600 bg-white dark:bg-[#161a25] ring-2 ring-blue-500/20 shadow-sm"
                 : "border-[#eaeaea] dark:border-[#202636] bg-white/70 dark:bg-[#12151e] hover:border-neutral-300 dark:hover:border-neutral-700"
             }`}
@@ -377,7 +378,7 @@ export default function DomainOnboardingPage() {
               </span>
             </div>
             <h3 className="text-xs font-bold text-[#121212] dark:text-white">
-              Register New via ZegaCloud
+              Register New Domain
             </h3>
             <p className="text-[11px] text-[#706f6c] dark:text-[#9ca3af] mt-1">
               Automated domain search & instant DNS provisioning with 1-click checkout.
@@ -434,7 +435,7 @@ export default function DomainOnboardingPage() {
         </div>
 
         {/* Tab 1 Content: WHMCS Domain Search */}
-        {domainPath === "zegacloud" && (
+        {domainPath === "direct" && (
           <div className="rounded-2xl border border-[#eaeaea] dark:border-[#202636] bg-white dark:bg-[#12151e] p-6 shadow-sm space-y-6">
             <div className="space-y-1">
               <h2 className="text-sm font-bold text-[#121212] dark:text-white flex items-center gap-2">
@@ -524,7 +525,7 @@ export default function DomainOnboardingPage() {
 
                   <p className="text-[11px] text-[#706f6c] dark:text-[#9ca3af]">
                     {searchPrimary.status === "available"
-                      ? "Ready for instant automated provisioning via ZegaCloud DNS."
+                      ? "Ready for instant automated provisioning via Cloud DNS."
                       : "This domain is already registered. Try an alternative extension below."}
                   </p>
                 </div>
@@ -543,7 +544,12 @@ export default function DomainOnboardingPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        window.location.href = `https://panel.zegacloud.com/cart.php?a=add&domain=register&query=${encodeURIComponent(searchPrimary.domain)}`;
+                        const cartUrl = getWhmcsCartUrl({ domain: searchPrimary.domain });
+                        if (cartUrl && cartUrl !== "#") {
+                          window.location.href = cartUrl;
+                        } else {
+                          router.push(`/login?domain=${encodeURIComponent(searchPrimary.domain)}`);
+                        }
                       }}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
                     >
@@ -585,7 +591,12 @@ export default function DomainOnboardingPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            window.location.href = `https://panel.zegacloud.com/cart.php?a=add&domain=register&query=${encodeURIComponent(sug.domain)}`;
+                            const cartUrl = getWhmcsCartUrl({ domain: sug.domain });
+                            if (cartUrl && cartUrl !== "#") {
+                              window.location.href = cartUrl;
+                            } else {
+                              router.push(`/login?domain=${encodeURIComponent(sug.domain)}`);
+                            }
                           }}
                           className="px-2.5 py-1 rounded bg-[#121212] dark:bg-white text-white dark:text-[#121212] text-[11px] font-semibold hover:opacity-90"
                         >

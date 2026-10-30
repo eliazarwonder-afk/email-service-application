@@ -16,13 +16,13 @@ services:
       - DATABASE_URL=postgresql://zegabytez:zegabytez_secure_pass@postgres:5432/zegabytez_mail
       - REDIS_URL=redis://redis:6379
       - NEXT_PUBLIC_APP_URL=${COOLIFY_FQDN:-http://localhost:3000}
-      - WHMCS_BASE_URL=${WHMCS_BASE_URL:-https://panel.zegacloud.com}
-      - WHMCS_API_URL=${WHMCS_API_URL:-https://panel.zegacloud.com/includes/api.php}
-      - NEXT_PUBLIC_WHMCS_BASE_URL=${NEXT_PUBLIC_WHMCS_BASE_URL:-https://panel.zegacloud.com}
-      - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-mail.zegacloud.com}
+      - WHMCS_BASE_URL=${WHMCS_BASE_URL:-}
+      - WHMCS_API_URL=${WHMCS_API_URL:-}
+      - NEXT_PUBLIC_WHMCS_BASE_URL=${NEXT_PUBLIC_WHMCS_BASE_URL:-}
+      - CPANEL_CLUSTER_HOST=${CPANEL_CLUSTER_HOST:-localhost}
       - CPANEL_SMTP_PORT=${CPANEL_SMTP_PORT:-465}
       - WHMCS_INTERNAL_WEBHOOK_SECRET=${WHMCS_INTERNAL_WEBHOOK_SECRET:-super_secret_whmcs_webhook_token}
-      - CRON_SECRET=${CRON_SECRET:-zegacloud-cron-secret}
+      - CRON_SECRET=${CRON_SECRET:-production-cron-secret-token}
       - CRYPTO_VERIFICATION_MODE=${CRYPTO_VERIFICATION_MODE:-auto_scanner}
     depends_on:
       postgres:

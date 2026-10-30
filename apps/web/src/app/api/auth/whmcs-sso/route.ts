@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const token = cookieStore.get("zega_session")?.value;
     const db = readDb();
 
-    let clientEmail = "owner@zegacloud.com";
+    let clientEmail = "alex@acmedesign.co";
     let clientId: string | number = 1049;
 
     if (token) {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       success: true,
       redirectUrl: ssoResult.redirectUrl,
       clientEmail,
-      message: "One-Click SSO session initialized for ZegaCloud Client Portal.",
+      message: "One-Click SSO session initialized for Client Portal.",
     });
   } catch (err: any) {
     console.error("WHMCS SSO error:", err);

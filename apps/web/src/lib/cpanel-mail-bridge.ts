@@ -44,7 +44,7 @@ export interface SendMailResult {
  * Uses cPanel server cluster defaults if individual mailbox pass is not provided.
  */
 export function getDefaultSmtpConfig(fromEmail: string, customPass?: string): SmtpConfig {
-  const clusterHost = process.env.CPANEL_CLUSTER_HOST || "mail.zegacloud.com";
+  const clusterHost = process.env.CPANEL_CLUSTER_HOST || "localhost";
   const clusterPort = parseInt(process.env.CPANEL_SMTP_PORT || "465", 10);
   const isSecure = clusterPort === 465;
 
@@ -54,7 +54,7 @@ export function getDefaultSmtpConfig(fromEmail: string, customPass?: string): Sm
     secure: isSecure,
     auth: {
       user: fromEmail,
-      pass: customPass || process.env.CPANEL_DEFAULT_MAIL_PASS || "ZegaCloud2026#Exim",
+      pass: customPass || process.env.CPANEL_DEFAULT_MAIL_PASS || "MailPass2026#Secret",
     },
     tls: {
       rejectUnauthorized: process.env.NODE_ENV === "production",

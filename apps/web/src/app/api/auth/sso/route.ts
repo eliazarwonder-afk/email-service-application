@@ -20,7 +20,7 @@ export async function GET(req: Request) {
       const fallbackUser = db.users[0] || {
         id: "usr_owner_001",
         name: "Alex Carter",
-        email: "owner@zegacloud.com",
+        email: "alex@acmedesign.co",
         role: "owner",
         orgId: "org_acme_001",
       };
@@ -65,11 +65,11 @@ export async function GET(req: Request) {
 
     const now = Math.floor(Date.now() / 1000);
     if (payload.exp && payload.exp < now) {
-      return NextResponse.redirect(`${appUrl}/login?error=SSO+token+expired.+Please+re-launch+from+ZegaCloud+Client+Area`);
+      return NextResponse.redirect(`${appUrl}/login?error=SSO+token+expired.+Please+re-launch+from+Client+Portal`);
     }
 
     const db = readDb();
-    const cleanEmail = (payload.email || "owner@zegacloud.com").toLowerCase().trim();
+    const cleanEmail = (payload.email || "alex@acmedesign.co").toLowerCase().trim();
     const clientId = payload.whmcsClientId ? `WHMCS-CL-${payload.whmcsClientId}` : "WHMCS-CL-40192";
 
     let user = db.users.find(
@@ -85,7 +85,7 @@ export async function GET(req: Request) {
       if (!org) {
         org = {
           id: orgId,
-          name: payload.name ? `${payload.name}'s Organization` : "ZegaCloud Business Mail",
+          name: payload.name ? `${payload.name}'s Organization` : "Business Mail Organization",
           ownerId: userId,
           plan: "growth",
           whmcsClientId: clientId,
@@ -119,7 +119,7 @@ export async function GET(req: Request) {
         id: "dom_" + crypto.randomUUID().slice(0, 8),
         orgId: user.orgId,
         domainName: domainName,
-        domainType: "zegacloud",
+        domainType: "direct",
         verified: true,
         mxStatus: "verified",
         spfStatus: "verified",

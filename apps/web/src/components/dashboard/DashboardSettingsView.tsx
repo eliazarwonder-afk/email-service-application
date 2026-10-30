@@ -22,6 +22,7 @@ import {
   Crown,
 } from "lucide-react";
 import { sanitizeText } from "@/lib/validation";
+import { getWhmcsInvoicesUrl, getWhmcsUpgradeUrl, MAIL_CLUSTER_HOST } from "@/lib/config";
 
 interface DashboardSettingsViewProps {
   settingsPerspective?: "admin" | "member";
@@ -419,7 +420,7 @@ export function DashboardSettingsView({
                 <span className="text-emerald-600 text-[10px]">Port 993 (SSL)</span>
               </div>
               <div className="text-[11px] text-slate-600 dark:text-slate-300">
-                Server: <span className="font-bold text-slate-900 dark:text-white">mail.zegacloud.com</span>
+                Server: <span className="font-bold text-slate-900 dark:text-white">{MAIL_CLUSTER_HOST}</span>
               </div>
               <div className="text-[11px] text-slate-600 dark:text-slate-300">
                 Username: <span className="font-bold text-slate-900 dark:text-white">{mailboxEmail}</span>
@@ -436,7 +437,7 @@ export function DashboardSettingsView({
                 <span className="text-emerald-600 text-[10px]">Port 465 (SSL)</span>
               </div>
               <div className="text-[11px] text-slate-600 dark:text-slate-300">
-                Server: <span className="font-bold text-slate-900 dark:text-white">mail.zegacloud.com</span>
+                Server: <span className="font-bold text-slate-900 dark:text-white">{MAIL_CLUSTER_HOST}</span>
               </div>
               <div className="text-[11px] text-slate-600 dark:text-slate-300">
                 Username: <span className="font-bold text-slate-900 dark:text-white">{mailboxEmail}</span>
@@ -574,17 +575,17 @@ export function DashboardSettingsView({
                   <span>Plan Invoices &amp; Client Portal Subscription</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Account subscriptions, domain additions, and receipts are managed via the ZegaCloud Client Portal.
+                  Account subscriptions, domain additions, and receipts are managed via the Client Portal.
                 </p>
               </div>
 
               <a
-                href="https://panel.zegacloud.com/clientarea.php?action=invoices"
+                href={getWhmcsInvoicesUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-semibold shadow-xs transition-all self-start sm:self-auto"
               >
-                <span>Open ZegaCloud Billing &amp; Invoices</span>
+                <span>Open Billing &amp; Invoices</span>
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
             </div>
@@ -598,7 +599,7 @@ export function DashboardSettingsView({
                 <span className="text-slate-400 ml-2">• Flat Domain Rate • Verified Inbox Delivery</span>
               </div>
               <a
-                href="https://panel.zegacloud.com/upgrade.php"
+                href={getWhmcsUpgradeUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"

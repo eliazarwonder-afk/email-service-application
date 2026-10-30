@@ -136,7 +136,7 @@ export default function LoginPage() {
 
   const handleWhmcsSSO = async () => {
     setIsLoading(true);
-    setSuccessMessage("Connecting to ZegaCloud Client Area SSO…");
+    setSuccessMessage("Connecting to Client Portal SSO…");
 
     try {
       const res = await fetch("/api/auth/whmcs-sso", {
@@ -165,7 +165,7 @@ export default function LoginPage() {
           <div className="text-center space-y-3 flex flex-col items-center">
             <ZegaLogo variant="full" className="mx-auto" />
             <p className="text-xs text-[#706f6c] dark:text-[#9ca3af]">
-              Professional Business Email • A Product of ZegaCloud
+              Professional Business Email • Enterprise Mail Platform
             </p>
           </div>
 
@@ -322,12 +322,12 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-xs">
                 <span className="bg-white dark:bg-[#12151e] px-2 text-[#706f6c] dark:text-[#9ca3af]">
-                  ZegaCloud Master Account
+                  Client Portal Account
                 </span>
               </div>
             </div>
 
-            {/* ZegaCloud One-Click Client SSO */}
+            {/* One-Click Client SSO */}
             <div>
               <button
                 type="button"
@@ -336,7 +336,7 @@ export default function LoginPage() {
                 className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/50 px-4 py-2.5 text-xs font-semibold text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors shadow-sm cursor-pointer"
               >
                 <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Sign In with ZegaCloud Account</span>
+                <span>Sign In with Client Portal Account</span>
               </button>
             </div>
           </div>

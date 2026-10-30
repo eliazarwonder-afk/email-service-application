@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import Link from "next/link";
 import { Shield, CheckCircle2 } from "lucide-react";
 import { ZegaLogo } from "./ZegaLogo";
@@ -175,7 +175,7 @@ export function Footer({ onOpenClientSetup }: FooterProps) {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-6 border-t border-[#eaeaea] dark:border-[#202636] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8d8c89]">
-          <p>© 2026 Zegabytez Limited. All rights reserved. Zega Mail is an official product of ZegaCloud.</p>
+          <p>© 2026 ZegaMail. All rights reserved. Open-source enterprise business mail infrastructure.</p>
           <div className="flex items-center gap-4">
             <span className="hover:text-[#121212] dark:hover:text-white cursor-pointer">Privacy Policy</span>
             <span>•</span>
