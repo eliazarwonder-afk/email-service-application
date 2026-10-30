@@ -58,8 +58,9 @@ export default function WebmailAppPage() {
   const [isDemoMode, setIsDemoMode] = useState<boolean>(true);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
-  // Messages State
+  // Messages & Contacts State
   const [messages, setMessages] = useState<EmailMessage[]>([]);
+  const [contacts, setContacts] = useState<any[]>([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   // Compose State
@@ -172,6 +173,7 @@ export default function WebmailAppPage() {
         if (data.folders) setCustomFolders(data.folders);
         if (data.templates) setTemplates(data.templates);
         if (data.billingOrders) setBillingOrders(data.billingOrders);
+        if (data.contacts) setContacts(data.contacts);
       }
     } catch (err) {
       console.error("Dashboard bootstrap error", err);
@@ -190,6 +192,14 @@ export default function WebmailAppPage() {
     } catch (e) {}
   };
 
+  const loadContacts = async () => {
+    try {
+      const res = await fetch("/api/contacts");
+      const data = await res.json();
+      if (data.success && data.contacts) setContacts(data.contacts);
+    } catch (e) {}
+  };
+
   const loadSession = loadDashboardBootstrap;
   const loadMessages = async () => {
     try {
@@ -200,6 +210,10 @@ export default function WebmailAppPage() {
   };
   const loadFolders = async () => {};
   const loadTemplates = async () => {};
+
+  useEffect(() => {
+    loadContacts();
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -305,14 +319,23 @@ export default function WebmailAppPage() {
     router.push("/login");
   };
 
-  const handleSwitchDemoPersona = async (email: string, pass: string) => {
-    await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password: pass }),
-    });
-    await loadSession();
-    await loadMessages();
+  const handleOpenCompose = (to = "", subject = "", body = "") => {
+    setComposeTo(to);
+    setComposeSubject(subject);
+    setComposeBody(body);
+    setIsComposeOpen(true);
+  };
+
+  const handleSelectFolder = (folder: string) => {
+    setSelectedFolder(folder);
+    setActiveTab("mail");
+    setMobileMailView("list");
+  };
+
+  const handleSelectMessage = (id: string) => {
+    setSelectedMessageId(id);
+    setActiveTab("mail");
+    setMobileMailView("message");
   };
 
   const handleGenerateAi = () => {
@@ -467,39 +490,17 @@ export default function WebmailAppPage() {
             <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
             <span className="font-semibold">Interactive Demo Mode:</span>
             <span>
-              Previewing workspace as <strong>{currentUser?.name || "Alex Carter"}</strong> ({currentUser?.email || "sales@acmedesign.co"})
+              Previewing live mailbox workspace (<strong>{currentUser?.email || "alex@acmedesign.co"}</strong>)
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-blue-700 dark:text-blue-300 hidden sm:inline">Switch Persona:</span>
-            <button
-              type="button"
-              onClick={() => handleSwitchDemoPersona("owner@zegacloud.com", "OwnerDemo#2026")}
-              className="px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 text-[10px] font-semibold hover:bg-blue-100 dark:hover:bg-blue-900"
-            >
-              Owner
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSwitchDemoPersona("sales@acmedesign.co", "SalesDemo#2026")}
-              className="px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 text-[10px] font-semibold hover:bg-blue-100 dark:hover:bg-blue-900"
-            >
-              Sales
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSwitchDemoPersona("support@zegacloud.com", "SupportDemo#2026")}
-              className="px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 text-[10px] font-semibold hover:bg-blue-100 dark:hover:bg-blue-900"
-            >
-              Support
-            </button>
             <button
               type="button"
               onClick={() => handleOpenUpgradePortal()}
-              className="ml-2 inline-flex items-center gap-1 rounded-lg bg-blue-600 text-white px-2.5 py-0.5 font-semibold text-[11px] hover:bg-blue-700 shadow-xs"
+              className="inline-flex items-center gap-1 rounded-lg bg-blue-600 text-white px-2.5 py-1 font-semibold text-[11px] hover:bg-blue-700 shadow-xs cursor-pointer"
             >
-              <span>Get Real Account</span>
+              <span>Get Your Domain Email</span>
               <ArrowRight className="h-3 w-3" />
             </button>
           </div>
@@ -515,10 +516,15 @@ export default function WebmailAppPage() {
         currentDomain={currentDomain}
         currentUser={currentUser}
         currentOrg={currentOrg}
+        messages={messages}
+        contacts={contacts}
+        onOpenCompose={() => handleOpenCompose()}
+        onComposeTo={(toEmail) => handleOpenCompose(toEmail)}
+        onSelectFolder={handleSelectFolder}
+        onSelectMessage={handleSelectMessage}
         onOpenClientModal={() => setIsClientModalOpen(true)}
         onOpenUpgradeModal={() => handleOpenUpgradePortal()}
         onLogout={handleLogout}
-        onSwitchPersona={handleSwitchDemoPersona}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />

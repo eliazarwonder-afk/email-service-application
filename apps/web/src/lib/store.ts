@@ -293,6 +293,15 @@ function getInitialDatabase(): DatabaseSchema {
   return {
     users: [
       {
+        id: "usr_alex_001",
+        name: "Alex Carter",
+        email: "alex@acmedesign.co",
+        passwordHash: hashPassword("SalesDemo#2026"),
+        role: "owner",
+        orgId: orgId,
+        createdAt: new Date().toISOString(),
+      },
+      {
         id: ownerId,
         name: "Alex Carter",
         email: "owner@zegacloud.com",

@@ -476,36 +476,22 @@ export function DashboardModals({
                 </div>
               </FormField>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Role &amp; Permission
-                  </label>
-                  <select
-                    value={newMemberRole}
-                    onChange={(e) => setNewMemberRole(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
-                  >
-                    <option value="Member">Member</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Billing">Billing Officer</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Dedicated Quota
-                  </label>
-                  <select
-                    value={newMemberQuotaMb}
-                    onChange={(e) => setNewMemberQuotaMb(Number(e.target.value))}
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
-                  >
-                    <option value={5000}>5.0 GB Quota</option>
-                    <option value={10000}>10.0 GB Quota</option>
-                    <option value={25000}>25.0 GB Quota</option>
-                  </select>
-                </div>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Dedicated Storage Quota
+                </label>
+                <select
+                  value={newMemberQuotaMb}
+                  onChange={(e) => setNewMemberQuotaMb(Number(e.target.value))}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                >
+                  <option value={5000}>5.0 GB Quota</option>
+                  <option value={10000}>10.0 GB Quota</option>
+                  <option value={25000}>25.0 GB Quota</option>
+                </select>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Each mailbox receives dedicated credentials, IMAP/SMTP access, and custom folders.
+                </p>
               </div>
 
               <div className="pt-2 flex justify-end gap-2">

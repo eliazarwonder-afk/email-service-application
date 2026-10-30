@@ -155,16 +155,9 @@ export function DashboardSettingsView({
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span>Mailbox Settings</span>
-            {isAdmin ? (
-              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
-                <Crown className="h-3 w-3" />
-                Administrator
-              </span>
-            ) : (
-              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-900">
-                Mailbox User
-              </span>
-            )}
+            <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-900">
+              Personal &amp; Domain Config
+            </span>
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Configure your personal mailbox profile, auto-responders, email signature, and mobile client setup.
@@ -515,112 +508,106 @@ export function DashboardSettingsView({
           </div>
         </div>
 
-        {/* CARD 5: PRIVILEGED CONTROLS (ONLY DISPLAYED IF MAILBOX HAS ADMIN PRIVILEGES) */}
-        {isAdmin ? (
-          <div className="space-y-6 pt-2">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-              <Crown className="h-3.5 w-3.5 text-amber-500" />
-              <span>Domain Administrator Privileged Controls</span>
-            </div>
+        {/* CARD 5: DOMAIN & SUBSCRIPTION SERVICES */}
+        <div className="space-y-6 pt-2">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+            <Globe className="h-3.5 w-3.5 text-blue-500" />
+            <span>Domain &amp; Subscription Controls</span>
+          </div>
 
-            {/* Catch-All Routing */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1017] p-5 sm:p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-3">
-                <div>
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-blue-600" />
-                    <span>Domain Catch-All Routing ({domainName})</span>
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Forward incoming emails sent to non-existent addresses on your domain to a designated inbox.
-                  </p>
-                </div>
+          {/* Catch-All Routing */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1017] p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-blue-600" />
+                  <span>Domain Catch-All Routing ({domainName})</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Forward incoming emails sent to non-existent addresses on your domain to a designated inbox.
+                </p>
+              </div>
 
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={catchAllEnabled}
-                    onChange={(e) => setCatchAllEnabled(e.target.checked)}
-                    className="sr-only"
-                  />
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={catchAllEnabled}
+                  onChange={(e) => setCatchAllEnabled(e.target.checked)}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-9 h-5 rounded-full transition-colors ${
+                    catchAllEnabled ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-700"
+                  }`}
+                >
                   <div
-                    className={`w-9 h-5 rounded-full transition-colors ${
-                      catchAllEnabled ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-700"
+                    className={`w-4 h-4 rounded-full bg-white transition-transform mt-0.5 ${
+                      catchAllEnabled ? "translate-x-4" : "translate-x-0.5"
                     }`}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full bg-white transition-transform mt-0.5 ${
-                        catchAllEnabled ? "translate-x-4" : "translate-x-0.5"
-                      }`}
-                    />
-                  </div>
-                </label>
-              </div>
-
-              {catchAllEnabled && (
-                <div className="space-y-1 text-xs">
-                  <label className="font-semibold text-slate-700 dark:text-slate-300">
-                    Forward Unmatched Messages To:
-                  </label>
-                  <input
-                    type="email"
-                    value={catchAllForwardEmail}
-                    onChange={(e) => setCatchAllForwardEmail(e.target.value)}
-                    placeholder={`admin@${domainName}`}
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono"
                   />
                 </div>
-              )}
+              </label>
             </div>
 
-            {/* Centralized Billing & Plan Subscription */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1017] p-5 sm:p-6 shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <CreditCard className="h-4 w-4 text-blue-600" />
-                    <span>Plan Invoices &amp; Client Portal Subscription</span>
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Account subscriptions, domain additions, and receipts are managed via the ZegaCloud Client Portal.
-                  </p>
-                </div>
+            {catchAllEnabled && (
+              <div className="space-y-1 text-xs">
+                <label className="font-semibold text-slate-700 dark:text-slate-300">
+                  Forward Unmatched Messages To:
+                </label>
+                <input
+                  type="email"
+                  value={catchAllForwardEmail}
+                  onChange={(e) => setCatchAllForwardEmail(e.target.value)}
+                  placeholder={`admin@${domainName}`}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono"
+                />
+              </div>
+            )}
+          </div>
 
-                <a
-                  href="https://billing.zegacloud.com/clientarea.php?action=invoices"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-semibold shadow-xs transition-all self-start sm:self-auto"
-                >
-                  <span>Open ZegaCloud Billing &amp; Invoices</span>
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
+          {/* Centralized Billing & Plan Subscription */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1017] p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-blue-600" />
+                  <span>Plan Invoices &amp; Client Portal Subscription</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Account subscriptions, domain additions, and receipts are managed via the ZegaCloud Client Portal.
+                </p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                <div>
-                  <span className="font-semibold text-slate-900 dark:text-white">Active Plan: </span>
-                  <span className="font-bold text-emerald-600 uppercase">
-                    {currentOrg?.plan || "GROWTH"}
-                  </span>
-                  <span className="text-slate-400 ml-2">• Flat Domain Rate • Verified Inbox Delivery</span>
-                </div>
-                <a
-                  href="https://billing.zegacloud.com/upgrade.php"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
-                >
-                  Manage Upgrades →
-                </a>
+              <a
+                href="https://billing.zegacloud.com/clientarea.php?action=invoices"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-semibold shadow-xs transition-all self-start sm:self-auto"
+              >
+                <span>Open ZegaCloud Billing &amp; Invoices</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div>
+                <span className="font-semibold text-slate-900 dark:text-white">Active Plan: </span>
+                <span className="font-bold text-emerald-600 uppercase">
+                  {currentOrg?.plan || "GROWTH"}
+                </span>
+                <span className="text-slate-400 ml-2">• Flat Domain Rate • Verified Inbox Delivery</span>
               </div>
+              <a
+                href="https://billing.zegacloud.com/upgrade.php"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+              >
+                Manage Upgrades →
+              </a>
             </div>
           </div>
-        ) : (
-          <div className="p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400">
-            Domain routing, storage upgrades, and billing are centrally controlled by your organization administrator via the ZegaCloud Master Portal.
-          </div>
-        )}
+        </div>
       </div>
     </main>
   );

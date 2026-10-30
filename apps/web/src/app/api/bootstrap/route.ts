@@ -41,6 +41,8 @@ export async function GET() {
     const folders = getFolders(targetOrgId);
     const templates = getTemplates(targetOrgId);
     const billingOrders = db.orders.filter((o) => o.orgId === targetOrgId);
+    const contacts = (db.contacts || []).filter((c: any) => c.orgId === targetOrgId || c.orgId === "org_acme_001");
+    const contactLists = (db.contactLists || []).filter((l: any) => l.orgId === targetOrgId || l.orgId === "org_acme_001");
 
     return NextResponse.json({
       success: true,
@@ -61,6 +63,8 @@ export async function GET() {
       folders,
       templates,
       billingOrders,
+      contacts,
+      contactLists,
     });
   } catch (err: any) {
     console.error("Bootstrap error:", err);

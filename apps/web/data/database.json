@@ -1,6 +1,15 @@
 {
   "users": [
     {
+      "id": "usr_alex_001",
+      "name": "Alex Carter",
+      "email": "alex@acmedesign.co",
+      "passwordHash": "a67c604d686f72c6092a23980f7b7147ac44631d5d2ef355527d4a254beddb69",
+      "role": "owner",
+      "orgId": "org_acme_001",
+      "createdAt": "2026-10-11T15:39:21.099Z"
+    },
+    {
       "id": "usr_owner_001",
       "name": "Alex Carter",
       "email": "owner@zegacloud.com",

@@ -12,7 +12,7 @@ import {
   EyeOff,
   ShieldCheck,
   RefreshCw,
-  X,
+  Sparkles,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { ZegaLogo } from "@/components/ZegaLogo";
@@ -25,9 +25,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLaunching, setIsDemoLaunching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
 
   // Field validation states
   const [touchedEmail, setTouchedEmail] = useState(false);
@@ -53,39 +53,38 @@ export default function LoginPage() {
     }
   }, []);
 
-  const testAccounts = [
-    {
-      id: "owner",
-      title: "Business Owner",
-      email: "owner@zegacloud.com",
-      pass: "OwnerDemo#2026",
-      role: "Admin & Billing",
-      badge: "Full Org Access",
-    },
-    {
-      id: "sales",
-      title: "Sales Director",
-      email: "sales@acmedesign.co",
-      pass: "SalesDemo#2026",
-      role: "Client Outreach",
-      badge: "Delivery Ticks",
-    },
-    {
-      id: "support",
-      title: "Support Lead",
-      email: "support@zegacloud.com",
-      pass: "SupportDemo#2026",
-      role: "Team Mailbox",
-      badge: "Shared Inbox",
-    },
-  ];
-
-  const handleSelectDemoAccount = (account: typeof testAccounts[0]) => {
-    setSelectedPersona(account.id);
-    setEmail(account.email);
-    setPassword(account.pass);
+  const handleLaunchDemo = async () => {
+    setIsLoading(true);
+    setIsDemoLaunching(true);
     setErrorMessage("");
-    setSuccessMessage(`Loaded ${account.title} credentials. Click "Sign In" or "Launch Demo".`);
+    setSuccessMessage("Launching interactive demo workspace…");
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "alex@acmedesign.co", password: "SalesDemo#2026" }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        router.push("/app?demo=true");
+      } else {
+        // Fallback demo redirect
+        router.push("/app?demo=true");
+      }
+    } catch {
+      router.push("/app?demo=true");
+    }
+  };
+
+  const handleAutofillDemo = () => {
+    setEmail("alex@acmedesign.co");
+    setPassword("SalesDemo#2026");
+    setTouchedEmail(true);
+    setTouchedPassword(true);
+    setErrorMessage("");
+    setSuccessMessage('Loaded demo credentials (alex@acmedesign.co). Click "Sign In to Webmail" to continue.');
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -143,7 +142,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/whmcs-sso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email || "owner@zegacloud.com" }),
+        body: JSON.stringify({ email: email || "alex@acmedesign.co" }),
       });
       const data = await res.json();
       if (data.success && data.redirectUrl) {
@@ -170,42 +169,49 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Guided Interactive Demo Workflow Section */}
-          <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/40 p-4 space-y-3 shadow-sm">
+          {/* 1-Click Interactive Demo Card */}
+          <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 p-4 space-y-3 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-900 dark:text-blue-300">
-                <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span>Interactive Guided Demo</span>
+                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span>Interactive Live Demo</span>
               </div>
               <span className="text-[10px] bg-white dark:bg-[#161a25] text-blue-700 dark:text-blue-300 font-mono px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800">
-                1-Click Access
+                Instant 1-Click
               </span>
             </div>
 
-            <p className="text-[11px] text-blue-800 dark:text-blue-300 leading-snug">
-              Select a persona to test live delivery status ticks, outbound template studio, and automated domain DNS sync:
+            <p className="text-[11px] text-blue-800 dark:text-blue-300 leading-relaxed">
+              Explore the full webmail workspace, cold outreach campaigns, AI copy studio, contacts, lists, and mobile sync with preloaded sample data.
             </p>
 
-            <div className="grid grid-cols-3 gap-1.5">
-              {testAccounts.map((account) => (
-                <button
-                  key={account.id}
-                  type="button"
-                  onClick={() => handleSelectDemoAccount(account)}
-                  className={`p-2 rounded-xl text-left transition-all border text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                    selectedPersona === account.id
-                      ? "border-blue-600 bg-white dark:bg-[#181d28] shadow-sm font-semibold"
-                      : "border-blue-200 dark:border-blue-900 bg-white/70 dark:bg-[#12151e] hover:bg-white dark:hover:bg-[#161a25]"
-                  }`}
-                >
-                  <p className="text-[#121212] dark:text-white text-[11px] truncate">
-                    {account.title}
-                  </p>
-                  <p className="text-[10px] text-blue-600 dark:text-blue-400 truncate mt-0.5">
-                    {account.badge}
-                  </p>
-                </button>
-              ))}
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={handleLaunchDemo}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white text-xs font-semibold shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer disabled:opacity-50"
+            >
+              {isDemoLaunching ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  <span>Launching Demo Mailbox…</span>
+                </>
+              ) : (
+                <>
+                  <span>Launch Demo Mailbox (alex@acmedesign.co)</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </>
+              )}
+            </button>
+
+            <div className="text-center pt-0.5">
+              <button
+                type="button"
+                onClick={handleAutofillDemo}
+                className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                Or autofill credentials into form below
+              </button>
             </div>
           </div>
 
@@ -287,7 +293,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-3 top-2.5 text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white"
+                    className="absolute right-3 top-2.5 text-[#706f6c] dark:text-[#9ca3af] hover:text-[#121212] dark:hover:text-white cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -297,9 +303,9 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#121212] dark:bg-white px-4 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 disabled:opacity-50 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#121212] dark:bg-white px-4 py-2.5 text-xs font-semibold text-white dark:text-[#121212] hover:bg-neutral-800 dark:hover:bg-neutral-200 disabled:opacity-50 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 cursor-pointer"
               >
-                {isLoading ? (
+                {isLoading && !isDemoLaunching ? (
                   <span>Verifying credentials…</span>
                 ) : (
                   <>
@@ -327,7 +333,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleWhmcsSSO}
                 disabled={isLoading}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/50 px-4 py-2.5 text-xs font-semibold text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/50 px-4 py-2.5 text-xs font-semibold text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors shadow-sm cursor-pointer"
               >
                 <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Sign In with ZegaCloud Account</span>
