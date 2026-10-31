@@ -23,9 +23,12 @@ add_hook('AfterRegistrarRegistration', 1, function ($vars) {
     // Check if the client has an active ZegaMail service
     $clientId = !empty($vars['params']['userid']) ? (int)$vars['params']['userid'] : 0;
     
-    // Dispatch silent DNS configuration request to ZegaMail cPanel Zone Manager
-    $apiUrl = 'http://localhost:3000';
-    $secret = 'super_secret_whmcs_webhook_token';
+    // Retrieve configured API URL and Webhook Secret from Addon Module settings if available
+    $settingUrl = Capsule::table('tbladdonmodules')->where('module', 'zegabytezmail_addon')->where('setting', 'api_url')->value('value');
+    $settingSecret = Capsule::table('tbladdonmodules')->where('module', 'zegabytezmail_addon')->where('setting', 'api_secret')->value('value');
+
+    $apiUrl = !empty($settingUrl) ? rtrim($settingUrl, '/') : 'http://localhost:3000';
+    $secret = !empty($settingSecret) ? $settingSecret : 'super_secret_whmcs_webhook_token';
 
     $payload = array(
         'domain' => strtolower($domain),
