@@ -39,9 +39,14 @@ export default function PricingPage() {
   const growthPrice = formatPlanPrice("growth", currency, billingCycle === "annual");
   const proPrice = formatPlanPrice("pro", currency, billingCycle === "annual");
 
-  const getWhmcsPlanUrl = (plan: "starter" | "growth" | "pro") => {
-    const pids = { starter: 1, growth: 2, pro: 3 };
-    const cycle = billingCycle === "annual" ? "annually" : "monthly";
+  const getWhmcsPlanUrl = (plan: "free" | "starter" | "growth" | "pro") => {
+    const pids: Record<string, number> = {
+      free: parseInt(process.env.NEXT_PUBLIC_WHMCS_FREE_PID || "1", 10),
+      starter: 1,
+      growth: 2,
+      pro: 3,
+    };
+    const cycle = plan === "free" ? "free" : (billingCycle === "annual" ? "annually" : "monthly");
     const cartUrl = getWhmcsCartUrl({ pid: pids[plan], billingcycle: cycle });
     return cartUrl !== "#" ? cartUrl : `/signup?plan=${plan}&cycle=${cycle}`;
   };
@@ -200,12 +205,12 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <Link
-              href="/signup?plan=free"
+            <a
+              href={getWhmcsPlanUrl("free")}
               className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 py-2.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors block"
             >
               Claim Free Mailboxes
-            </Link>
+            </a>
           </div>
 
           {/* CARD 2: Starter Plan */}

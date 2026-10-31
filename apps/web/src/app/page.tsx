@@ -47,9 +47,14 @@ export default function HomePage() {
   // Billing cycle
   const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
 
-  const getWhmcsPlanUrl = (plan: "starter" | "growth" | "pro") => {
-    const pids = { starter: 1, growth: 2, pro: 3 };
-    const cycle = billingCycle === "annual" ? "annually" : "monthly";
+  const getWhmcsPlanUrl = (plan: "free" | "starter" | "growth" | "pro") => {
+    const pids: Record<string, number> = {
+      free: parseInt(process.env.NEXT_PUBLIC_WHMCS_FREE_PID || "1", 10),
+      starter: 1,
+      growth: 2,
+      pro: 3,
+    };
+    const cycle = plan === "free" ? "free" : (billingCycle === "annual" ? "annually" : "monthly");
     const cartUrl = getWhmcsCartUrl({ pid: pids[plan], billingcycle: cycle });
     return cartUrl !== "#" ? cartUrl : `/signup?plan=${plan}&cycle=${cycle}`;
   };
@@ -448,12 +453,12 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <Link
-                href="/signup?plan=free"
+              <a
+                href={getWhmcsPlanUrl("free")}
                 className="mt-8 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-center font-semibold text-xs text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors block"
               >
                 Claim Free Mailboxes
-              </Link>
+              </a>
             </div>
 
             {/* CARD 2: Starter Plan */}

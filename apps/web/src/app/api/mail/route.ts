@@ -86,6 +86,17 @@ export async function POST(req: Request) {
       })),
     });
 
+    if (!sendResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: sendResult.error || "Outbound SMTP server rejected the message.",
+          mtaStatus: sendResult.mtaStatus,
+        },
+        { status: 502 }
+      );
+    }
+
     const newMessage: StoredMessage = {
       id: "msg_" + crypto.randomUUID().slice(0, 8),
       orgId: orgId,

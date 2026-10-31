@@ -90,13 +90,23 @@ export async function POST(req: Request) {
       );
     }
 
-    // Call cPanel UAPI client (or demo mock if in demo mode / credentials missing)
+    // Call cPanel UAPI client
     const provisionResult = await createCpanelMailbox({
       emailPrefix: cleanPrefix,
       domain: cleanDomain,
       password: password || `ZegaMail_${Date.now()}#2026`,
       quotaMb,
     });
+
+    if (!provisionResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: provisionResult.error || `Failed to provision mailbox ${fullEmail} on server.`,
+        },
+        { status: 502 }
+      );
+    }
 
     const newMailbox: StoredMailbox = {
       id: "mbx_" + Date.now().toString(36),

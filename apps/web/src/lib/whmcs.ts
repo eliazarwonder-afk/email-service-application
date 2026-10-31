@@ -57,6 +57,17 @@ export interface WhmcsSsoResult {
   error?: string;
 }
 
+export interface WhmcsProductItem {
+  pid: number;
+  gid?: number;
+  type?: string;
+  name: string;
+  description: string;
+  paytype?: string;
+  isFree: boolean;
+  pricing: Record<string, { monthly?: string; annually?: string; [cycle: string]: any }>;
+}
+
 export function getWhmcsConfig(): WhmcsConfig {
   const base = process.env.WHMCS_BASE_URL || process.env.NEXT_PUBLIC_WHMCS_BASE_URL || "";
   return {
@@ -75,8 +86,8 @@ export function getWhmcsConfig(): WhmcsConfig {
 export async function callWhmcsApi(action: string, params: Record<string, any> = {}): Promise<any> {
   const config = getWhmcsConfig();
 
-  // If WHMCS credentials are not provided, return graceful mock response (Sandbox / Demo Mode)
-  if (!config.apiIdentifier && !config.username) {
+  // If WHMCS API URL is not set or credentials not provided in dev/offline
+  if (!config.apiUrl || (!config.apiIdentifier && !config.username)) {
     return handleWhmcsMock(action, params);
   }
 
@@ -106,15 +117,101 @@ export async function callWhmcsApi(action: string, params: Record<string, any> =
         "User-Agent": "ZegaMail-WhmcsBridge/2.0",
       },
       body: postData.toString(),
+      cache: "no-store",
     });
+
+    if (!res.ok) {
+      throw new Error(`WHMCS API HTTP ${res.status}: ${res.statusText}`);
+    }
 
     const data = await res.json();
     return data;
   } catch (err: any) {
-    console.error(`WHMCS API error for action ${action}:`, err);
-    // Graceful fallback to sandbox simulation
-    return handleWhmcsMock(action, params);
+    console.error(`WHMCS API error for action ${action}:`, err.message);
+    if (!config.apiIdentifier && !config.username) {
+      return handleWhmcsMock(action, params);
+    }
+    return { result: "error", message: err.message };
   }
+}
+
+/**
+ * Fetch live products and pricing tiers from WHMCS catalog.
+ */
+export async function getWhmcsProducts(): Promise<{
+  success: boolean;
+  fromWhmcs: boolean;
+  products: WhmcsProductItem[];
+  error?: string;
+}> {
+  const config = getWhmcsConfig();
+
+  if (config.apiUrl && (config.apiIdentifier || config.username)) {
+    try {
+      const res = await callWhmcsApi("GetProducts", {
+        // Can be filtered by module: "zegabytezmail"
+      });
+
+      if (res && res.result === "success" && res.products && Array.isArray(res.products.product)) {
+        const prods: WhmcsProductItem[] = res.products.product.map((p: any) => ({
+          pid: parseInt(p.pid || p.id, 10),
+          gid: parseInt(p.gid, 10),
+          type: p.type || "other",
+          name: p.name,
+          description: p.description || "",
+          paytype: p.paytype || "recurring",
+          isFree: p.paytype === "free" || p.name?.toLowerCase().includes("free"),
+          pricing: p.pricing || {},
+        }));
+
+        return {
+          success: true,
+          fromWhmcs: true,
+          products: prods,
+        };
+      }
+    } catch (err: any) {
+      console.warn("WHMCS GetProducts error:", err.message);
+    }
+  }
+
+  // Baseline email hosting product tiers if WHMCS API is not yet populated
+  return {
+    success: true,
+    fromWhmcs: false,
+    products: [
+      {
+        pid: 1,
+        name: "Starter Business Mail",
+        description: "5 Mailboxes • 10 GB Storage • Custom Domain",
+        isFree: false,
+        pricing: {
+          USD: { monthly: "3.90", annually: "37.44" },
+          NGN: { monthly: "1500.00", annually: "14400.00" },
+        },
+      },
+      {
+        pid: 2,
+        name: "Growth Agency Mail",
+        description: "15 Mailboxes • 50 GB Storage • Outreach Engine",
+        isFree: false,
+        pricing: {
+          USD: { monthly: "9.90", annually: "95.04" },
+          NGN: { monthly: "4500.00", annually: "43200.00" },
+        },
+      },
+      {
+        pid: 3,
+        name: "Enterprise Pro Mail",
+        description: "30 Mailboxes • 100 GB Storage • Multi-Domain Anycast",
+        isFree: false,
+        pricing: {
+          USD: { monthly: "24.90", annually: "239.04" },
+          NGN: { monthly: "12000.00", annually: "115200.00" },
+        },
+      },
+    ],
+  };
 }
 
 /**

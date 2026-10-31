@@ -111,16 +111,23 @@ export async function sendViaCPanelExim(options: SendMailOptions): Promise<SendM
       mtaStatus: info.response || "250 OK id=1tZCL-0004x8-26 Message accepted for delivery",
     };
   } catch (err: any) {
-    console.warn(`[cPanel Exim Gateway] SMTP relay notice (${smtpConfig.host}:${smtpConfig.port}): ${err.message}.`);
-    
-    // In local dev / sandbox mode without live cPanel Exim reachability, return safe simulation
+    console.error(`[cPanel Exim Gateway] SMTP relay failed (${smtpConfig.host}:${smtpConfig.port}): ${err.message}`);
+    if (process.env.NODE_ENV === "production" || process.env.SMTP_HOST || process.env.CPANEL_CLUSTER_HOST !== "localhost") {
+      return {
+        success: false,
+        deliveryStatus: "failed",
+        mtaStatus: `MTA Relay Error: ${err.message}`,
+        error: `SMTP server ${smtpConfig.host}:${smtpConfig.port} failed: ${err.message}. Please verify SMTP credentials.`,
+      };
+    }
+    // Local offline dev fallback only
     const simulatedMsgId = `<zega_${Date.now()}_${Math.random().toString(36).substring(2, 8)}@${smtpConfig.host}>`;
     return {
       success: true,
       messageId: simulatedMsgId,
-      response: `250 OK id=1tSIM-${Date.now().toString(36)} (Simulated via Anycast MTA)`,
+      response: `250 OK id=1tSIM-${Date.now().toString(36)} (Local Sandbox)`,
       deliveryStatus: "delivered",
-      mtaStatus: "250 OK Message accepted for delivery (Anycast Dovecot Spool)",
+      mtaStatus: "250 OK Message accepted for delivery (Local Sandbox)",
     };
   }
 }
